@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L08 Sorting — เว็บติวสอบ Final DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-sorting">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html" class="active">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญ Sorting <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#why">ทำไมต้องเรียงข้อมูล</a>
+    <a href="#basic">พื้นฐานที่ต้องรู้ก่อน</a>
+    <a href="#bubble">Bubble Sort</a>
+    <a href="#selection">Selection Sort</a>
+    <a href="#insertion">Insertion Sort</a>
+    <a href="#trio">เทียบ 3 ตัว intuitive</a>
+    <a href="#dnc">Divide &amp; Conquer คืออะไร</a>
+    <a href="#quick">Quick Sort</a>
+    <a href="#merge">Merge Sort</a>
+    <a href="#radix">Radix Sort</a>
+    <a href="#counting">Counting Sort</a>
+    <a href="#bucket">Bucket Sort</a>
+    <a href="#shell">Shell Sort</a>
+    <a href="#heapbst">Heap Sort &amp; BST Sort</a>
+    <a href="#summary">ตารางสรุป + แนวข้อสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">L08 · Sorting Primer</div>
+  <h1>Sorting — เรียงข้อมูลให้เป็นระเบียบ</h1>
+  <p class="lead">บทนี้เป็นบทที่<strong>ออกสอบแน่นอนทุกปี</strong> — รุ่นพี่เจอทั้ง "trace การเรียงทีละรอบพร้อมผลลัพธ์สุดท้าย"
+  (Bubble, Insertion, Selection, Quick) และ "เติมคำ 15 ข้อเรื่อง Sort/Big-O" เราจะเรียนจากง่ายไปยาก
+  พร้อมภาพไล่ทีละสเต็ปให้เห็นว่าตัวเลขวิ่งยังไง</p>
+  <div class="meta">
+    <span class="chip">⭐ ออกสอบ: trace Bubble / Insertion / Selection / Quick</span>
+    <span class="chip">⭐ เติมคำ: stability, Big-O</span>
+  </div>
+</section>
+
+<h2 id="why">🤔 ทำไมต้องเรียงข้อมูล (Reasons for Sorting)</h2>
+<p>ลองนึกภาพหนังสือในห้องสมุดที่วางเล่มสุ่ม ๆ — จะหาเล่มชื่อ "Zebra" ต้องไล่หาทุกชั้น แต่ถ้าเรียงตามตัวอักษรแล้ว
+เปิดตรงกลาง ดูว่า Z อยู่ครึ่งหลัง เปิดซ้ำไปเรื่อย ๆ ก็เจอในไม่กี่ครั้ง การเรียงลำดับจึงเป็น "การวางรากฐาน"
+ให้งานอื่นง่ายขึ้น 3 อย่าง (ตามสไลด์):</p>
+<ul>
+  <li><strong>ค้นหา (lookup/search) เร็วขึ้น</strong> — ข้อมูลเรียงแล้ว binary search ใช้ O(log n) แทนที่จะไล่หา O(n)</li>
+  <li><strong>รวมชุดข้อมูล (merge) ง่ายขึ้น</strong> — สองกองเรียงแล้ว ตักตัวเล็กสุดทีละกองมารวมได้ในเส้นเดียว</li>
+  <li><strong>ประมวลผลตามลำดับที่กำหนดได้</strong> — เช่น รายงานเรียงตามวันที่, จ่ายเงินตามลำดับความสำคัญ</li>
+</ul>
+
+<h2 id="basic">🧱 พื้นฐานที่ต้องรู้ก่อน (อ่านตรงนี้ให้ครบก่อน — ออกเติมคำบ่อย)</h2>
+
+<div class="box basic"><div class="box-title"><span class="em">📗</span>พื้นฐาน 1: Big-O ใน 2 นาที</div>
+<p>Big-O บอก "เวลาโตแบบไหน เมื่อข้อมูล (n) เยอะขึ้น" — เทียบกับการหาคนในห้อง:</p>
+<ul>
+  <li><strong>O(1)</strong> — ชี้หาเพื่อนที่นั่งที่โต๊ะ fix ไว้แล้ว 1 ครั้งจบ ไม่ว่าห้องจะมีกี่คน</li>
+  <li><strong>O(log n)</strong> — เล่นเกมทายเลข 1–1000 โดยถาม "มากกว่า 500 ไหม?" ตัดครึ่งทิ้งทีละรอบ → 1000 คนก็ใช้แค่ ~10 คำถาม</li>
+  <li><strong>O(n)</strong> — ไล่มองทุกคนในห้อง 1 รอบ คนเยอะขึ้นเท่าไร งานเยอะขึ้นเท่ากัน</li>
+  <li><strong>O(n²)</strong> — ทุกคนต้องจับมือกับทุกคน คนเป็น 2 เท่า จับมือเป็น 4 เท่า (10 คน=45 ครั้ง, 100 คน=4,950 ครั้ง!)</li>
+  <li><strong>O(n log n)</strong> — จุดคานงามของการ sort แบบเปรียบเทียบ (เดี๋ยวอธิบายว่าทำไมต่ำกว่านี้ไม่ได้)</li>
+</ul>
+<p>Best case = ดวงดีสุด (ข้อมูลดีไปหมด), Worst case = ดวงซวยสุด, Average case = เฉลี่ยทั่วไป</p></div>
+
+<div class="box basic"><div class="box-title"><span class="em">📗</span>พื้นฐาน 2: ศัพท์ 4 คำที่ข้อสอบชอบถาม</div>
+<ul>
+  <li><strong>Comparison-based sort</strong> = เรียงโดย "เปรียบเทียบ" คู่ข้อมูล (ถามว่า ตัวไหนมากกว่า?) ตระกูลนี้ <strong>ต่ำสุดที่เป็นไปได้คือ O(n log n)</strong> เพราะต้องเทียบอย่างน้อย log n รอบ × จัดการ n ตัว</li>
+  <li><strong>In-place</strong> = ไม่ต้องใช้หน่วยความจำเพิ่ม (extra memory เท่ากับ O(1)) เรียง "ในที่" เดิม เหมือนเรียงไพ่ในมือโดยไม่ต้องเอาลงโต๊ะ</li>
+  <li><strong>Stable sort (เรียงแบบเสถียร)</strong> = ข้อมูลที่มีค่า key เท่ากัน <strong>คงลำดับเดิมไว้</strong> ไม่สลับกัน<br>
+  เปรียบเทียบ: แถวคิวชำระเงินที่คนน้ำหนักซองเท่ากัน — ถ้า stable คนที่มาก่อนก็จ่ายก่อน ถ้าไม่ stable อาจถูกสลับ!<br>
+  ใช้จริงตอน "เรียงหลาย key": เรียงตามชื่อก่อน แล้วเรียงตามคะแนนด้วย stable sort → คนคะแนนเท่ากันจะยังเรียงตามชื่อให้อัตโนมัติ</li>
+  <li><strong>Internal sort</strong> = เรียงข้อมูลทั้งหมดในหน่วยความจำหลัก ไม่ต้องอ่าน/เขียนดิสก์เพิ่ม</li>
+</ul></div>
+
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>กับดักข้อสอบเรื่องทิศทาง</div>
+<p><strong>Ascending</strong> = น้อย → มาก (1,2,3…), <strong>Descending</strong> = มาก → น้อย (9,8,7…) — อ่านโจทย์ให้ดีก่อน trace ทุกครั้ง!</p></div>
+
+<h2 id="bubble">🫧 Bubble Sort — ฟองสบู่ลอยขึ้น</h2>
+<p><strong>ไอเดีย:</strong> ยืนตรวจแถวคิวจากซ้ายไปขวา มองคู่ข้าง ๆ ทีละคู่ ถ้าตัวซ้าย &gt; ตัวขวาก็<strong>สลับ</strong> (swap)
+เดินครบแถว 1 รอบ (1 pass) ค่า "หนักสุด" จะถูกดันไปสุดท้ายแล้วอยู่ตรงนั้นตลอด — เหมือนฟองอากาศในน้ำที่ลอยขึ้นเกาะผิวน้ำทีละฟอง</p>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p>เหมือนเดินตรวจแถวนักเรียนที่เรียงตามส่วนสูง: มองคนริม 2 คน ถ้าตัวเล็กยืนขวาก็สลับ แล้วขยับไปมองคู่ถัดไป
+เดินจนสุดแถว 1 รอบ = คนตัวสูงสุดไปยืนท้ายแถวแล้ว รอบหน้าไม่ต้องตรวจท้ายสุดอีก (จึงลดช่วง <code>j &lt; n-i-1</code>)</p></div>
+
+<h3>ทำไมโค้ดวนซ้ำแบบนี้</h3>
+<pre><code><span class="kw">void</span> <span class="fn">bubbleSort</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> n) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = 0; i &lt; n-1; i++)        <span class="cm">// รอบนอก: n-1 pass</span>
+        <span class="kw">for</span> (<span class="kw">int</span> j = 0; j &lt; n-i-1; j++)  <span class="cm">// รอบใน: เทียบคู่ข้าง ๆ จนก่อนโซนที่เรียงแล้ว</span>
+            <span class="kw">if</span> (a[j] &gt; a[j+1])           <span class="cm">// ซ้ายมากกว่าขวา → สลับ</span>
+                <span class="fn">swap</span>(a, j, j+1);
+}</code></pre>
+<p>สังเกต 2 จุด: (1) รอบนอกแค่ <code>n-1</code> pass เพราะเหลือตัวเดียวไม่ต้องเรียง (2) รอบในสั้นลงเรื่อย ๆ (<code>n-i-1</code>)
+เพราะท้ายแถวเริ่ม "นิ่ง" เป็นโซนที่เรียงเสร็จแล้ว</p>
+
+<h3>Trace ทีละคู่ — ข้อมูล [5, 3, 8, 1] (Ascending)</h3>
+<figure class="diagram">
+<svg viewBox="0 0 740 300" width="740" role="img" aria-label="Bubble sort pass 1">
+  <text x="20" y="24" class="slab-b">Pass 1 — สุดท้ายแล้ว 8 จบการทำงาน</text>
+  <!-- step 1: compare 5,3 swap -->
+  <g transform="translate(20,40)">
+    <rect x="0" width="38" height="32" rx="5" class="cell bad"/><text x="19" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell bad"/><text x="57" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell"/><text x="95" y="22" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell"/><text x="133" y="22" text-anchor="middle" class="box-lab">1</text>
+    <text x="0" y="48" class="tag">เทียบ 5,3 → 5&gt;3 สลับ!</text>
+  </g>
+  <text x="180" y="60" class="slab-b">→</text>
+  <g transform="translate(205,40)">
+    <rect x="0" width="38" height="32" rx="5" class="cell good"/><text x="19" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell good"/><text x="57" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell"/><text x="95" y="22" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell"/><text x="133" y="22" text-anchor="middle" class="box-lab">1</text>
+    <text x="0" y="48" class="tag">เทียบ 5,8 → โอเค ไม่สลับ</text>
+  </g>
+  <text x="365" y="60" class="slab-b">→</text>
+  <g transform="translate(390,40)">
+    <rect x="0" width="38" height="32" rx="5" class="cell good"/><text x="19" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell good"/><text x="57" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell bad"/><text x="95" y="22" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell bad"/><text x="133" y="22" text-anchor="middle" class="box-lab">1</text>
+    <text x="0" y="48" class="tag">เทียบ 8,1 → 8&gt;1 สลับ!</text>
+  </g>
+  <text x="565" y="60" class="slab-b">→</text>
+  <g transform="translate(585,40)">
+    <rect x="0" width="38" height="32" rx="5" class="cell"/><text x="19" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell"/><text x="57" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell"/><text x="95" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="22" text-anchor="middle" class="box-lab">8</text>
+    <text x="0" y="48" class="tag">จบ pass 1: 8 ล็อกท้ายแล้ว 🔒</text>
+  </g>
+
+  <text x="20" y="130" class="slab-b">Pass 2 — โซนล็อกโตขึ้นเป็น 2 ตัวขวา</text>
+  <g transform="translate(20,146)">
+    <rect x="0" width="38" height="32" rx="5" class="cell bad"/><text x="19" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell bad"/><text x="57" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell"/><text x="95" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="22" text-anchor="middle" class="box-lab">8</text>
+    <text x="0" y="48" class="tag">3,5 ไม่สลับ · 5,1 สลับ!</text>
+  </g>
+  <text x="180" y="166" class="slab-b">→</text>
+  <g transform="translate(205,146)">
+    <rect x="0" width="38" height="32" rx="5" class="cell"/><text x="19" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell"/><text x="57" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell hot"/><text x="95" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="22" text-anchor="middle" class="box-lab">8</text>
+    <text x="0" y="48" class="tag">จบ pass 2: 5,8 ล็อก 🔒</text>
+  </g>
+
+  <text x="20" y="236" class="slab-b">Pass 3 — 1,3 สลับ → เสร็จ! (3 แถวสุดท้ายคือเรียงแล้ว)</text>
+  <g transform="translate(20,252)">
+    <rect x="0" width="38" height="32" rx="5" class="cell bad"/><text x="19" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell bad"/><text x="57" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell hot"/><text x="95" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="22" text-anchor="middle" class="box-lab">8</text>
+    <text x="0" y="48" class="tag">3,1 สลับ!</text>
+  </g>
+  <text x="180" y="272" class="slab-b">→</text>
+  <g transform="translate(205,252)">
+    <rect x="0" width="38" height="32" rx="5" class="cell good"/><text x="19" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell good"/><text x="57" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell good"/><text x="95" y="22" text-anchor="middle" class="box-lab">5</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell good"/><text x="133" y="22" text-anchor="middle" class="box-lab">8</text>
+    <text x="0" y="48" class="tag">✅ เรียงเสร็จ</text>
+  </g>
+</svg>
+<figcaption><b>Bubble sort</b> — แดง = คู่ที่กำลังเทียบ, เขียว = เรียงเสร็จ, เหลือง = โซนล็อกแล้ว</figcaption>
+</figure>
+
+<div class="box basic"><div class="box-title"><span class="em">💡</span>Improved bubble sort (เวอร์ชันฉลาดขึ้น)</div>
+<p>ถ้ารอบไหน <strong>ไม่มีการสลับเลยแม้แต่ครั้งเดียว</strong> แปลว่าเรียงเสร็จแล้ว — ใช้ตัวแปร <code>swapped</code> จำไว้แล้ว break ออก
+นี่คือเหตุผลที่ best case เป็น <strong>O(n)</strong> (ข้อมูลเรียงมาแล้ว แวะดูรอบเดียวจบ) — ส่วนแบบ naïve ที่วนตามโค้ดข้างบน best = O(n²) เหมือนกันหมด</p></div>
+
+<h3>สรุปตัวเลข Bubble Sort</h3>
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th class="num">Comparisons</th><th class="num">Swaps</th></tr></thead>
+<tbody>
+<tr><td>Best (เรียงมาแล้ว)</td><td class="num">O(n)</td><td class="num">O(1)</td></tr>
+<tr><td>Worst (เรียงสวนทาง)</td><td class="num">O(n²)</td><td class="num">O(n²)</td></tr>
+<tr><td>Average</td><td class="num">O(n²)</td><td class="num">O(n²)</td></tr>
+</tbody></table></div>
+<p class="small">Memory: ไม่ต้องใช้เพิ่ม (in-place, O(1)) · Stable: <strong>Yes</strong> (เท่ากันไม่สลับ เพราะเงื่อนไขเป็น <code>&gt;</code> เท่านั้น) · สไลด์บอกว่า <em>ทำไว้เพื่อการเรียนการสอน ห้ามใช้จริง!</em></p>
+
+<h2 id="selection">🎯 Selection Sort — เลือกตัวเล็กสุดมาวางหน้า</h2>
+<p><strong>ไอเดีย:</strong> มองทั้งแถว <strong>หาตัวเล็กสุด</strong> แล้วเอามาสลับไว้หัวแถว จากนั้นก็มองแถวที่เหลือ หาเล็กสุดมาไว้ตำแหน่งที่ 2 … ไล่ไปเรื่อย ๆ
+เหมือนเลือกกัปตันทีม: จับฉ่ายทั้งห้อง หยิบเก่งสุดคนแรก แล้วไล่เลือกลำดับถัดไปจากคนที่เหลือ</p>
+
+<figure class="diagram">
+<svg viewBox="0 0 740 170" width="740" role="img" aria-label="Selection sort trace">
+  <g transform="translate(20,20)">
+    <text x="0" y="0" class="slab-b">รอบที่ 1: สแกนหา min ของทั้งแถว → เจอ 1 ที่ช่องสุดท้าย</text>
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell"/><text x="19" y="32" text-anchor="middle" class="box-lab">5</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell"/><text x="57" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="32" text-anchor="middle" class="box-lab">1</text>
+    <text x="0" y="62" class="tag">min=1 → สลับกับตำแหน่ง 0</text>
+  </g>
+  <text x="230" y="52" class="slab-b">→</text>
+  <g transform="translate(255,20)">
+    <text x="0" y="0" class="slab-b">รอบที่ 2: min ของแถวที่เหลือ = 3 (อยู่แล้ว)</text>
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">1</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell"/><text x="57" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell"/><text x="133" y="32" text-anchor="middle" class="box-lab">5</text>
+    <text x="0" y="62" class="tag">ไม่ต้องสลับ</text>
+  </g>
+  <text x="465" y="52" class="slab-b">→</text>
+  <g transform="translate(490,20)">
+    <text x="0" y="0" class="slab-b">รอบที่ 3: min ของ {8,5} = 5 → สลับ</text>
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">1</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell good"/><text x="57" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="32" text-anchor="middle" class="box-lab">5</text>
+    <text x="0" y="62" class="tag">ผลลัพธ์ 1,3,5,8 ✅</text>
+  </g>
+  <g transform="translate(640,20)">
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">1</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell good"/><text x="57" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell good"/><text x="95" y="32" text-anchor="middle" class="box-lab">5</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell good"/><text x="133" y="32" text-anchor="middle" class="box-lab">8</text>
+  </g>
+</svg>
+<figcaption><b>Selection sort</b> — เหลือง = ตัวเล็กสุดที่เจอในรอบนั้น</figcaption>
+</figure>
+
+<h3>จุดสังเกตสำคัญ (ออกเติมคำบ่อย)</h3>
+<ul>
+  <li><strong>จำนวนเทียบ "ตายตัว" ที่ O(n²) เสมอ</strong> ไม่ว่าข้อมูลเรียงมาแล้วหรือยัง — เพราะมันต้อง "สแกนหา min" ทุกรอบเสมอ → Best = Worst = O(n²) ในการเทียบ</li>
+  <li>แต่ <strong>swap น้อยมาก (สูงสุด n-1 ครั้ง)</strong> — จุดขายตัวเดียวของมัน: เหมาะเมื่อ "การเขียนข้อมูลแพง" (เช่น เขียน flash memory)</li>
+  <li><strong>Stable: No!</strong> กับดักคลาสสิก — การ "สลับข้ามระยะไกล" อาจกระโดดข้ามตัวที่ค่าเท่ากันไป เช่น [3a, 3b, 1] → รอบแรกสลับ 3a กับ 1 ได้ [1, 3b, 3a] → 3a กับ 3b สลับที่กัน ลำดับเดิมพัง</li>
+</ul>
+
+<h2 id="insertion">🃏 Insertion Sort — เรียงไพ่ในมือ</h2>
+<p><strong>ไอเดีย:</strong> ฝั่งซ้ายคือ "ไพ่ในมือ" (เรียงแล้ว) ฝั่งขวาคือกองกองใหม่ หยิบทีละใบ แล้ว <strong>สอด</strong> เข้าตำแหน่งที่ถูกต้องของฝั่งซ้าย โดยเลื่อนไพ่ที่ใหญ่กว่าไปขวาทีละใบ
+เริ่มจากฝั่งซ้ายมี 1 ใบ (ไพ่ 1 ใบถือว่าเรียงแล้วเสมอ) จนหมดกอง</p>
+
+<figure class="diagram">
+<svg viewBox="0 0 740 190" width="740" role="img" aria-label="Insertion sort trace">
+  <g transform="translate(20,14)">
+    <text x="0" y="0" class="slab-b">หยิบ 3 → 5 ใหญ่กว่า เลื่อน 5 ไปขวา แล้วสอด 3 หน้า</text>
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">5</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell"/><text x="57" y="32" text-anchor="middle" class="box-lab">| 3</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell"/><text x="133" y="32" text-anchor="middle" class="box-lab">1</text>
+  </g>
+  <text x="230" y="46" class="slab-b">→</text>
+  <g transform="translate(255,14)">
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell good"/><text x="57" y="32" text-anchor="middle" class="box-lab">5</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell"/><text x="95" y="32" text-anchor="middle" class="box-lab">| 8</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell"/><text x="133" y="32" text-anchor="middle" class="box-lab">1</text>
+    <text x="0" y="62" class="tag">หยิบ 8 → ใหญ่สุดอยู่แล้ว ไม่ต้องเลื่อน</text>
+  </g>
+  <g transform="translate(490,14)">
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell good"/><text x="57" y="32" text-anchor="middle" class="box-lab">5</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell good"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell"/><text x="133" y="32" text-anchor="middle" class="box-lab">| 1</text>
+    <text x="0" y="62" class="tag">หยิบ 1 → เลื่อน 8, 5, 3 ไปขวาทีละตัว</text>
+  </g>
+  <text x="465" y="46" class="slab-b">→</text>
+  <g transform="translate(655,14)">
+    <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">1</text>
+    <rect x="38" y="10" width="38" height="32" rx="5" class="cell good"/><text x="57" y="32" text-anchor="middle" class="box-lab">3</text>
+    <rect x="76" y="10" width="38" height="32" rx="5" class="cell good"/><text x="95" y="32" text-anchor="middle" class="box-lab">5</text>
+    <rect x="114" y="10" width="38" height="32" rx="5" class="cell good"/><text x="133" y="32" text-anchor="middle" class="box-lab">8</text>
+    <text x="0" y="62" class="tag">✅</text>
+  </g>
+  <text x="20" y="120" class="slab">สังเกต: ฝั่งซ้ายของขีด "|" คือ "ไพ่ในมือ" ที่เรียงแล้วเสมอ — ข้อมูลรับมาแบบไหนฝั่งซ้ายก็ไม่เคยพัง</text>
+</svg>
+<figcaption><b>Insertion sort</b> — ขยายโซนเรียงทีละ 1 ตัวจนเต็มแถว</figcaption>
+</figure>
+
+<h3>เทคนิคในโค้ด: "swap" vs "shift" (มีในสไลด์)</h3>
+<ul>
+  <li>แบบ <strong>swap</strong> (ไม่ใช้ตัวแปร key): เทียบแล้วสลับไปเรื่อย ๆ จนหลุดตำแหน่ง — เขียนสั้น แต่ swap 3 ครั้ง = เขียน 3 เท่า</li>
+  <li>แบบ <strong>shift</strong> (ใช้ตัวแปร key เก็บค่าที่หยิบไว้): เลื่อนตัวที่ใหญ่กว่าไปขวาทีละตัว จนเจอช่องว่างแล้ว "วาง key ลงครั้งเดียว" — เร็วกว่าในทางปฏิบัติ</li>
+</ul>
+
+<div class="box basic"><div class="box-title"><span class="em">💡</span>ทำไม insertion sort ยังมีใช้จริง</div>
+<p>ข้อมูลน้อย (สัก 10–30 ตัว) หรือข้อมูล "เกือบเรียงแล้ว" มันเร็วมาก (เกือบ O(n)) — อัลกอริทึมจริงจังอย่าง Timsort (Python/Java) และ Introsort (C++ std::sort)
+ยังเรียก insertion sort มาใช้กับก้อนย่อย ๆ ตอนแบ่งข้อมูลเหลือชิ้นเล็กแล้ว!</p></div>
+
+<h2 id="trio">⚖️ เทียบ 3 ตัว intuitive ในตารางเดียว</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>อัลกอริทึม</th><th>ไอเดียสั้น ๆ</th><th class="num">Best</th><th class="num">Worst</th><th>Swaps มากไหม</th><th>Stable</th></tr></thead>
+<tbody>
+<tr><td><b>Bubble</b></td><td>เทียบคู่ข้าง ๆ แล้วสลับ ฟองใหญ่ลอยท้าย</td><td class="num">O(n)</td><td class="num">O(n²)</td><td>เยอะมาก (O(n²))</td><td class="good">✅ Yes</td></tr>
+<tr><td><b>Selection</b></td><td>หาเล็กสุดมาวางหน้าทีละตำแหน่ง</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>น้อยสุด (≤ n−1)</td><td class="bad">❌ No</td></tr>
+<tr><td><b>Insertion</b></td><td>หยิบใหม่สอดเข้าโซนที่เรียงแล้ว</td><td class="num">O(n)</td><td class="num">O(n²)</td><td>ขึ้นกับข้อมูล</td><td class="good">✅ Yes</td></tr>
+</tbody>
+</table></div>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>แนวข้อสอบ: เลือกอัลกอริทึมให้ตรงสถานการณ์</div>
+<p>• "ข้อมูลเกือบเรียงแล้ว อยากได้เร็ว + stable" → <strong>Insertion sort</strong><br>
+• "เขียนข้อมูลแพง (memory write ช้า) อยาก swap น้อยที่สุด" → <strong>Selection sort</strong><br>
+• "ต้องการ stable + ทน worst case ที่ O(n log n) แน่นอน" → <strong>Merge sort</strong> (ไม่ใช่ 3 ตัวนี้ — เล็กเกินกว่าจะ O(n log n) ได้)</p></div>
+<h2 id="dnc">🪓 Divide &amp; Conquer — แบ่งแล้วครอง (แนวคิดของ Quick/Merge)</h2>
+<p>สไลด์มีเรื่อง "Food of thought" ที่เข้าใจง่ายมาก: สมมติมี sort โง่ ๆ ชื่อ <code>dullSort</code> แพง O(n²)
+ถ้าเราแบ่งข้อมูลเป็นสองครึ่ง (ขนาด n/2) เรียงแยกกันแล้วรวมกลับ:</p>
+<p style="text-align:center"><code>2 × (n/2)² + n = n²/2 + n ≈ ครึ่งหนึ่งของเดิม — "สองครึ่งดีกว่าทั้งก้อน!"</code></p>
+<ul>
+  <li><strong>Moral 1:</strong> สองครึ่งดีกว่าทั้งก้อน (แบ่งเล็กลงงานถูกย่อ)</li>
+  <li><strong>Moral 2:</strong> แบ่งยิ่งเยอะยิ่งดี (แบ่งถี่ ๆ จนเล็กมาก งานยิ่งน้อย → ถึงจุด O(n log n))</li>
+  <li><strong>Moral 3:</strong> แบ่งไม่สมดุลแล้วไม่ดี — 0.1n กับ 0.9n ยังเหลือ 0.82n² (ดีขึ้นแค่ 18%) → นี่คือต้นเหตุที่ Quick sort เจอ pivot แย่แล้วหน่ายเป็น O(n²)!</li>
+</ul>
+
+<h2 id="quick">⚡ Quick Sort — เลือก pivot มาขั้นครึ่ง</h2>
+<p><strong>ไอเดีย:</strong> เลือกค่าหนึ่งเป็น <strong>pivot</strong> (เช่น ตัวสุดท้าย) แล้วจัดแถวให้
+<strong>ตัวที่ &lt; pivot อยู่ซ้ายทั้งหมด, ตัวที่ &gt; pivot อยู่ขวาทั้งหมด</strong> (ขั้นตอนนี้เรียก <strong>partition</strong>)
+pivot จะลงตำแหน่ง "สุดท้ายของมัน" แล้ว จากนั้นก็ทำ partition ซ้ำกับครึ่งซ้ายและครึ่งขวาแบบ recursive
+เปรียบเหมือนการจัดแถวคนตามส่วนสูงโดยเลือก "เกณฑ์" คนหนึ่ง — ตัวเตี้ยกว่าเกณฑ์ยืนซ้าย สูงกว่ายืนขวา แล้วจัดแถวย่อยในแต่ละฝั่งต่อ</p>
+
+<h3>Partition ทีละสเต็ป (แบบ Lomuto — ใช้ i เป็น "กำแพงโซนเล็ก")</h3>
+<p>ข้อมูล <code>[7, 2, 9, 4, 3, 8, 6]</code> pivot = 6 (ตัวท้าย) — กฎ: เจอตัว ≤ pivot ให้ขยายกำแพง (i++) แล้วสลับมาไว้หน้ากำแพง</p>
+<figure class="diagram">
+<svg viewBox="0 0 760 320" width="760" role="img" aria-label="Quick sort partition trace">
+  <defs><marker id="arwq" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8a94a0"/></marker></defs>
+  <!-- row 1: initial -->
+  <g transform="translate(20,10)">
+    <text x="0" y="0" class="slab-b">เริ่ม: i = -1 (กำแพงไม่มี) · pivot = 6</text>
+    <rect x="0" y="8" width="38" height="32" rx="5" class="cell"/><text x="19" y="30" text-anchor="middle" class="box-lab">7</text>
+    <rect x="38" y="8" width="38" height="32" rx="5" class="cell"/><text x="57" y="30" text-anchor="middle" class="box-lab">2</text>
+    <rect x="76" y="8" width="38" height="32" rx="5" class="cell"/><text x="95" y="30" text-anchor="middle" class="box-lab">9</text>
+    <rect x="114" y="8" width="38" height="32" rx="5" class="cell"/><text x="133" y="30" text-anchor="middle" class="box-lab">4</text>
+    <rect x="152" y="8" width="38" height="32" rx="5" class="cell"/><text x="171" y="30" text-anchor="middle" class="box-lab">3</text>
+    <rect x="190" y="8" width="38" height="32" rx="5" class="cell"/><text x="209" y="30" text-anchor="middle" class="box-lab">8</text>
+    <rect x="228" y="8" width="38" height="32" rx="5" class="cell hot"/><text x="247" y="30" text-anchor="middle" class="box-lab">6</text>
+    <text x="247" y="56" text-anchor="middle" class="tag">pivot</text>
+  </g>
+  <!-- row 2 -->
+  <g transform="translate(20,86)">
+    <text x="0" y="0" class="slab-b">j=1 เจอ 2 ≤ 6 → i=0 สลับ a[0],a[1]</text>
+    <rect x="0" y="8" width="38" height="32" rx="5" class="cell good"/><text x="19" y="30" text-anchor="middle" class="box-lab">2</text>
+    <rect x="38" y="8" width="38" height="32" rx="5" class="cell"/><text x="57" y="30" text-anchor="middle" class="box-lab">7</text>
+    <rect x="76" y="8" width="38" height="32" rx="5" class="cell"/><text x="95" y="30" text-anchor="middle" class="box-lab">9</text>
+    <rect x="114" y="8" width="38" height="32" rx="5" class="cell"/><text x="133" y="30" text-anchor="middle" class="box-lab">4</text>
+    <rect x="152" y="8" width="38" height="32" rx="5" class="cell"/><text x="171" y="30" text-anchor="middle" class="box-lab">3</text>
+    <rect x="190" y="8" width="38" height="32" rx="5" class="cell"/><text x="209" y="30" text-anchor="middle" class="box-lab">8</text>
+    <rect x="228" y="8" width="38" height="32" rx="5" class="cell hot"/><text x="247" y="30" text-anchor="middle" class="box-lab">6</text>
+    <text x="0" y="56" class="tag">[2] | 7,9,4,3,8 · pivot6</text>
+  </g>
+  <g transform="translate(320,86)">
+    <text x="0" y="0" class="slab-b">j=3 เจอ 4 ≤ 6 → i=1 สลับ a[1],a[3]</text>
+    <rect x="0" y="8" width="38" height="32" rx="5" class="cell good"/><text x="19" y="30" text-anchor="middle" class="box-lab">2</text>
+    <rect x="38" y="8" width="38" height="32" rx="5" class="cell good"/><text x="57" y="30" text-anchor="middle" class="box-lab">4</text>
+    <rect x="76" y="8" width="38" height="32" rx="5" class="cell"/><text x="95" y="30" text-anchor="middle" class="box-lab">9</text>
+    <rect x="114" y="8" width="38" height="32" rx="5" class="cell"/><text x="133" y="30" text-anchor="middle" class="box-lab">7</text>
+    <rect x="152" y="8" width="38" height="32" rx="5" class="cell"/><text x="171" y="30" text-anchor="middle" class="box-lab">3</text>
+    <rect x="190" y="8" width="38" height="32" rx="5" class="cell"/><text x="209" y="30" text-anchor="middle" class="box-lab">8</text>
+    <rect x="228" y="8" width="38" height="32" rx="5" class="cell hot"/><text x="247" y="30" text-anchor="middle" class="box-lab">6</text>
+  </g>
+  <!-- row 3 -->
+  <g transform="translate(20,166)">
+    <text x="0" y="0" class="slab-b">j=4 เจอ 3 ≤ 6 → i=2 สลับ a[2],a[4] · j=5 เจอ 8 &gt; 6 ข้าม</text>
+    <rect x="0" y="8" width="38" height="32" rx="5" class="cell good"/><text x="19" y="30" text-anchor="middle" class="box-lab">2</text>
+    <rect x="38" y="8" width="38" height="32" rx="5" class="cell good"/><text x="57" y="30" text-anchor="middle" class="box-lab">4</text>
+    <rect x="76" y="8" width="38" height="32" rx="5" class="cell good"/><text x="95" y="30" text-anchor="middle" class="box-lab">3</text>
+    <rect x="114" y="8" width="38" height="32" rx="5" class="cell"/><text x="133" y="30" text-anchor="middle" class="box-lab">7</text>
+    <rect x="152" y="8" width="38" height="32" rx="5" class="cell"/><text x="171" y="30" text-anchor="middle" class="box-lab">9</text>
+    <rect x="190" y="8" width="38" height="32" rx="5" class="cell"/><text x="209" y="30" text-anchor="middle" class="box-lab">8</text>
+    <rect x="228" y="8" width="38" height="32" rx="5" class="cell hot"/><text x="247" y="30" text-anchor="middle" class="box-lab">6</text>
+  </g>
+  <g transform="translate(400,166)">
+    <text x="0" y="0" class="slab-b">จบลูป: สลับ pivot เข้าหลังกำแพง (a[3] ↔ a[6])</text>
+    <rect x="0" y="8" width="38" height="32" rx="5" class="cell good"/><text x="19" y="30" text-anchor="middle" class="box-lab">2</text>
+    <rect x="38" y="8" width="38" height="32" rx="5" class="cell good"/><text x="57" y="30" text-anchor="middle" class="box-lab">4</text>
+    <rect x="76" y="8" width="38" height="32" rx="5" class="cell good"/><text x="95" y="30" text-anchor="middle" class="box-lab">3</text>
+    <rect x="114" y="8" width="38" height="32" rx="5" class="cell hot"/><text x="133" y="30" text-anchor="middle" class="box-lab">6</text>
+    <rect x="152" y="8" width="38" height="32" rx="5" class="cell"/><text x="171" y="30" text-anchor="middle" class="box-lab">9</text>
+    <rect x="190" y="8" width="38" height="32" rx="5" class="cell"/><text x="209" y="30" text-anchor="middle" class="box-lab">8</text>
+    <rect x="228" y="8" width="38" height="32" rx="5" class="cell"/><text x="247" y="30" text-anchor="middle" class="box-lab">7</text>
+    <text x="0" y="56" class="tag">6 ลงตำแหน่งจริงแล้ว → quicksort ซ้าย {2,4,3} และขวา {9,8,7}</text>
+  </g>
+  <line x1="133" y1="216" x2="396" y2="216" class="te dash" marker-end="url(#arwq)"/>
+</svg>
+<figcaption><b>Partition 1 รอบ</b> — เขียว = โซน "เล็กกว่า pivot", เหลือง = pivot; จากนั้น recursive ต่อทั้งสองฝั่ง</figcaption>
+</figure>
+
+<h3>จุดชี้ขาดคือ pivot</h3>
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>Worst case ของ Quick sort = pivot แย่</div>
+<p>ถ้า pivot ที่เลือกได้เป็น "ตัวเล็กสุดหรือใหญ่สุดเสมอ" (เช่น ข้อมูลเรียงมาแล้วแล้วเลือกตัวท้ายเป็น pivot) การแบ่งจะเอียงสุด ๆ
+ฝั่งหนึ่งมี n−1 ตัว อีกฝั่ง 0 ตัว → งานโตเป็น <strong>O(n²)</strong> (นึกถึง Moral 3: unbalanced แล้วแย่)<br>
+<strong>Pivot ที่ดีที่สุดคือ median</strong> (ค่ากลาง) — แต่คำนวณ median ตรง ๆ แพงไป จึงใช้เทคนิคอย่าง random pivot หรือ median-of-three แทน</p></div>
+<p>สรุปสมรรถนะ: Best/Average <strong>O(n log n)</strong>, Worst <strong>O(n²)</strong>, Memory <strong>O(log n)</strong> (สแตก recursion), Stable <strong>No</strong> — ในทางปฏิบัติเร็วจริง (cache friendly, ง่าย) จึงเป็นที่นิยมสูงสุดตั้งแต่ 1959 ถึงทุกวันนี้</p>
+
+<h2 id="merge">🧩 Merge Sort — แบ่งจนเล็กสุดแล้ว "รวม" กลับแบบเรียง</h2>
+<p><strong>ไอเดีย:</strong> หักครึ่งไปเรื่อย ๆ จนเหลือชิ้นเดียว (ชิ้นเดียว = เรียงอยู่แล้วโดยนิยาม) แล้วค่อย ๆ <strong>รวม (merge)</strong>
+สองกองที่เรียงแล้วให้เป็นกองเดียวที่เรียง — การรวมกองนั้นง่ายมาก: มองหัวสองกอง ตักตัวน้อยกว่าออกไปทีละตัว (O(n))</p>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p>เหมือนรวมสองแถวคิวที่เรียงตามส่วนสูงแล้ว: มองหัวแถวทั้งสอง คนตัวเตี้ยกว่าเดินออกไปตั้งแถวใหม่ ทำซ้ำจนหมด —
+ไม่เคยต้องเทียบข้ามกองย้อนหลังเลย จึงเร็ว</p></div>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 330" width="760" role="img" aria-label="Merge sort recursion tree">
+  <defs><marker id="arwm" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8a94a0"/></marker></defs>
+  <g font-size="13" font-weight="700">
+    <!-- level 0 -->
+    <rect x="300" y="10" width="160" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="380" y="32" text-anchor="middle" class="tlabel">[38, 27, 43, 10]</text>
+    <!-- split arrows down -->
+    <line x1="340" y1="44" x2="215" y2="78" class="te dash" marker-end="url(#arwm)"/>
+    <line x1="420" y1="44" x2="545" y2="78" class="te dash" marker-end="url(#arwm)"/>
+    <text x="262" y="60" class="tag">หักครึ่ง</text>
+    <!-- level 1 -->
+    <rect x="135" y="80" width="110" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="190" y="102" text-anchor="middle" class="tlabel">[38, 27]</text>
+    <rect x="515" y="80" width="110" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="570" y="102" text-anchor="middle" class="tlabel">[43, 10]</text>
+    <line x1="170" y1="114" x2="130" y2="148" class="te dash" marker-end="url(#arwm)"/>
+    <line x1="210" y1="114" x2="250" y2="148" class="te dash" marker-end="url(#arwm)"/>
+    <line x1="550" y1="114" x2="510" y2="148" class="te dash" marker-end="url(#arwm)"/>
+    <line x1="590" y1="114" x2="630" y2="148" class="te dash" marker-end="url(#arwm)"/>
+    <!-- level 2 singles -->
+    <rect x="85" y="150" width="60" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="115" y="172" text-anchor="middle" class="tlabel">[38]</text>
+    <rect x="235" y="150" width="60" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="265" y="172" text-anchor="middle" class="tlabel">[27]</text>
+    <rect x="465" y="150" width="60" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="495" y="172" text-anchor="middle" class="tlabel">[43]</text>
+    <rect x="615" y="150" width="60" height="34" rx="8" fill="var(--bg-soft)" stroke="var(--ink-soft)"/>
+    <text x="645" y="172" text-anchor="middle" class="tlabel">[10]</text>
+    <text x="380" y="150" text-anchor="middle" class="slab">แตกจนเหลือชิ้นเดียว (เรียงอยู่แล้ว)</text>
+    <!-- merge arrows up -->
+    <line x1="130" y1="188" x2="170" y2="220" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arwm)"/>
+    <line x1="250" y1="188" x2="210" y2="220" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arwm)"/>
+    <line x1="510" y1="188" x2="550" y2="220" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arwm)"/>
+    <line x1="630" y1="188" x2="590" y2="220" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arwm)"/>
+    <text x="380" y="212" text-anchor="middle" class="slab-b">merge กลับ: ตักหัวกองที่น้อยกว่าทีละตัว</text>
+    <!-- merged pairs -->
+    <rect x="135" y="222" width="110" height="34" rx="8" fill="var(--ok-bg)" stroke="#16a34a"/>
+    <text x="190" y="244" text-anchor="middle" class="tlabel">[27, 38]</text>
+    <rect x="515" y="222" width="110" height="34" rx="8" fill="var(--ok-bg)" stroke="#16a34a"/>
+    <text x="570" y="244" text-anchor="middle" class="tlabel">[10, 43]</text>
+    <line x1="190" y1="256" x2="340" y2="288" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arwm)"/>
+    <line x1="570" y1="256" x2="420" y2="288" stroke="#16a34a" stroke-width="2.5" marker-end="url(#arwm)"/>
+    <!-- final -->
+    <rect x="290" y="290" width="180" height="34" rx="8" fill="var(--ok-bg)" stroke="#16a34a" stroke-width="2"/>
+    <text x="380" y="312" text-anchor="middle" class="tlabel">[10, 27, 38, 43] ✅</text>
+  </g>
+</svg>
+<figcaption><b>Merge sort</b> — ลงไปแบบ "หักครึ่ง" (log n ชั้น) แต่ละชั้น merge รวมกันหมด n ตัว → n log n พอดี</figcaption>
+</figure>
+
+<h3>โค้ดจากสไลด์ (ใช้ tmp array แชร์ตัวเดียว — ประหยัด memory)</h3>
+<pre><code><span class="kw">public void</span> <span class="fn">mSort</span>(<span class="kw">int</span>[] arr) {
+    <span class="kw">int</span>[] tmp = <span class="kw">new int</span>[arr.length];   <span class="cm">// สร้างครั้งเดียว แชร์ทุก recursion</span>
+    <span class="fn">mSort</span>(arr, tmp, 0, arr.length-1);
+}
+<span class="kw">private void</span> <span class="fn">mSort</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span>[] tmp, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+    <span class="kw">if</span> (low &gt;= high) <span class="kw">return</span>;              <span class="cm">// ชิ้นเดียว = จบ</span>
+    <span class="kw">int</span> mid = low + ((high - low) &gt;&gt; 1);  <span class="cm">// กึ่งกลาง (ห้าม (low+high)/2 แบบเสี่ยง overflow)</span>
+    <span class="fn">mSort</span>(arr, tmp, low, mid);
+    <span class="fn">mSort</span>(arr, tmp, mid+1, high);
+    <span class="fn">merge</span>(arr, tmp, low, mid, high);      <span class="cm">// รวมสองครึ่งที่เรียงแล้ว</span>
+}
+<span class="kw">private void</span> <span class="fn">merge</span>(<span class="kw">int</span>[] arr, <span class="kw">int</span>[] tmp, <span class="kw">int</span> low, <span class="kw">int</span> mid, <span class="kw">int</span> high) {
+    <span class="kw">int</span> i = low, j = mid+1, k = low;
+    <span class="kw">while</span> (i &lt;= mid &amp;&amp; j &lt;= high)
+        tmp[k++] = (arr[i] &lt;= arr[j]) ? arr[i++] : arr[j++];  <span class="cm">// &lt;= → stable!</span>
+    <span class="kw">while</span> (i &lt;= mid) tmp[k++] = arr[i++];   <span class="cm">// เศษซ้าย</span>
+    <span class="kw">while</span> (j &lt;= high) tmp[k++] = arr[j++];  <span class="cm">// เศษขวา</span>
+    <span class="kw">for</span> (i = low; i &lt;= high; i++) arr[i] = tmp[i];  <span class="cm">// ก๊อปคืนเฉพาะช่วงนี้</span>
+}</code></pre>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>ทำไม stable อยู่ที่เครื่องหมาย <code>&lt;=</code></div>
+<p>ตอนหัวสองกองเท่ากัน ถ้าใช้ <code>&lt;=</code> จะตัก "ของกองซ้าย" (ซึ่งเดิมอยู่หน้ากว่า) ออกก่อน — ลำดับเดิมไม่ถูกพัง
+ถ้าเผลอใช้ <code>&lt;</code> ตัวเท่ากันจากกองขวาจะหลุดมาก่อน → เสีย stability ทันที (จุดเติมคำชวนออก!)</p></div>
+
+<h3>วิเคราะห์เวลาแบบ recurrence (สไลด์ทำให้ดูเลย)</h3>
+<p style="text-align:center"><code>T(n) = 2T(n/2) + cn</code> (เรียกสองครึ่ง + merge เป็น cn) → แตกออกเป็น log n ชั้น แต่ละชั้นรวมกัน cn → <strong>Θ(n log n)</strong></p>
+<p>และเพราะไม่สนว่าข้อมูลเป็นยังไง (แบ่งเสมอ ไม่ขึ้นกับค่า) → <strong>Best = Average = Worst = O(n log n) หมด</strong> ราคาที่ต้องจ่ายคือ memory เพิ่ม <strong>O(n)</strong> สำหรับ tmp</p>
+
+<h2 id="radix">🔢 Radix Sort — จัดตาม "หลักตัวเลข" ไม่เทียบเลย</h2>
+<p>ตระกูล <strong>non-comparison sort</strong> ทะลุขอบ O(n log n) เพราะไม่ถามว่า "ตัวไหนมากกว่า" เลย!
+Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรียงตามหลักหน่วยก่อน แล้วหลักสิบ แล้วหลักร้อย … จนครบทุกหลัก
+เหมือนคัดแยกบัตรประชาชนตามเลขท้ายหนึ่งหลัก แล้วไล่ระดับขึ้นไป — เงื่อนไขสำคัญ: <strong>การจัดเข้าถังต้อง stable</strong> (รอบก่อนจึงไม่ถูกทำลาย)</p>
+<figure class="diagram">
+<svg viewBox="0 0 760 260" width="760" role="img" aria-label="Radix sort buckets">
+  <text x="20" y="20" class="slab-b">เริ่ม: [170, 45, 75, 90, 802, 24, 2, 66]</text>
+  <!-- pass 1 buckets -->
+  <text x="20" y="48" class="slab">รอบ 1: จัดตามหลัก "หน่วย" → ถัง 0: 170,90 · ถัง 2: 2,802 · ถัง 4: 24 · ถัง 5: 45,75 · ถัง 6: 66</text>
+  <g transform="translate(20,60)">
+    <rect x="0" width="150" height="26" rx="5" class="bucket"/><text x="8" y="18" class="box-lab">0 :</text><text x="38" y="18" class="box-lab">170, 90</text>
+    <rect x="155" width="150" height="26" rx="5" class="bucket"/><text x="163" y="18" class="box-lab">2 :</text><text x="193" y="18" class="box-lab">2, 802</text>
+    <rect x="310" width="110" height="26" rx="5" class="bucket"/><text x="318" y="18" class="box-lab">4 :</text><text x="348" y="18" class="box-lab">24</text>
+    <rect x="425" width="150" height="26" rx="5" class="bucket"/><text x="433" y="18" class="box-lab">5 :</text><text x="463" y="18" class="box-lab">45, 75</text>
+    <rect x="580" width="110" height="26" rx="5" class="bucket"/><text x="588" y="18" class="box-lab">6 :</text><text x="618" y="18" class="box-lab">66</text>
+  </g>
+  <text x="20" y="112" class="slab">รวบกลับ (ถัง 0 → 9): [170, 90, 2, 802, 24, 45, 75, 66]</text>
+  <text x="20" y="140" class="slab">รอบ 2: ตามหลัก "สิบ" → ถัง 0: 2, 802 · ถัง 2: 24 · ถัง 4: 45 · ถัง 6: 66 · ถัง 7: 170, 75 · ถัง 9: 90</text>
+  <text x="20" y="162" class="slab">รวบกลับ: [802, 2, 24, 45, 66, 170, 75, 90]</text>
+  <text x="20" y="190" class="slab">รอบ 3: ตามหลัก "ร้อย" → ถัง 0: 2, 24, 45, 66, 75, 90 · ถัง 1: 170 · ถัง 8: 802</text>
+  <g transform="translate(20,204)">
+    <rect x="0" width="38" height="32" rx="5" class="cell good"/><text x="19" y="22" text-anchor="middle" class="box-lab">2</text>
+    <rect x="38" width="38" height="32" rx="5" class="cell good"/><text x="57" y="22" text-anchor="middle" class="box-lab">24</text>
+    <rect x="76" width="38" height="32" rx="5" class="cell good"/><text x="95" y="22" text-anchor="middle" class="box-lab">45</text>
+    <rect x="114" width="38" height="32" rx="5" class="cell good"/><text x="133" y="22" text-anchor="middle" class="box-lab">66</text>
+    <rect x="152" width="38" height="32" rx="5" class="cell good"/><text x="171" y="22" text-anchor="middle" class="box-lab">75</text>
+    <rect x="190" width="38" height="32" rx="5" class="cell good"/><text x="209" y="22" text-anchor="middle" class="box-lab">90</text>
+    <rect x="228" width="38" height="32" rx="5" class="cell good"/><text x="247" y="22" text-anchor="middle" class="box-lab">170</text>
+    <rect x="266" width="38" height="32" rx="5" class="cell good"/><text x="285" y="22" text-anchor="middle" class="box-lab">802</text>
+    <text x="320" y="22" class="tag">✅ เรียงจบ โดยไม่เทียบคู่เลยแม้แต่ครั้งเดียว</text>
+  </g>
+</svg>
+<figcaption><b>Radix sort (LSD)</b> — จัดถังตามหลักจากขวาไปซ้าย รอบละ 1 หลัก · O(nd) เมื่อ d = จำนวนหลัก</figcaption>
+</figure>
+<p class="small">สรรพคุณ: Best/Worst/Average = <strong>O(nd)</strong>, Memory <strong>O(n+d)</strong>, <strong>Stable: Yes</strong> — Counting sort (ข้างล่าง) มักถูกใช้เป็น "เครื่องจัดถัง" ของ radix sort</p>
+
+<h2 id="counting">🗳️ Counting Sort — นับความถี่ + prefix sum</h2>
+<p>ถ้า key เป็นเลขจำนวนเต็มในช่วงแคบ ๆ (เช่น 0–9, 0–100) เราไม่ต้องเทียบเลย: (1) <strong>นับ</strong>ว่าแต่ละค่ามีกี่ตัว
+(2) ทำ <strong>prefix sum</strong> (รวมสะสม) เพื่อบอก "ตำแหน่งสุดท้าย" ของแต่ละค่าใน output (3) เดิน input <strong>จากขวาไปซ้าย</strong> วางของลงตำแหน่ง</p>
+<figure class="diagram">
+<svg viewBox="0 0 760 250" width="760" role="img" aria-label="Counting sort count and prefix sum">
+  <text x="20" y="18" class="slab-b">Input: [1, 3, 2, 1, 0, 3] (ค่าอยู่ใน 0..3)</text>
+  <!-- count row -->
+  <text x="20" y="52" class="slab">ขั้น 1 นับความถี่:</text>
+  <g transform="translate(140,34)">
+    <rect x="0" width="46" height="34" rx="5" class="cell"/><text x="23" y="22" text-anchor="middle" class="box-lab">0→1</text>
+    <rect x="46" width="46" height="34" rx="5" class="cell"/><text x="69" y="22" text-anchor="middle" class="box-lab">1→2</text>
+    <rect x="92" width="46" height="34" rx="5" class="cell"/><text x="115" y="22" text-anchor="middle" class="box-lab">2→1</text>
+    <rect x="138" width="46" height="34" rx="5" class="cell"/><text x="161" y="22" text-anchor="middle" class="box-lab">3→2</text>
+    <text x="0" y="50" class="tag">count[]</text>
+  </g>
+  <!-- prefix row -->
+  <text x="20" y="116" class="slab">ขั้น 2 prefix sum (รวมสะสม):</text>
+  <g transform="translate(200,98)">
+    <rect x="0" width="46" height="34" rx="5" class="cell hot"/><text x="23" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="46" width="46" height="34" rx="5" class="cell hot"/><text x="69" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="92" width="46" height="34" rx="5" class="cell hot"/><text x="115" y="22" text-anchor="middle" class="box-lab">4</text>
+    <rect x="138" width="46" height="34" rx="5" class="cell hot"/><text x="161" y="22" text-anchor="middle" class="box-lab">6</text>
+    <text x="0" y="50" class="tag">ค่านี้ = "ตำแหน่งท้ายของแต่ละค่าใน output"</text>
+  </g>
+  <!-- placement -->
+  <text x="20" y="180" class="slab">ขั้น 3 วางจากขวาไปซ้าย: เจอ 3 → ไปช่อง prefix[3]=6 คือ output[5], แล้วลด prefix[3] ลง 1 … ทำไมจากขวา? เพื่อให้ตัว "ที่อยู่หลัง" ใน input ไปวางหลัง → stable!</text>
+  <g transform="translate(20,196)">
+    <rect x="0" width="46" height="34" rx="5" class="cell good"/><text x="23" y="22" text-anchor="middle" class="box-lab">0</text>
+    <rect x="46" width="46" height="34" rx="5" class="cell good"/><text x="69" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="92" width="46" height="34" rx="5" class="cell good"/><text x="115" y="22" text-anchor="middle" class="box-lab">1</text>
+    <rect x="138" width="46" height="34" rx="5" class="cell good"/><text x="161" y="22" text-anchor="middle" class="box-lab">2</text>
+    <rect x="184" width="46" height="34" rx="5" class="cell good"/><text x="207" y="22" text-anchor="middle" class="box-lab">3</text>
+    <rect x="230" width="46" height="34" rx="5" class="cell good"/><text x="253" y="22" text-anchor="middle" class="box-lab">3</text>
+    <text x="290" y="22" class="tag">✅</text>
+  </g>
+</svg>
+<figcaption><b>Counting sort</b> — เร็วเป็นเส้นตรง O(n + m) เมื่อ m = ช่วงค่าของ key</figcaption>
+</figure>
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>กับดักคลาสสิก</div>
+<p><strong>Counting sort จะ stable ต่อเมื่อวางของจากขวาไปซ้าย!</strong> (ใช้ prefix sum เป็น "ตำแหน่งท้าย") — ถ้าเดินจากซ้าย มันก็ยังเรียงถูก แต่เสีย stability
+และถ้าช่วงค่า (m) กว้างมาก ๆ เช่น 1 ล้าน เทียบกับข้อมูล 100 ตัว → เสียเปล่าโง่ ๆ นั่นแหละที่มัน "เหมาะกับ key ไม่ห่างกันมากกว่าจำนวนข้อมูล"</p></div>
+
+<h2 id="bucket">🪣 Bucket Sort — จัดถังกว้าง ๆ แล้วอ่านทีละถัง</h2>
+<p>ทำงานคล้าย counting sort แต่ถังหยาบกว่า: โยนของใส่ถังตามช่วงค่า แล้ววิ่งอ่านออกทีละถัง เป็นตัวอย่าง <strong>external (non-)comparison sorting</strong>
+ที่ทะลุขอบ O(n log n) ได้ เหมาะกับข้อมูลที่ "กระจายสม่ำเสมอ"</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th class="num">Best</th><th class="num">Worst</th><th>Memory</th><th>Stable</th></tr></thead>
+<tbody>
+<tr><td>Bucket sort</td><td class="num">O(n) เมื่อ m = n</td><td class="num">O(m+n)</td><td>O(m)</td><td class="good">Yes</td></tr>
+</tbody></table></div>
+
+<h2 id="shell">🐚 Shell Sort — insertion sort ที่กระโดดข้ามไกลได้</h2>
+<p>insertion sort ช้าเพราะของ "ต้องเดินทีละช่อง" ถ้าตัวที่ควรอยู่ขวาสุดอยู่ซ้ายสุด มันต้องเลื่อน n−1 รอบ
+<strong>Shell sort แก้โดยใช้ gap (h)</strong>: จัดให้ทุกตัวที่ห่าง h ช่องกันเป็นกลุ่มเรียงก่อน (<strong>h-sorted</strong>) แล้วค่อย ๆ ลด h ลงจนถึง 1 (รอบสุดท้ายก็คือ insertion sort ธรรมดา แต่ตอนนั้นข้อมูล "เกือบเรียงแล้ว" เลยเร็วมาก)</p>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p>เหมือนจัดหนังสือบนชั้นยาว ๆ: รอบแรกจัดหยาบ ๆ ทุก ๆ 4 เล่ม (ขยับข้ามไกล ๆ ให้ใกล้บ้านที่ถูกต้อง)
+รอบต่อมาจัดละเอียดทุก 2 เล่ม แล้วจบด้วยการจับคู่ข้าง ๆ — เพราะจัดหยาบไปแล้ว งานละเอียดจึงเหลือน้อยมาก</p></div>
+<p class="small">ใช้จริงใน embedded: uClibc, Linux kernel (โค้ดสั้น ไม่ใช้ call stack) และใน bzip2 สำหรับ array สั้น ๆ</p>
+
+<h2 id="heapbst">⛰️ Heap Sort &amp; BST Sort — เรียงโดยใช้โครงสร้างข้อมูล</h2>
+<ul>
+  <li><strong>Heap sort:</strong> ยัดข้อมูลทั้งหมดลง heap แล้วดึงออกทีละตัว (root คือน้อยสุด/มากสุดเสมอ) → ได้เรียงพอดี
+  Best/Worst/Average = <strong>O(n log n)</strong> หมด, Stable <strong>No</strong> (รายละเอียดในบท Heap)</li>
+  <li><strong>BST sort:</strong> ยัดลง BST แล้ว walk แบบ in-order → ได้เรียง (รายละเอียดในบท BST) — แต่ถ้าต้นไม้เอียงจะโดน O(n²)</li>
+</ul>
+
+<h2 id="summary">📌 ตารางสรุปใหญ่ + แนวข้อสอบบทนี้</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>Algorithm</th><th class="num">Best</th><th class="num">Average</th><th class="num">Worst</th><th>Memory</th><th>Stable</th><th>จำง่าย ๆ</th></tr></thead>
+<tbody>
+<tr><td>Bubble</td><td class="num">O(n)</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>O(1)</td><td class="good">Yes</td><td>ฟองลอยท้าย สลับเยอะ</td></tr>
+<tr><td>Selection</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>O(1)</td><td class="bad">No</td><td>swap น้อยสุด</td></tr>
+<tr><td>Insertion</td><td class="num">O(n)</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>O(1)</td><td class="good">Yes</td><td>เรียงไพ่ในมือ เก่งของเกือบเรียง</td></tr>
+<tr><td>Quick</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td class="num bad">O(n²)</td><td>O(log n)</td><td class="bad">No</td><td>เร็วจริง แต่ pivot แย่ = พัง</td></tr>
+<tr><td>Merge</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td>O(n)</td><td class="good">Yes</td><td>ทนทุกกรณี แลก memory</td></tr>
+<tr><td>Heap</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td>O(n)</td><td class="bad">No</td><td>ดึง root ทีละตัว</td></tr>
+<tr><td>Radix</td><td class="num">O(nd)</td><td class="num">O(nd)</td><td class="num">O(nd)</td><td>O(n+d)</td><td class="good">Yes</td><td>จัดถังตามหลักเลข</td></tr>
+<tr><td>Counting</td><td class="num">O(n)</td><td class="num">O(m+n)</td><td class="num">O(m+n)</td><td>O(m)</td><td class="good">Yes*</td><td>*stable เฉพาะวางจากขวา</td></tr>
+<tr><td>Bucket</td><td class="num">O(n)</td><td class="num">O(m+n)</td><td class="num">O(m+n)</td><td>O(m)</td><td class="good">Yes</td><td>ถังช่วงกว้าง</td></tr>
+<tr><td>Shell</td><td class="num">—</td><td class="num">ขึ้นกับ gap</td><td class="num">&gt; O(n log n)</td><td>O(1)</td><td class="bad">No</td><td>insertion + gap กระโดดไกล</td></tr>
+</tbody></table></div>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>แนวข้อสอบ (จากรีวิวรุ่นพี่ Final 66/67)</div>
+<p><strong>ข้อ 1:</strong> ให้ชุดตัวเลขมา แสดงขั้นตอนการเรียงแบบ Bubble / Insertion / Selection / Quick <strong>ละเอียดทุกรอบ พร้อมผลลัพธ์สุดท้าย</strong></p>
+<details class="sol"><summary>วิธีทำให้ได้คะแนนเต็ม</summary><div class="sol-body">
+<ol>
+<li>เขียนสถานะ array ใหม่ทุกครั้งที่ "มีการสลับ/วาง" — ครูให้คะแนนจากความละเอียด</li>
+<li>ระบุ pass/รอบที่ทำอยู่ เช่น "Pass 1: เทียบ (5,3) สลับ → …"</li>
+<li>Selection sort อย่าลืมบอก min ของรอบนั้นว่าคือตัวไหน</li>
+<li>Quick sort แสดง pivot ชัด ๆ และผล partition ของแต่ละรอบ (ซ้าย ≤ pivot ≤ ขวา)</li>
+<li>กล่องสุดท้ายเขียนผลลัพธ์ final พร้อมขีดเส้นตีกรอบให้ชัด</li>
+</ol>
+</div></details>
+<p style="margin-top:10px"><strong>ข้อ 2 (เติมคำ):</strong> ลองตอบคำถามด้านล่าง กดดูเฉลยได้</p>
+</div>
+
+<div class="mcq" data-q="1">
+  <div class="q">1) อัลกอริทึมไหน "ไม่" เป็น stable sort?</div>
+  <div class="opts">
+    <button class="opt" data-correct="1">Selection sort</button>
+    <button class="opt">Insertion sort</button>
+    <button class="opt">Bubble sort</button>
+    <button class="opt">Merge sort</button>
+  </div>
+  <div class="explain">✅ Selection sort สลับข้ามระยะไกล อาจพังลำดับของค่าที่เท่ากัน (ส่วน Quick และ Heap ก็ไม่ stable เหมือนกัน — ระวังโจทย์พลิก!)</div>
+</div>
+<div class="mcq" data-q="2">
+  <div class="q">2) ขอบเขตล่างของ comparison-based sort คือเท่าไร และใครทะลุขอบได้?</div>
+  <div class="opts">
+    <button class="opt">O(n log n) — ทุกตัวทะลุได้ถ้าดวงดี</button>
+    <button class="opt" data-correct="1">O(n log n) — ทะลุได้ด้วย non-comparison เช่น Counting/Radix/Bucket</button>
+    <button class="opt">O(n²) — ไม่มีใครทะลุได้</button>
+    <button class="opt">O(n) — เพราะต้องดูข้อมูลทุกตัว</button>
+  </div>
+  <div class="explain">✅ การเทียบคู่ต้องเทียบอย่างน้อย log n บิตข้อมูล × n ตัว → O(n log n) แต่ non-comparison sort ไม่ได้ "เทียบ" เลย จึงไปถึง O(n+m) หรือ O(nd) ได้</div>
+</div>
+<div class="mcq" data-q="3">
+  <div class="q">3) ข้อมูล [2,3,4,5,1] กับ Insertion sort — ต้อง "เลื่อน" กี่ครั้ง?</div>
+  <div class="opts">
+    <button class="opt">1 ครั้ง</button>
+    <button class="opt">2 ครั้ง</button>
+    <button class="opt" data-correct="1">4 ครั้ง</button>
+    <button class="opt">5 ครั้ง</button>
+  </div>
+  <div class="explain">✅ ตัว 1 ต้องข้าม 2,3,4,5 = เลื่อน 4 ตัว → ตัวเดียววางผิดที่ก็ยังเสีย O(n) เท่าจำนวน inversion — insertion sort นับเวลาจาก "จำนวนคู่ที่สลับตำแหน่งกัน" (inversions) เสมอ</div>
+</div>
+
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>ภาพรวมทั้งบทในหนึ่งบรรทัด</div>
+<p>ง่าย (O(n²), in-place): <strong>Bubble / Selection / Insertion</strong> → แบ่งแล้วครอง (O(n log n)): <strong>Quick (เร็วแต่ worst O(n²)) / Merge (ทนแต่กิน memory)</strong> →
+ไม่เทียบคู่ (ทะลุขอบ): <strong>Counting / Radix / Bucket</strong> → ปรับปรุง insertion: <strong>Shell</strong> → ใช้โครงสร้าง: <strong>Heap / BST sort</strong></p></div>
+
+<div class="pager">
+  <a href="index.html"><span class="dir">← กลับหน้าแรก</span><span class="pt">ภาพรวมทุกบท</span></a>
+  <a href="heap.html" class="next"><span class="dir">บทถัดไป →</span><span class="pt">L09 Heap &amp; Priority Queue</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · L08 Sorting</div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>
+

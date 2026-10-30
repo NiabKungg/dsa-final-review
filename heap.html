@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L09 Priority Queue &amp; Heap — เว็บติวสอบ Final DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-heap">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html" class="active">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญ Heap &amp; PQ <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#pq">Priority Queue คืออะไร</a>
+    <a href="#apps">ใช้ทำอะไรในโลกจริง</a>
+    <a href="#heap">Heap (binary heap)</a>
+    <a href="#terms">ศัพท์ต้นไม้ที่ต้องรู้</a>
+    <a href="#array">เก็บ heap ใน array</a>
+    <a href="#insert">insert — percolate up</a>
+    <a href="#remove">remove — percolate down</a>
+    <a href="#deleteother">ลบ node อื่น ๆ</a>
+    <a href="#code">โค้ด MyMinHeap เต็ม</a>
+    <a href="#heapify">Heapify &amp; Heap Sort</a>
+    <a href="#kth">Challenge: kth highest score</a>
+    <a href="#summary">สรุป + แนวข้อสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">L09 · Priority Queue &amp; Binary Heap</div>
+  <h1>Priority Queue &amp; Heap — คิวที่คนสำคัญเข้าก่อน</h1>
+  <p class="lead">รีวิวรุ่นพี่เจอ 2 แนว: <strong>"มี tree มาให้ ถ้า insert เลขนี้ tree ใหม่จะเป็นยังไง"</strong> (Final 66)
+  และ <strong>"Min Heap + delete min node"</strong> (Final 67) — ทั้งสองแนวใช้แค่ 2 การเคลื่อนไหว:
+  <strong>เคาะขึ้น (percolate up)</strong> กับ <strong>เคาะลง (percolate down)</strong> ฝึกจากหน้านี้ให้คล่องแล้วจบ</p>
+  <div class="meta">
+    <span class="chip">⭐ trace insert ลง tree</span>
+    <span class="chip">⭐ delete min (root)</span>
+    <span class="chip">⭐ index ลูก/แม่ ใน array</span>
+  </div>
+</section>
+
+<h2 id="pq">🚑 Priority Queue (ADT) — คิวแบบมีสิทธิ์</h2>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>พื้นฐาน: Queue และ ADT</div>
+<p><strong>Queue (คิว)</strong> ที่เราคุ้นเคยคือ FIFO — First In First Out, เข้าก่อนออกก่อน เหมือนแถวซื้อข้าว
+โครงสร้างเชิงตรรกะ (ADT = Abstract Data Type) คือ "สัญญาว่าทำอะไรได้บ้าง" (enqueue/dequeue) ไม่ผูกว่า "ข้างในเขียนด้วยอะไร"</p>
+<p><strong>Priority Queue</strong> คือ ADT แบบเดียวกัน แต่เปลี่ยนกฎการออก: <strong>ไม่ดูว่าเข้าก่อน ดูว่า "สำคัญกว่า"</strong> — สิทธิ์สูงออกก่อนเสมอ
+เหมือนห้องฉุกเฉินโรงพยาบาล: คนไข้หนัก (priority สูง) เข้าห้องหมอก่อน แม้จะมาถึงทีหลังเพื่อน</p></div>
+
+<p>ตัวอย่างจากสไลด์: ฝากข้อมูล 7, 3, 5, 4, 2 ตามลำดับ โดยแต่ละตัวมี priority 2, 3, 2, 1, 1 (เลขน้อย = สำคัญกว่า):</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>ข้อมูล</th><th class="num">7</th><th class="num">3</th><th class="num">5</th><th class="num">4</th><th class="num">2</th></tr></thead>
+<tbody><tr><td>priority</td><td class="num">2</td><td class="num">3</td><td class="num">2</td><td class="num">1</td><td class="num">1</td></tr></tbody>
+</table></div>
+<p>ตอน dequeue จะออกตามสิทธิ์ → <strong>4, 2, 7, 5, 3</strong> (สิทธิ์ 1 ทั้งคู่: 4 มาก่อนจึงออกก่อน · สิทธิ์ 2 ทั้งคู่: 7 มาก่อนออกก่อน) —
+ประเด็นสไลด์คือ: <em>เราไม่แคร์ข้างในเก็บยังไง แค่รู้ว่า "ออกถูกลำดับสิทธิ์" ก็พอ</em></p>
+
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>คนสิทธิ์เท่ากัน ไม่การันตี "มาก่อน-ออกก่อน"!</div>
+<p>Heap ปกติ<strong>ไม่รับประกัน</strong>ว่าคน priority เท่ากันจะออกตามลำดับเข้า (FIFO) — ถ้าโจทย์ต้องการ ให้แก้ด้วยการ
+<strong>เก็บ "ลำดับที่เข้า" (counter/timestamp) ติดไปกับข้อมูล</strong> แล้วใช้เป็นตัวตัดสินรองเมื่อ priority เท่ากัน</p></div>
+
+<h2 id="apps">🌍 ใช้ทำอะไรในโลกจริง</h2>
+<ul>
+  <li><strong>OS:</strong> จัดคิว process (process scheduling), จัดการ interrupt — งานด่วนได้ CPU ก่อน</li>
+  <li><strong>อัลกอริทึมกราฟ:</strong> Dijkstra (หาเส้นทางสั้นสุด), Prim (MST), Huffman coding — เดี๋ยวเจอมันอีกรอบในบท Graph!</li>
+  <li><strong>ระบบทรัพยากร:</strong> load balancing, เราเตอร์เครือข่าย (packet สำคัญส่งก่อน)</li>
+  <li><strong>หน้างานบริการ:</strong> คิวลูกค้า VIP, คิวตรวจภายใน</li>
+</ul>
+
+<h2 id="heap">⛰️ Heap — โครงสร้างที่ใช้สร้าง PQ ที่ดีที่สุด</h2>
+<p>ทำ PQ ด้วย array หรือ linked list ตรง ๆ ก็ได้ แต่ไม่ดี (อย่างดีอย่างหนึ่งจะช้า: array เรียง → insert แพง; array ไม่เรียง → remove min ต้องไล่หา O(n))
+<strong>binary heap</strong> ให้ insert/remove/peek ได้ O(log n)/O(log n)/O(1) — นิยาม:</p>
+<ul>
+  <li><strong>Min heap:</strong> พ่อแม่ (parent) ≤ ลูกทุกคน → <strong>root คือค่าน้อยสุดของทั้ง heap เสมอ</strong></li>
+  <li><strong>Max heap:</strong> พ่อแม่ ≥ ลูกทุกคน → root คือค่ามากสุด</li>
+  <li>ห้ามลืม: heap เทียบแค่ "พ่อ-ลูก" <strong>ไม่ได้เรียงซ้ายก่อนขวา!</strong> (ต่างจาก BST — จุดเติมคำชวนออก)</li>
+</ul>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 210" width="760" role="img" aria-label="Min heap vs Max heap">
+  <g>
+    <text x="190" y="16" text-anchor="middle" class="slab-b">Min Heap — แม่ ≤ ลูก (root เล็กสุด)</text>
+    <line x1="190" y1="56" x2="120" y2="96" class="te"/><line x1="190" y1="56" x2="260" y2="96" class="te"/>
+    <line x1="120" y1="116" x2="75" y2="156" class="te"/><line x1="120" y1="116" x2="165" y2="156" class="te"/>
+    <line x1="260" y1="116" x2="215" y2="156" class="te"/>
+    <g><circle cx="190" cy="46" r="19" class="nd hot"/><text x="190" y="51" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="120" cy="106" r="19" class="nd"/><text x="120" y="111" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="260" cy="106" r="19" class="nd"/><text x="260" y="111" text-anchor="middle" class="nlab">6</text></g>
+    <g><circle cx="75" cy="166" r="19" class="nd"/><text x="75" y="171" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="165" cy="166" r="19" class="nd"/><text x="165" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="215" cy="166" r="19" class="nd"/><text x="215" y="171" text-anchor="middle" class="nlab">8</text></g>
+    <text x="190" y="205" text-anchor="middle" class="tag">✅ แม่ทุกตัว ≤ ลูกทุกตัว · แถวล่าง 9,8 สลับซ้ายขวาได้ เพราะไม่มีกฎซ้าย/ขวา</text>
+  </g>
+  <g>
+    <text x="570" y="16" text-anchor="middle" class="slab-b">Max Heap — แม่ ≥ ลูก (root ใหญ่สุด)</text>
+    <line x1="570" y1="56" x2="500" y2="96" class="te"/><line x1="570" y1="56" x2="640" y2="96" class="te"/>
+    <line x1="500" y1="116" x2="455" y2="156" class="te"/><line x1="500" y1="116" x2="545" y2="156" class="te"/>
+    <line x1="640" y1="116" x2="640" y2="156" class="te"/>
+    <g><circle cx="570" cy="46" r="19" class="nd hot"/><text x="570" y="51" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="500" cy="106" r="19" class="nd"/><text x="500" y="111" text-anchor="middle" class="nlab">7</text></g>
+    <g><circle cx="640" cy="106" r="19" class="nd"/><text x="640" y="111" text-anchor="middle" class="nlab">8</text></g>
+    <g><circle cx="455" cy="166" r="19" class="nd"/><text x="455" y="171" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="545" cy="166" r="19" class="nd"/><text x="545" y="171" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="640" cy="166" r="19" class="nd"/><text x="640" y="171" text-anchor="middle" class="nlab">3</text></g>
+    <text x="570" y="205" text-anchor="middle" class="tag">✅ root = มากสุด ใช้ทำ PQ แบบ "สิทธิ์สูงก่อน" หรือ heap sort แบบมาก→น้อย</text>
+  </g>
+</svg>
+<figcaption><b>Min heap vs Max heap</b> — กฎเดียว: เทียบแม่กับลูก จบ (ไม่ใช่การเรียงซ้าย→ขวา)</figcaption>
+</figure>
+
+<h2 id="terms">🌳 ศัพท์ต้นไม้ที่ต้องแยกให้ออก (เติมคำออกบ่อย)</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>ศัพท์</th><th>นิยาม</th><th>จำง่าย</th></tr></thead>
+<tbody>
+<tr><td><b>Complete binary tree</b></td><td>ทุกชั้นเต็ม ยกเว้นชั้นสุดท้าย และชั้นสุดท้ายต้องอัดชิด<strong>ซ้าย</strong></td><td>heap ใช้แบบนี้! (จึงจับลง array ได้พอดี)</td></tr>
+<tr><td><b>Perfect binary tree</b></td><td>internal node ทุกตัวมี 2 ลูก และใบทุกใบอยู่ชั้นเดียวกัน</td><td>"สมบูรณ์แบบ" สมมาตรสุด ๆ</td></tr>
+<tr><td><b>Full binary tree</b></td><td>ทุก node มีลูก 0 หรือ 2 คน (ไม่มีใครมีลูกเดียว)</td><td>ไม่มี "ลูกครึ่ง"</td></tr>
+<tr><td><b>Balanced</b></td><td>สูงของต้น = O(log n) ซ้ายขวาต่างกันไม่เกิน 1 ต่อ node</td><td>heap เป็น balanced โดยธรรมชาติ → สูง log n</td></tr>
+</tbody></table></div>
+
+<h2 id="array">📦 จับ heap ใส่ array — สูตร index ที่ต้องท่อง</h2>
+<p>เพราะ heap เป็น complete tree (อัดชิดซ้ายทุกชั้น) เราเลยเรียง node "ตามชั้น จากซ้ายไปขวา" ใส่ array ได้พอดี ไม่มีรู และหาญาติพี่น้องด้วยคณิต:</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>หาอะไร (node ที่ index i)</th><th class="num">สูตร</th><th>ตัวอย่าง i = 3</th></tr></thead>
+<tbody>
+<tr><td>ลูกซ้าย</td><td class="num">2i + 1</td><td class="num">7</td></tr>
+<tr><td>ลูกขวา</td><td class="num">2i + 2</td><td class="num">8</td></tr>
+<tr><td>พ่อแม่</td><td class="num">(i − 1) / 2</td><td class="num">1</td></tr>
+<tr><td>root</td><td class="num">i = 0</td><td class="num">—</td></tr>
+</tbody></table></div>
+
+<figure class="diagram">
+<svg viewBox="0 0 700 250" width="700" role="img" aria-label="Heap array mapping">
+  <!-- tree -->
+  <g>
+    <text x="170" y="18" text-anchor="middle" class="slab-b">Tree (ตามชั้น)</text>
+    <line x1="170" y1="66" x2="105" y2="106" class="te"/><line x1="170" y1="66" x2="235" y2="106" class="te"/>
+    <line x1="105" y1="126" x2="65" y2="166" class="te"/><line x1="105" y1="126" x2="145" y2="166" class="te"/>
+    <line x1="235" y1="126" x2="195" y2="166" class="te"/><line x1="235" y1="126" x2="275" y2="166" class="te"/>
+    <g><circle cx="170" cy="56" r="20" class="nd"/><text x="170" y="61" text-anchor="middle" class="nlab">2</text><text x="196" y="42" class="tag">i=0</text></g>
+    <g><circle cx="105" cy="116" r="20" class="nd"/><text x="105" y="121" text-anchor="middle" class="nlab">5</text><text x="75" y="98" class="tag">i=1</text></g>
+    <g><circle cx="235" cy="116" r="20" class="nd"/><text x="235" y="121" text-anchor="middle" class="nlab">8</text><text x="258" y="98" class="tag">i=2</text></g>
+    <g><circle cx="65" cy="176" r="20" class="nd"/><text x="65" y="181" text-anchor="middle" class="nlab">9</text><text x="35" y="204" class="tag">i=3</text></g>
+    <g><circle cx="145" cy="176" r="20" class="nd"/><text x="145" y="181" text-anchor="middle" class="nlab">7</text><text x="120" y="204" class="tag">i=4</text></g>
+    <g><circle cx="195" cy="176" r="20" class="nd"/><text x="195" y="181" text-anchor="middle" class="nlab">10</text><text x="172" y="204" class="tag">i=5</text></g>
+    <g><circle cx="275" cy="176" r="20" class="nd"/><text x="275" y="181" text-anchor="middle" class="nlab">3</text><text x="292" y="204" class="tag">i=6</text></g>
+  </g>
+  <!-- arrow -->
+  <text x="345" y="120" class="slab-b">→ เรียงตามชั้น →</text>
+  <!-- array -->
+  <g transform="translate(390,60)">
+    <text x="0" y="0" class="slab-b">Array เดียวกัน</text>
+    <g transform="translate(0,12)">
+      <rect x="0" width="46" height="40" rx="5" class="cell hot"/><text x="23" y="26" text-anchor="middle" class="box-lab">2</text>
+      <rect x="46" width="46" height="40" rx="5" class="cell"/><text x="69" y="26" text-anchor="middle" class="box-lab">5</text>
+      <rect x="92" width="46" height="40" rx="5" class="cell"/><text x="115" y="26" text-anchor="middle" class="box-lab">8</text>
+      <rect x="138" width="46" height="40" rx="5" class="cell"/><text x="161" y="26" text-anchor="middle" class="box-lab">9</text>
+      <rect x="184" width="46" height="40" rx="5" class="cell"/><text x="207" y="26" text-anchor="middle" class="box-lab">7</text>
+      <rect x="230" width="46" height="40" rx="5" class="cell"/><text x="253" y="26" text-anchor="middle" class="box-lab">10</text>
+      <rect x="276" width="46" height="40" rx="5" class="cell"/><text x="299" y="26" text-anchor="middle" class="box-lab">3</text>
+      <text x="23" y="68" text-anchor="middle" class="tag">0</text><text x="69" y="68" text-anchor="middle" class="tag">1</text>
+      <text x="115" y="68" text-anchor="middle" class="tag">2</text><text x="161" y="68" text-anchor="middle" class="tag">3</text>
+      <text x="207" y="68" text-anchor="middle" class="tag">4</text><text x="253" y="68" text-anchor="middle" class="tag">5</text>
+      <text x="299" y="68" text-anchor="middle" class="tag">6</text>
+    </g>
+    <text x="0" y="110" class="tag">ตรวจสูตร: ค่า 5 (i=1) มีลูกซ้าย 2(1)+1=3 → ค่า 9 ✅ ลูกขวา 2(1)+2=4 → ค่า 7 ✅ แม่ (1−1)/2=0 → ค่า 2 ✅</text>
+    <text x="0" y="132" class="tag">ไม่ว่า tree จะยักไหน array นี้คือ "ความจริง" ข้อสอบมักให้ trace บน array!</text>
+  </g>
+</svg>
+<figcaption><b>Array representation</b> — ไม่ต้องใช้ pointer เลย เก็บแถว ๆ ลงมือ หาญาติด้วยสูตรคูณสอง</figcaption>
+</figure>
+
+<h2 id="insert">⬆️ insert — วางท้ายแล้ว "เคาะขึ้น" (percolate up)</h2>
+<p>ขั้นตอน insert ค่า d ลง min heap: (1) <strong>วาง d ที่ช่องท้ายสุด</strong> (ตำแหน่ง <code>size++</code> — ช่องนี้ว่างเสมอเพราะ complete tree)
+(2) เทียบกับแม่: ถ้า d &lt; แม่ → <strong>สลับ</strong> แล้วเทียบต่อขึ้นไปเรื่อย ๆ (3) หยุดเมื่อแม่ ≤ ตัวเอง หรือขึ้นไปถึง root</p>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p>เหมือนพนักงานใหม่ตัวจิ๋วได้เข้า "ตำแหน่งสุดท้าย" ขององค์กรก่อน แล้วค่อย ๆ <strong>เลื่อนขึ้นเป็นขั้น</strong>:
+ถ้าเก่งกว่าหัวหน้า (ค่าน้อยกว่า) ก็สลับตำแหน่งกับหัวหน้า ไต่ขึ้นไปเรื่อย ๆ จนเจอหัวหน้าที่เก่งกว่าตัวเองก็หยุดอยู่ตรงนั้น</p></div>
+
+<h3>Trace: insert(3) ลง min heap [2, 5, 8, 9, 7, 10] — 3 สเต็ปจบ</h3>
+<div class="steps">
+  <div class="step"><span class="step-t">วาง 3 ที่ช่องท้าย (i=6, ลูกขวาของ 8)</span>array: [2,5,8,9,7,10,<strong>3</strong>] — ยังไม่ถูกกฎ เพราะแม่ (8) ใหญ่กว่า 3</div>
+  <div class="step"><span class="step-t">เทียบ 3 กับแม่ (8) → 3 &lt; 8 สลับ!</span>array: [2,5,<strong>3</strong>,9,7,10,<strong>8</strong>] — ตอนนี้ 3 อยู่ i=2</div>
+  <div class="step"><span class="step-t">เทียบ 3 กับแม่ใหม่ (root = 2) → 3 &gt; 2 หยุด ✅</span>ผลลัพธ์: [2,5,3,9,7,10,8] — heap ถูกกฎแล้ว จบใน 1 ครั้งของการสลับ</div>
+</div>
+
+<figure class="diagram">
+<svg viewBox="0 0 780 220" width="780" role="img" aria-label="Heap insert trace">
+  <g>
+    <text x="120" y="14" text-anchor="middle" class="slab-b">เริ่ม: วาง 3 ท้าย</text>
+    <line x1="120" y1="56" x2="55" y2="96" class="te"/><line x1="120" y1="56" x2="185" y2="96" class="te"/>
+    <line x1="55" y1="126" x2="15" y2="156" class="te"/><line x1="55" y1="126" x2="95" y2="156" class="te"/>
+    <line x1="185" y1="116" x2="148" y2="156" class="te"/><line x1="185" y1="116" x2="222" y2="156" class="te"/>
+    <g><circle cx="120" cy="46" r="19" class="nd"/><text x="120" y="51" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="55" cy="106" r="19" class="nd"/><text x="55" y="111" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="185" cy="106" r="19" class="nd"/><text x="185" y="111" text-anchor="middle" class="nlab">8</text></g>
+    <g><circle cx="15" cy="166" r="18" class="nd"/><text x="15" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="95" cy="166" r="18" class="nd"/><text x="95" y="171" text-anchor="middle" class="nlab">7</text></g>
+    <g><circle cx="148" cy="166" r="18" class="nd"/><text x="148" y="171" text-anchor="middle" class="nlab">10</text></g>
+    <g><circle cx="222" cy="166" r="18" class="nd hot"/><text x="222" y="171" text-anchor="middle" class="nlab">3</text></g>
+    <text x="120" y="208" text-anchor="middle" class="tag">แม่ของ 3 = 8 → 3&lt;8 ผิดกฎ!</text>
+  </g>
+  <g>
+    <text x="400" y="14" text-anchor="middle" class="slab-b">สลับ 3 ↔ 8</text>
+    <line x1="400" y1="56" x2="335" y2="96" class="te"/><line x1="400" y1="56" x2="465" y2="96" class="te"/>
+    <line x1="330" y1="120" x2="295" y2="156" class="te"/><line x1="342" y1="120" x2="378" y2="156" class="te"/>
+    <line x1="460" y1="120" x2="425" y2="156" class="te"/><line x1="472" y1="120" x2="508" y2="156" class="te"/>
+    <g><circle cx="400" cy="46" r="19" class="nd"/><text x="400" y="51" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="335" cy="106" r="19" class="nd"/><text x="335" y="111" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="465" cy="106" r="19" class="nd hot"/><text x="465" y="111" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="293" cy="166" r="18" class="nd"/><text x="293" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="380" cy="166" r="18" class="nd"/><text x="380" y="171" text-anchor="middle" class="nlab">7</text></g>
+    <g><circle cx="425" cy="166" r="18" class="nd"/><text x="425" y="171" text-anchor="middle" class="nlab">10</text></g>
+    <g><circle cx="512" cy="166" r="18" class="nd hot"/><text x="512" y="171" text-anchor="middle" class="nlab">8</text></g>
+    <text x="400" y="208" text-anchor="middle" class="tag">แม่ของ 3 = 2 → 3&gt;2 โอเค หยุด</text>
+  </g>
+  <g>
+    <text x="672" y="14" text-anchor="middle" class="slab-b">ผลลัพธ์ ✅</text>
+    <line x1="672" y1="56" x2="612" y2="96" class="te"/><line x1="672" y1="56" x2="732" y2="96" class="te"/>
+    <line x1="607" y1="120" x2="572" y2="156" class="te"/><line x1="619" y1="120" x2="652" y2="156" class="te"/>
+    <line x1="727" y1="120" x2="695" y2="156" class="te"/><line x1="738" y1="120" x2="758" y2="156" class="te"/>
+    <g><circle cx="672" cy="46" r="19" class="nd good"/><text x="672" y="51" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="612" cy="106" r="19" class="nd good"/><text x="612" y="111" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="732" cy="106" r="19" class="nd good"/><text x="732" y="111" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="570" cy="166" r="17" class="nd"/><text x="570" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="654" cy="166" r="17" class="nd"/><text x="654" y="171" text-anchor="middle" class="nlab">7</text></g>
+    <g><circle cx="695" cy="166" r="17" class="nd"/><text x="695" y="171" text-anchor="middle" class="nlab">10</text></g>
+    <g><circle cx="760" cy="166" r="17" class="nd"/><text x="760" y="171" text-anchor="middle" class="nlab">8</text></g>
+    <text x="672" y="208" text-anchor="middle" class="tag">[2,5,3,9,7,10,8] — แม่≤ลูกทุกคู่</text>
+  </g>
+</svg>
+<figcaption><b>insert(3)</b> — เหลือง = node ที่เพิ่งวาง/กำลังเดินขึ้น · สูงสุดเดินแค่ "ความสูงของ tree" = <b>O(log n)</b></figcaption>
+</figure>
+
+<h3>โค้ด insert จากสไลด์ (อ่านทีละบรรทัดให้ครบ)</h3>
+<pre><code><span class="kw">public void</span> <span class="fn">insert</span>(<span class="kw">int</span> d) {
+  <span class="kw">int</span> p = size++;      <span class="cm">// เพิ่มพื้นที่ 1 ช่อง แล้วชี้ช่องท้าย (วาง d ไว้ท้ายสุด)</span>
+  heap[p] = d;
+  <span class="kw">int</span> parent = (p-1)/2;            <span class="cm">// สูตรหาแม่</span>
+  <span class="kw">while</span> ( (p &gt; 0) &amp;&amp; (heap[p] &lt; heap[parent]) ) {  <span class="cm">// min heap: ลูกน้อยกว่าแม่ → สลับ</span>
+    <span class="fn">swap</span>(p, parent);
+    p = parent;                    <span class="cm">// ตัวเราย้ายขึ้นไปอยู่ที่ของแม่เดิม</span>
+    parent = (p-1)/2;              <span class="cm">// อัปเดตแม่คนใหม่</span>
+  }
+}   <span class="cm">// จบ loop อัตโนมัติเมื่อ (p==0 → ถึง root) หรือ (แม่ ≤ ตัวเอง)</span></code></pre>
+<p class="small">ถ้าเป็น <strong>max heap</strong> เปลี่ยนเงื่อนไขเป็น <code>heap[p] &gt; heap[parent]</code> — แค่นิดเดียว ระวังโจทย์ถาม min หรือ max!</p>
+<h2 id="remove">⬇️ remove (delete min) — หยิบ root แล้ว "เคาะลง" (percolate down)</h2>
+<p>การลบ "น้อยสุด" = ลบ root: (1) จำค่า root เก็บไว้คืน (2) <strong>ยกใบสุดท้ายของ array ขึ้นมาแทน root</strong> (ย้ายตัวเดียว ไม่ง้อโครง)
+(3) ตัวใหม่อาจใหญ่เกิน → เทียบกับ <strong>ลูกตัวเล็กกว่า</strong> แล้วสลับลงไปเรื่อย ๆ จนลูกทั้งคู่ใหญ่กว่าตัวเอง หรือตกถึงใบ</p>
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>เลือกลูก "ตัวเล็กกว่า" เสมอ (min heap)</div>
+<p>ตอนเคาะลงต้องสลับกับ <strong>min(ลูกซ้าย, ลูกขวา)</strong> — ถ้าเลือกผิดฝั่ง (สลับกับลูกใหญ่กว่า) กฎ heap จะพังทันที
+เพราะตัวที่ถูก "ชนขึ้น" จะกลายเป็นแม่ของลูกอีกฝ่ายโดยมีค่ามากกว่า</p></div>
+
+<h3>Trace: remove() จาก min heap [3, 5, 6, 9, 8]</h3>
+<div class="steps">
+  <div class="step"><span class="step-t">จำ root (3) ไว้คืนค่า</span>ค่าที่จะ return = 3</div>
+  <div class="step"><span class="step-t">ยกใบสุดท้าย (8) ขึ้น root</span>array: [<strong>8</strong>, 5, 6, 9] (size ลดเหลือ 4) — ผิดกฎ เพราะ 8 ใหญ่กว่าลูก</div>
+  <div class="step"><span class="step-t">เทียบ 8 กับลูก (5, 6) → ตัวเล็กกว่าคือ 5 → สลับ</span>array: [<strong>5</strong>, <strong>8</strong>, 6, 9] — 8 ตกลงไป i=1</div>
+  <div class="step"><span class="step-t">เทียบ 8 กับลูกของมัน (9) → 8 &lt; 9 หยุด ✅</span>ผลลัพธ์: [5, 8, 6, 9] · return 3 — heap กลับมาถูกกฎ</div>
+</div>
+
+<h3>3 เคสที่ลูป "เคาะลง" ต้องโดน (โครงสร้างเดียวกันทุกข้อสอบ)</h3>
+<figure class="diagram">
+<svg viewBox="0 0 760 190" width="760" role="img" aria-label="Percolate down three cases">
+  <!-- case 1: no child -->
+  <g>
+    <text x="120" y="16" text-anchor="middle" class="slab-b">เคส 1: ไม่มีลูก → หยุดเลย</text>
+    <line x1="120" y1="56" x2="55" y2="96" class="te"/><line x1="120" y1="56" x2="185" y2="96" class="te"/>
+    <line x1="55" y1="126" x2="20" y2="156" class="te"/><line x1="55" y1="126" x2="90" y2="156" class="te"/>
+    <g><circle cx="120" cy="46" r="19" class="nd"/><text x="120" y="51" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="55" cy="106" r="19" class="nd hot"/><text x="55" y="111" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="185" cy="106" r="19" class="nd"/><text x="185" y="111" text-anchor="middle" class="nlab">6</text></g>
+    <g><circle cx="20" cy="166" r="18" class="nd"/><text x="20" y="171" text-anchor="middle" class="nlab">5</text></g>
+    <text x="120" y="204" text-anchor="middle" class="tag">ตัวที่เดินลง (3) ไม่มีลูก → break ทันที (left ≥ size)</text>
+  </g>
+  <!-- case 2: one child -->
+  <g>
+    <text x="400" y="16" text-anchor="middle" class="slab-b">เคส 2: มีลูกเดียว (ซ้าย) → เทียบแล้วจบ</text>
+    <line x1="400" y1="56" x2="335" y2="96" class="te"/><line x1="400" y1="56" x2="465" y2="96" class="te"/>
+    <line x1="335" y1="126" x2="298" y2="156" class="te"/><line x1="335" y1="126" x2="372" y2="156" class="te"/>
+    <line x1="465" y1="116" x2="465" y2="146" class="te"/>
+    <g><circle cx="400" cy="46" r="19" class="nd"/><text x="400" y="51" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="335" cy="106" r="19" class="nd hot"/><text x="335" y="111" text-anchor="middle" class="nlab">8</text></g>
+    <g><circle cx="465" cy="106" r="19" class="nd"/><text x="465" y="111" text-anchor="middle" class="nlab">6</text></g>
+    <g><circle cx="298" cy="166" r="18" class="nd"/><text x="298" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="372" cy="166" r="18" class="nd"/><text x="372" y="171" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="465" cy="156" r="18" class="nd"/><text x="465" y="161" text-anchor="middle" class="nlab">10</text></g>
+    <text x="400" y="204" text-anchor="middle" class="tag">8 เทียบกับ 10 → 8&lt;10 ไม่สลับ → break (complete tree มีลูกเดียวได้แค่ฝั่งซ้ายชั้นสุดท้าย)</text>
+  </g>
+  <!-- case 3: two children -->
+  <g>
+    <text x="680" y="16" text-anchor="middle" class="slab-b">เคส 3: มีสองลูก → เลือกเล็กกว่า</text>
+    <line x1="680" y1="56" x2="615" y2="96" class="te"/><line x1="680" y1="56" x2="745" y2="96" class="te"/>
+    <line x1="615" y1="116" x2="580" y2="156" class="te"/><line x1="615" y1="116" x2="652" y2="156" class="te"/>
+    <g><circle cx="680" cy="46" r="19" class="nd"/><text x="680" y="51" text-anchor="middle" class="nlab">8</text></g>
+    <g><circle cx="615" cy="106" r="19" class="nd good"/><text x="615" y="111" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="745" cy="106" r="19" class="nd"/><text x="745" y="111" text-anchor="middle" class="nlab">6</text></g>
+    <g><circle cx="580" cy="166" r="18" class="nd"/><text x="580" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="652" cy="166" r="18" class="nd"/><text x="652" y="171" text-anchor="middle" class="nlab">7</text></g>
+    <text x="680" y="204" text-anchor="middle" class="tag">min(5,6)=5 → สลับ 8↔5 (ถ้า 8 ≤ ลูกเล็กสุดแล้ว → break)</text>
+  </g>
+</svg>
+<figcaption><b>เคาะลง</b> — โค้ดใช้ <code>left = 2p+1</code>, <code>right = 2p+2</code> แล้วเช็ค 3 เคสนี้ตามลำดับ</figcaption>
+</figure>
+
+<h2 id="deleteother">✂️ ถ้าโจทย์ให้ "ลบ node อื่น" ที่ไม่ใช่ root</h2>
+<p>โจทย์ Final 67 มี "Delete Min Node ที่น้อยที่สุด" (คือลบ root) — แต่เผื่อโจทย์ให้ลบค่าอื่น เช่น ลบ 9 ที่เป็นใบ หรือลบ 6 ที่มีลูกเดียว หลักการเดียวกันทั้งหมด:</p>
+<div class="steps">
+  <div class="step"><span class="step-t">ลบใบ (leaf) — ง่ายสุด</span>แค่ตัดออกจาก array ตัวเดียว โครง heap ไม่พังเลย (ใบไม่มีลูกให้เสียกฎ)</div>
+  <div class="step"><span class="step-t">ลบ node ลูกเดียว</span>แทนที่ node ด้วย "ลูกตัวนั้น" ขึ้นมา — เพราะ complete tree จะมีลูกเดียวได้เฉพาะใบสุดท้ายฝั่งซ้าย การยกลูกขึ้นจึงไม่ทำให้เกิดรูกลาง array</div>
+  <div class="step"><span class="step-t">ลบ node สองลูก (เช่น root)</span>ยก "ใบสุดท้ายของ array" มาแทนที่ แล้ว <strong>เคาะขึ้นหรือเคาะลงตามความเหมาะ</strong>:
+  ถ้ามันเล็กกว่าแม่ → percolate up · ถ้าใหญ่กว่าลูก → percolate down (บางครั้งทั้งสองอย่างไม่จำเป็น)</div>
+</div>
+
+<h2 id="code">💻 โค้ดเต็ม MyMinHeap + MyPQueue (จากสไลด์)</h2>
+<pre><code><span class="kw">public class</span> <span class="fn">MyMinHeap</span> {
+  <span class="kw">int</span> MAX_SIZE = 100;
+  <span class="kw">int</span> heap[] = <span class="kw">new int</span>[MAX_SIZE];
+  <span class="kw">int</span> size = 0;
+
+  <span class="kw">public void</span> <span class="fn">insert</span>(<span class="kw">int</span> d) {          <span class="cm">// O(log n)</span>
+    <span class="kw">int</span> p = size++;  heap[p] = d;
+    <span class="kw">int</span> parent = (p-1)/2;
+    <span class="kw">while</span> (p &gt; 0 &amp;&amp; heap[p] &lt; heap[parent]) { <span class="fn">swap</span>(p, parent); p = parent; parent = (p-1)/2; }
+  }
+  <span class="kw">public int</span> <span class="fn">remove</span>() {                 <span class="cm">// O(log n) — ดึงน้อยสุด</span>
+    <span class="kw">int</span> d = heap[0];
+    heap[0] = heap[--size];              <span class="cm">// ใบสุดท้ายขึ้น root, ช่องท้ายว่างลง</span>
+    heap[size] = d;                      <span class="cm">// แถวนี้จากสไลด์: เก็บค่า root ทิ้งไว้ช่องท้าย (สำหรับ heap sort!)</span>
+    <span class="kw">int</span> p = 0;
+    <span class="kw">while</span> (<span class="kw">true</span>) {
+      <span class="kw">int</span> left = 2*p+1;
+      <span class="kw">if</span> (left &gt;= size) <span class="kw">break</span>;           <span class="cm">// เคส 1: ไม่มีลูก</span>
+      <span class="kw">int</span> right = 2*p+2;
+      <span class="kw">if</span> (right == size) {               <span class="cm">// เคส 2: ลูกเดียว</span>
+        <span class="kw">if</span> (heap[p] &gt; heap[left]) <span class="fn">swap</span>(p, left);
+        <span class="kw">break</span>;
+      }
+      <span class="kw">int</span> q = heap[left] &lt; heap[right] ? left : right;  <span class="cm">// เคส 3: เลือกลูกเล็กกว่า</span>
+      <span class="kw">if</span> (heap[p] &gt; heap[q]) { <span class="fn">swap</span>(p, q); p = q; }
+      <span class="kw">else break</span>;
+    }
+    <span class="kw">return</span> d;
+  }
+  <span class="kw">public int</span> <span class="fn">peek</span>() { <span class="kw">return</span> heap[0]; }        <span class="cm">// O(1) มองน้อยสุดโดยไม่ดึงออก</span>
+  <span class="kw">public boolean</span> <span class="fn">isFull</span>() { <span class="kw">return</span> size == MAX_SIZE; }
+  <span class="kw">public boolean</span> <span class="fn">isEmpty</span>() { <span class="kw">return</span> size == 0; }
+}
+
+<span class="kw">public class</span> <span class="fn">MyPQueue</span> {          <span class="cm">// PQ = ห่อ heap ไว้อีกชั้น</span>
+  MyMinHeap heap = <span class="kw">new</span> MyMinHeap();
+  <span class="kw">public void</span> <span class="fn">enqueue</span>(<span class="kw">int</span> d) { heap.<span class="fn">insert</span>(d); }   <span class="cm">// ADT ใช้ชื่อ queue แต่ข้างในเป็น heap</span>
+  <span class="kw">public int</span> <span class="fn">dequeue</span>()      { <span class="kw">return</span> heap.<span class="fn">remove</span>(); }
+  <span class="kw">public int</span> <span class="fn">front</span>()        { <span class="kw">return</span> heap.<span class="fn">peek</span>(); }
+}</code></pre>
+<p class="small">สังเกตบรรทัด <code>heap[size] = d;</code> — สไลด์ "ทิ้ง" ค่าเก่าไว้ช่องท้ายโดยตั้งใจ ถ้าเรียก remove วนซ้ำจนหมด
+ข้อมูลทั้ง array จะเรียงจากมากไปน้อยพอดี → นั่นแหละ heap sort ซ่อนอยู่ใน remove!</p>
+
+<h3>4 วิธีเขียน swap (โกงเกมจากสไลด์ — ข้อสอบอาจถามว่าอันไหนมีโรค)</h3>
+<div class="tbl-wrap"><table>
+<thead><tr><th>วิธี</th><th>โค้ด</th><th>ความเห็น</th></tr></thead>
+<tbody>
+<tr><td>temp (มาตรฐาน)</td><td><code>t=a; a=b; b=t;</code></td><td class="good">✅ ปลอดภัยสุด</td></tr>
+<tr><td>บวก/ลบ</td><td><code>a=a+b; b=a-b; a=a-b;</code></td><td class="bad">⚠️ overflow ถ้าเลขมาก</td></tr>
+<tr><td>คูณ/หาร</td><td><code>a=a*b; b=a/b; a=a/b;</code></td><td class="bad">⚠️ พังถ้าค่าใดเป็น 0</td></tr>
+<tr><td>XOR</td><td><code>a=a^b; b=a^b; a=a^b;</code></td><td>ใช้ได้กับ int (เก่าแต่เท่)</td></tr>
+</tbody></table></div>
+
+<h2 id="heapify">🏗️ Heapify — สร้าง heap จาก array เดิม ใน O(n) เท่านั้น!</h2>
+<p>สองวิธีสร้าง heap จาก n ตัว:</p>
+<ul>
+  <li><strong>insert ทีละตัว n ครั้ง:</strong> แต่ละครั้ง O(log n) → รวม <strong>O(n log n)</strong></li>
+  <li><strong>heapify:</strong> ถือว่า array ที่มีอยู่เป็น tree ไปเลย แล้ว "เคาะลง" จาก node กลาง ๆ (<code>(n-2)/2</code>) ย้อนกลับมาถึง root → <strong>O(n)</strong>!
+  เพราะ node ส่วนใหญ่ใน tree อยู่ "ลึก ๆ ใกล้ใบ" (ครึ่งหนึ่งของ node เป็นใบ) — ใบไม่ต้องทำอะไรเลย ตัวที่ต้องเดินไกลมีแค่นิดเดียว เฉลี่ยต่อ node จึงคงที่</li>
+</ul>
+<p class="small">สรุปข้อสอบ: <strong>build heap จาก array ด้วย heapify = O(n)</strong> · <strong>insert สะสม n ตัว = O(n log n)</strong> — สองค่านี้ไม่เหมือนกัน โจทย์ชอบวัด!</p>
+
+<h3>Heap Sort — ดึง root ทีละตัวจนหมด = ได้ข้อมูลเรียงฟรี ๆ</h3>
+<ol>
+  <li>heapify array ทั้งก้อน (O(n))</li>
+  <li>เรียก remove วน n ครั้ง (ครั้งละ O(log n)) — ทุกครั้ง root (น้อยสุด) ถูกวางไว้ท้าย array ตามโค้ดข้างบน → array กลายเป็นเรียง <strong>มาก→น้อย</strong> (ถ้าอยากได้น้อย→มาก ใช้ max heap)</li>
+</ol>
+<p class="small">สรรพคุณ: Best = Average = Worst = <strong>O(n log n)</strong> · Stable <strong>No</strong> · (สไลด์ใส่ memory O(n) เพราะใช้ array เดิมเป็นที่เก็บผล — ตัวเรียงตัวเอง in-place O(1) เพิ่มเติม)</p>
+
+<h2 id="kth">🏅 Challenge ท้ายบท: หาคะแนนอันดับ k สูงสุดจากสตรีม</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์จากสไลด์ (Example Challenge)</div>
+<p>เขียน class ที่รับคะแนนไหลเข้ามาเรื่อย ๆ (stream) และทุกครั้งที่มีคะแนนใหม่ ต้องตอบ <strong>"คะแนนอันดับ k สูงสุด"</strong> ได้ทันที</p></div>
+<details class="sol"><summary>เฉลยแนวคิด — ใช้ min heap ขนาด k (ตัวเล็กสุดของกองคือ "อันดับ k")</summary><div class="sol-body">
+<p><strong>ไอเดีย:</strong> เก็บ "หนึ่งวงของ k ตัวที่ใหญ่ที่สุดเท่าที่เคยเห็น" ไว้ใน <strong>min heap</strong> — root ของ min heap คือตัวเล็กสุดในวง = อันดับ k พอดี:
+</p>
+<ol>
+<li>ใส่คะแนนใหม่ลง heap</li>
+<li>ถ้าขนาด heap &gt; k → ทิ้ง root (ตัวเล็กสุด) ออก</li>
+<li>ตอบ = root (ถ้า heap ยังไม่เต็ม k ตัว ตอบตัวเล็กสุดที่มีอยู่ก่อน)</li>
+</ol>
+<p>ตัวอย่าง k = 3 กับคะแนน 60, 85, 70, 90, 75:</p>
+<table>
+<thead><tr><th>คะแนนเข้า</th><th>heap หลังจัด</th><th>ตอบ (อันดับ 3)</th></tr></thead>
+<tbody>
+<tr><td>60</td><td>{60}</td><td>—</td></tr>
+<tr><td>85</td><td>{60, 85}</td><td>—</td></tr>
+<tr><td>70</td><td>{60, 70, 85}</td><td><b>60</b></td></tr>
+<tr><td>90</td><td>{70, 85, 90} (ทิ้ง 60)</td><td><b>70</b></td></tr>
+<tr><td>75</td><td>{75, 85, 90} (ทิ้ง 70)</td><td><b>75</b></td></tr>
+</tbody></table>
+<p>เวลาต่อคะแนนหนึ่งตัว = O(log k) — ทำไมใช้ max heap เก็บทุกตัวไม่ดีกว่าไหม? ได้แต่เปลือง: ต้องเก็บทุกคะแนน O(n) และตอบก็ยัง O(log n) — min heap k ตัวเก็บแค่ที่จำเป็น</p>
+</div></details>
+
+<h2 id="summary">📌 สรุปบท + แนวข้อสอบ</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>การทำงาน</th><th class="num">เวลา</th><th>หัวใจ</th></tr></thead>
+<tbody>
+<tr><td>peek / front</td><td class="num">O(1)</td><td>root ก็คือคำตอบ</td></tr>
+<tr><td>insert</td><td class="num">O(log n)</td><td>วางท้าย → เคาะขึ้น</td></tr>
+<tr><td>remove (min/max)</td><td class="num">O(log n)</td><td>ใบสุดท้ายขึ้น root → เคาะลง (เลือกลูกเล็ก/ใหญ่กว่าตามชนิด heap)</td></tr>
+<tr><td>build heap (heapify)</td><td class="num">O(n)</td><td>เคาะลงย้อนจากกลาง array ไป root</td></tr>
+<tr><td>heap sort</td><td class="num">O(n log n)</td><td>heapify + remove วนจนหมด</td></tr>
+</tbody></table></div>
+
+<div class="mcq" data-q="1">
+  <div class="q">1) min heap [2,5,8,9,7,10] — ถ้า insert(1) ต้องสลับกี่ครั้ง?</div>
+  <div class="opts">
+    <button class="opt">0 ครั้ง</button>
+    <button class="opt">1 ครั้ง</button>
+    <button class="opt" data-correct="1">2 ครั้ง</button>
+    <button class="opt">3 ครั้ง</button>
+  </div>
+  <div class="explain">✅ วาง 1 ที่ i=6 (แม่คือ 8) → 1&lt;8 สลับ (ครั้งที่ 1) → ตอนนี้ 1 อยู่ i=2 แม่คือ 2 → 1&lt;2 สลับ (ครั้งที่ 2) → ถึง root จบ = 2 ครั้ง เดินขึ้น 2 ชั้นพอดี</div>
+</div>
+<div class="mcq" data-q="2">
+  <div class="q">2) ใน array ของ heap node ที่ index i มีแม่อยู่ index เท่าไร?</div>
+  <div class="opts">
+    <button class="opt">i / 2</button>
+    <button class="opt" data-correct="1">(i − 1) / 2</button>
+    <button class="opt">2i + 1</button>
+    <button class="opt">i − 1</button>
+  </div>
+  <div class="explain">✅ (i−1)/2 (integer division) — ลูกซ้าย 2i+1, ลูกขวา 2i+2 มาเรียงกัน แม่จึง "ถอยกลับครึ่งช่วง"</div>
+</div>
+<div class="mcq" data-q="3">
+  <div class="q">3) build heap จาก array ด้วย heapify ใช้เวลาเท่าไร?</div>
+  <div class="opts">
+    <button class="opt">O(n log n)</button>
+    <button class="opt" data-correct="1">O(n)</button>
+    <button class="opt">O(log n)</button>
+    <button class="opt">O(n²)</button>
+  </div>
+  <div class="explain">✅ O(n) — เพราะ node ส่วนใหญ่อยู่ใกล้ใบ ทำงานน้อยมาก ต่างจาก insert ทีละตัว n ครั้งที่ได้ O(n log n)</div>
+</div>
+
+<div class="pager">
+  <a href="sorting.html"><span class="dir">← บทก่อน</span><span class="pt">L08 Sorting</span></a>
+  <a href="bst.html" class="next"><span class="dir">บทถัดไป →</span><span class="pt">L10 Binary Search Tree</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · L09 Priority Queue &amp; Heap</div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>

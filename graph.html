@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L12 Graph — เว็บติวสอบ Final DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-graph">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html" class="active">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญ Graph <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#what">Graph คืออะไร + ศัพท์</a>
+    <a href="#kind">ชนิดกราฟ</a>
+    <a href="#path">Path / Cycle / Component</a>
+    <a href="#repr">Matrix vs List</a>
+    <a href="#bfs">BFS (คิว)</a>
+    <a href="#dfs">DFS (สแตก/recursive)</a>
+    <a href="#mst">MST + Prim</a>
+    <a href="#dijkstra">Dijkstra</a>
+    <a href="#unionfind">Union-Find</a>
+    <a href="#kruskal">Kruskal (ออกสอบ!)</a>
+    <a href="#summary">สรุป + แนวข้อสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">L12 · Graph</div>
+  <h1>Graph — จุดกับเส้น ที่ขยายไปได้ไกลถึง Google Maps</h1>
+  <p class="lead">รีวิวรุ่นพี่ออก 2 ข้อยิบ ๆ: <strong>Kruskal หา MST แสดงขั้นตอน</strong> (Final 66) และ
+  <strong>Dijkstra หา Shortest Path แสดงขั้นตอนพร้อมผลลัพธ์</strong> (Final 66/67 — "โจทย์เป็นรูป แต่เปลี่ยนเลข")
+  เราจะฝึก trace ทั้งสองแบบพร้อมตาราง ให้เขียนตามได้ในห้องสอบ</p>
+  <div class="meta">
+    <span class="chip">⭐ Kruskal trace + Union-Find</span>
+    <span class="chip">⭐ Dijkstra trace ตาราง dist</span>
+    <span class="chip">⭐ BFS/DFS พร้อม queue/stack</span>
+  </div>
+</section>
+
+<h2 id="what">🌐 Graph คืออะไร</h2>
+<p>Graph คือ ADT ที่เก็บ <strong>"สิ่งของ + ความสัมพันธ์ระหว่างสิ่งของ"</strong> — G = (V, E):
+<strong>V</strong> (vertices/nodes) คือกลุ่มจุด, <strong>E</strong> (edges) คือกลุ่มเส้นเชื่อม โดยแต่ละเส้นเป็นคู่ (v, w)
+เหมือนโลกจริง: จุด = ห้องในบ้าน/เมือง/คน, เส้น = ประตู/ถนน/มิตรภาพ — อะไรก็แมปได้หมด:</p>
+<ul>
+  <li>ห้อง + ประตูต่อกัน → หาทางเดินจากห้องนอนไปครัว</li>
+  <li>เมือง + ถนน (มีระยะทาง) → GPS หาเส้นทางสั้นสุด ← คือ Dijkstra!</li>
+  <li>คน + การเป็นเพื่อนกัน → social network</li>
+  <li>สายไฟ + จุดต่อ → วงจรไฟฟ้า</li>
+</ul>
+
+<div class="box basic"><div class="box-title"><span class="em">📗</span>ศัพท์พื้นฐานที่ออกเติมคำ</div>
+<ul>
+<li><strong>Undirected</strong> = เส้นสองทาง (มี (x,y) แปลว่ามี (y,x) ด้วย) · <strong>Directed</strong> = เส้นทางเดียว (เรียก edge ว่า arc — มีหัวลูกศร)</li>
+<li><strong>Weighted</strong> = ทุกเส้นมีตัวเลข (ระยะทาง/ค่าใช้จ่าย) ติดไปด้วย · ไม่มีน้ำหนัก = ทุกเส้นเท่ากัน</li>
+<li><strong>Loop</strong> = เส้นที่จาก x ไป x เอง · <strong>Multi-edge</strong> = จุดเดิมคู่เดิมมีหลายเส้น · กราฟที่ไม่มีทั้งสองอย่างเรียก <strong>simple graph</strong></li>
+<li><strong>Adjacent</strong>: w adjacent กับ v ถ้ามีเส้น (v, w) — "ติดกัน"</li>
+<li><strong>Degree</strong> = จำนวนเส้นที่แตะ node นั้น (undirected) · directed แยก <strong>in-degree</strong> (ลูกศรเข้า) / <strong>out-degree</strong> (ลูกศรออก)</li>
+<li><strong>Sparse</strong> = เส้นน้อย (|E| = O(|V|)) · <strong>Dense</strong> = เส้นเยอะ (|E| = O(|V|²))</li>
+</ul></div>
+
+<h2 id="kind">🧩 ชนิดกราฟพิเศษ</h2>
+<figure class="diagram">
+<svg viewBox="0 0 760 220" width="760" role="img" aria-label="Undirected, directed, complete, bipartite">
+  <!-- undirected pentagon -->
+  <g>
+    <text x="110" y="14" text-anchor="middle" class="slab-b">Undirected (สองทาง)</text>
+    <line x1="110" y1="50" x2="45" y2="105" class="te"/><line x1="45" y1="125" x2="70" y2="180" class="te"/>
+    <line x1="95" y1="192" x2="145" y2="192" class="te"/><line x1="165" y1="180" x2="185" y2="125" class="te"/>
+    <line x1="175" y1="105" x2="120" y2="52" class="te"/><line x1="55" y1="100" x2="65" y2="170" class="te"/>
+    <g><circle cx="110" cy="40" r="17" class="nd"/><text x="110" y="45" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="40" cy="115" r="17" class="nd"/><text x="40" y="120" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="80" cy="192" r="17" class="nd"/><text x="80" y="197" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="160" cy="192" r="17" class="nd"/><text x="160" y="197" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="185" cy="115" r="17" class="nd"/><text x="185" y="120" text-anchor="middle" class="nlab">5</text></g>
+    <text x="110" y="222" text-anchor="middle" class="tag">E = {(1,2),(2,3),(3,4),(2,4),(4,5),(5,1)}</text>
+  </g>
+  <!-- directed -->
+  <g>
+    <text x="380" y="14" text-anchor="middle" class="slab-b">Directed (หัวลูกศร = ทางเดียว)</text>
+    <defs><marker id="arwg" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#8a94a0"/></marker></defs>
+    <line x1="355" y1="50" x2="305" y2="108" class="te" marker-end="url(#arwg)"/>
+    <line x1="318" y1="125" x2="345" y2="175" class="te" marker-end="url(#arwg)"/>
+    <line x1="375" y1="192" x2="425" y2="192" class="te" marker-end="url(#arwg)"/>
+    <line x1="448" y1="178" x2="462" y2="128" class="te" marker-end="url(#arwg)"/>
+    <line x1="448" y1="103" x2="390" y2="52" class="te" marker-end="url(#arwg)"/>
+    <g><circle cx="380" cy="40" r="17" class="nd"/><text x="380" y="45" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="310" cy="115" r="17" class="nd"/><text x="310" y="120" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="365" cy="192" r="17" class="nd"/><text x="365" y="197" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="435" cy="192" r="17" class="nd"/><text x="435" y="197" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="455" cy="115" r="17" class="nd"/><text x="455" y="120" text-anchor="middle" class="nlab">5</text></g>
+    <text x="380" y="222" text-anchor="middle" class="tag">1→2→3→4→5→1 · in-degree(4)=2, out-degree(4)=1</text>
+  </g>
+  <!-- complete + bipartite -->
+  <g>
+    <text x="640" y="14" text-anchor="middle" class="slab-b">Complete: ทุกคู่มีเส้น (K₄ = 6 เส้น)</text>
+    <line x1="580" y1="60" x2="705" y2="60" class="te"/><line x1="580" y1="60" x2="600" y2="160" class="te"/>
+    <line x1="580" y1="60" x2="680" y2="160" class="te"/><line x1="705" y1="60" x2="600" y2="160" class="te"/>
+    <line x1="705" y1="60" x2="680" y2="160" class="te"/><line x1="600" y1="160" x2="680" y2="160" class="te"/>
+    <g><circle cx="580" cy="55" r="16" class="nd"/><text x="580" y="60" text-anchor="middle" class="nlab">A</text></g>
+    <g><circle cx="705" cy="55" r="16" class="nd"/><text x="705" y="60" text-anchor="middle" class="nlab">B</text></g>
+    <g><circle cx="600" cy="165" r="16" class="nd"/><text x="600" y="170" text-anchor="middle" class="nlab">C</text></g>
+    <g><circle cx="680" cy="165" r="16" class="nd"/><text x="680" y="170" text-anchor="middle" class="nlab">D</text></g>
+    <text x="640" y="222" text-anchor="middle" class="tag">Bipartite: แบ่งเป็น 2 กลุ่ม เส้นข้ามกลุ่มเท่านั้น</text>
+    <text x="640" y="240" text-anchor="middle" class="tag">(เช่น ผู้สมัคร ↔ บริษัท, นักเรียน ↔ วิชา)</text>
+  </g>
+</svg>
+<figcaption><b>ชนิดกราฟ</b> — โจทย์บอก directed/undirected ยังไง ผลลัพธ์อัลกอริทึมต่างกันได้!</figcaption>
+</figure>
+
+<h2 id="path">🛤️ Path, Cycle, Connected Component</h2>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>ศัพท์เส้นทาง</div>
+<ul>
+<li><strong>Path</strong> = ลำดับจุดที่เดินต่อกันได้ด้วยเส้น · <strong>length ของ path</strong> = จำนวนเส้น (เดินจากตัวเองไปตัวเอง = 0)</li>
+<li><strong>Simple path</strong> = ไม่แวะจุดไหนซ้ำ</li>
+<li><strong>Cycle</strong> = path ที่ออกจากจุดแล้ว "วนกลับมาจบที่จุดเดิม" (ยาว ≥ 2 จุด, ไม่ย้อนเส้นเดิม) · <strong>simple cycle</strong> = ไม่มีจุดซ้ำนอกจากจุดเริ่ม-จบ</li>
+<li><strong>DAG</strong> = Directed Acyclic Graph — กราฟมีทิศที่ไม่มีวงวน (ใช้ทำ schedule/timeline)</li>
+<li><strong>Connected component</strong> = ก้อนที่จุดภายใน "ไปหากันได้หมด" และใหญ่สุดแล้ว (undirected) — กราฟถูกแบ่งเป็นก้อน ๆ ไม่ซ้ำกัน</li>
+<li><strong>Forest</strong> = กราฟที่แต่ละ component เป็น tree (ไม่มีวง) · <strong>Tree</strong> = connected + ไม่มี cycle (undirected)</li>
+</ul></div>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>Subgraph (เคยออกในสไลด์ MIT)</div>
+<p>H = (V′, E′) เป็น subgraph ของ G = (V, E) ต่อเมื่อ <strong>V′ ⊆ V และ E′ ⊆ E</strong> — ระวังกับดัก:
+"หยิบเส้นมาแล้วแต่จุดปลายเส้นไม่อยู่ใน V′" = <strong>ไม่ใช่ subgraph</strong> · "ใช้เส้นที่ไม่มีใน G" = ไม่ใช่เช่นกัน</p></div>
+
+<h2 id="repr">💾 เก็บกราฟในโค้ด: Adjacency Matrix vs Adjacency List</h2>
+<figure class="diagram">
+<svg viewBox="0 0 700 240" width="700" role="img" aria-label="Undirected graph and its adjacency matrix">
+  <g>
+    <line x1="130" y1="46" x2="60" y2="112" class="te"/><line x1="60" y1="132" x2="90" y2="196" class="te"/>
+    <line x1="112" y1="206" x2="168" y2="206" class="te"/><line x1="190" y1="196" x2="205" y2="132" class="te"/>
+    <line x1="196" y1="112" x2="140" y2="48" class="te"/><line x1="72" y1="108" x2="82" y2="188" class="te"/>
+    <g><circle cx="130" cy="38" r="18" class="nd"/><text x="130" y="43" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="55" cy="122" r="18" class="nd"/><text x="55" y="127" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="100" cy="208" r="18" class="nd"/><text x="100" y="213" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="180" cy="208" r="18" class="nd"/><text x="180" y="213" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="210" cy="122" r="18" class="nd"/><text x="210" y="127" text-anchor="middle" class="nlab">5</text></g>
+    <text x="130" y="248" text-anchor="middle" class="slab-b">Undirected graph เดียวกัน</text>
+  </g>
+  <g transform="translate(300,20)">
+    <text x="0" y="0" class="slab-b">Adjacency Matrix (5×5)</text>
+    <g transform="translate(0,14)">
+      <text x="18" y="10" class="tag"></text>
+      <text x="45" y="12" text-anchor="middle" class="tag">1</text><text x="83" y="12" text-anchor="middle" class="tag">2</text><text x="121" y="12" text-anchor="middle" class="tag">3</text><text x="159" y="12" text-anchor="middle" class="tag">4</text><text x="197" y="12" text-anchor="middle" class="tag">5</text>
+      <rect x="8" y="18" width="38" height="30" class="cell"/><text x="27" y="39" text-anchor="middle" class="box-lab">0</text>
+      <rect x="46" y="18" width="38" height="30" class="cell good"/><text x="65" y="39" text-anchor="middle" class="box-lab">1</text>
+      <rect x="84" y="18" width="38" height="30" class="cell"/><text x="103" y="39" text-anchor="middle" class="box-lab">0</text>
+      <rect x="122" y="18" width="38" height="30" class="cell"/><text x="141" y="39" text-anchor="middle" class="box-lab">0</text>
+      <rect x="160" y="18" width="38" height="30" class="cell good"/><text x="179" y="39" text-anchor="middle" class="box-lab">1</text>
+      <text x="0" y="39" text-anchor="end" class="tag">1</text>
+      <rect x="8" y="48" width="38" height="30" class="cell good"/><text x="27" y="69" text-anchor="middle" class="box-lab">1</text>
+      <rect x="46" y="48" width="38" height="30" class="cell"/><text x="65" y="69" text-anchor="middle" class="box-lab">0</text>
+      <rect x="84" y="48" width="38" height="30" class="cell good"/><text x="103" y="69" text-anchor="middle" class="box-lab">1</text>
+      <rect x="122" y="48" width="38" height="30" class="cell good"/><text x="141" y="69" text-anchor="middle" class="box-lab">1</text>
+      <rect x="160" y="48" width="38" height="30" class="cell"/><text x="179" y="69" text-anchor="middle" class="box-lab">0</text>
+      <text x="0" y="69" text-anchor="end" class="tag">2</text>
+      <rect x="8" y="78" width="38" height="30" class="cell"/><text x="27" y="99" text-anchor="middle" class="box-lab">0</text>
+      <rect x="46" y="78" width="38" height="30" class="cell good"/><text x="65" y="99" text-anchor="middle" class="box-lab">1</text>
+      <rect x="84" y="78" width="38" height="30" class="cell"/><text x="103" y="99" text-anchor="middle" class="box-lab">0</text>
+      <rect x="122" y="78" width="38" height="30" class="cell good"/><text x="141" y="99" text-anchor="middle" class="box-lab">1</text>
+      <rect x="160" y="78" width="38" height="30" class="cell"/><text x="179" y="99" text-anchor="middle" class="box-lab">0</text>
+      <text x="0" y="99" text-anchor="end" class="tag">3</text>
+      <rect x="8" y="108" width="38" height="30" class="cell"/><text x="27" y="129" text-anchor="middle" class="box-lab">0</text>
+      <rect x="46" y="108" width="38" height="30" class="cell good"/><text x="65" y="129" text-anchor="middle" class="box-lab">1</text>
+      <rect x="84" y="108" width="38" height="30" class="cell good"/><text x="103" y="129" text-anchor="middle" class="box-lab">1</text>
+      <rect x="122" y="108" width="38" height="30" class="cell"/><text x="141" y="129" text-anchor="middle" class="box-lab">0</text>
+      <rect x="160" y="108" width="38" height="30" class="cell good"/><text x="179" y="129" text-anchor="middle" class="box-lab">1</text>
+      <text x="0" y="129" text-anchor="end" class="tag">4</text>
+      <rect x="8" y="138" width="38" height="30" class="cell good"/><text x="27" y="159" text-anchor="middle" class="box-lab">1</text>
+      <rect x="46" y="138" width="38" height="30" class="cell"/><text x="65" y="159" text-anchor="middle" class="box-lab">0</text>
+      <rect x="84" y="138" width="38" height="30" class="cell"/><text x="103" y="159" text-anchor="middle" class="box-lab">0</text>
+      <rect x="122" y="138" width="38" height="30" class="cell good"/><text x="141" y="159" text-anchor="middle" class="box-lab">1</text>
+      <rect x="160" y="138" width="38" height="30" class="cell"/><text x="179" y="159" text-anchor="middle" class="box-lab">0</text>
+      <text x="0" y="159" text-anchor="end" class="tag">5</text>
+    </g>
+    <text x="0" y="196" class="tag">undirected → matrix สมมาตร (M[i][j] = M[j][i])</text>
+    <text x="0" y="216" class="tag">ถ้ามี weight เปลี่ยน 1 เป็นน้ำหนัก, 0 คือไม่มีเส้น</text>
+  </g>
+</svg>
+<figcaption><b>Adjacency matrix</b> — ถามว่า "i กับ j ต่อกันไหม?" ตอบ O(1) แต่เปลือง O(V²) เสมอ</figcaption>
+</figure>
+
+<p><strong>Adjacency list</strong> = แต่ละ vertex เก็บ "รายชื่อเพื่อนบ้าน" ของตัวเอง (vector of lists) — เหมาะกับกราฟ sparse เพราะเก็บเฉพาะเส้นที่มีจริง เก็บ weight ได้โดยเก็บคู่ [neighbor, weight]:</p>
+<pre><code><span class="cm">// โจทย์จากสไลด์: n=7, roads = [[0,6,7],[0,1,2],[1,2,3],[1,3,3],[6,3,3],[3,5,1],[6,5,1],[2,5,1],[0,4,5],[4,6,2]]</span>
+<span class="cm">// แต่ละ triplet [u, v, w] = เส้น undirected ระหว่าง u,v น้ำหนัก w → เขียน adjacency list แบบ [w, v]:</span>
+graph.get(0) = [[2,1], [5,4], [7,6]]     <span class="cm">// 0 ต่อกับ 1(w2), 4(w5), 6(w7)</span>
+graph.get(1) = [[2,0], [3,2], [3,3]]
+graph.get(2) = [[3,1], [1,5]]
+graph.get(3) = [[3,1], [1,5], [3,6]]
+graph.get(4) = [[5,0], [2,6]]
+graph.get(5) = [[1,3], [1,2], [1,6]]
+graph.get(6) = [[7,0], [3,3], [1,5], [2,4]]</code></pre>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>เทียบ</th><th>Adjacency List</th><th>Adjacency Matrix</th><th>ใครชนะ</th></tr></thead>
+<tbody>
+<tr><td>Memory</td><td class="good">Θ(V + E)</td><td class="bad">Θ(V²)</td><td>List (กราฟ sparse)</td></tr>
+<tr><td>ถามว่า (u,v) มีเส้นไหม</td><td class="bad">O(deg(u))</td><td class="good">O(1)</td><td>Matrix</td></tr>
+<tr><td>เพิ่ม/ลบเส้น</td><td class="good">O(1) / O(deg(u))</td><td class="good">O(1) / O(1)</td><td>Matrix (ลบ)</td></tr>
+<tr><td>หา degree</td><td class="good">O(1)*</td><td>O(V)</td><td>List</td></tr>
+<tr><td>Traverse ทั้งกราฟ</td><td class="good">O(V + E)</td><td>O(V²)</td><td>List</td></tr>
+<tr><td>ใช้ดีกับ</td><td>ปัญหากราฟส่วนใหญ่</td><td>กราฟ dense / ถามเส้นบ่อย</td><td>ดูกราฟ</td></tr>
+</tbody></table></div>
+<p class="small">*เมื่อ list เก็บขนาดไว้ (เช่น ArrayList.size()) — นี่คือตาราง trade-off ในสไลด์ อ่านให้ออกว่ากรณีไหนใครได้เปรียบ</p>
+
+<h2 id="bfs">🌊 BFS — Breadth-First Search (กว้างก่อน ใช้คิว)</h2>
+<p>เดินสำรวจกราฟแบบ "ระดับ" เหมือนกระดานหยดน้ำ: สำรวจจุดใกล้ ๆ ทั้งหมดก่อน แล้วค่อยขยายวงออกไป — ใช้ <strong>Queue (FIFO)</strong>
+จุดแต่ละจุดมี 3 สถานะ: <strong>unvisited → discovered (ต่อคิวแล้ว) → explored (ดึงออกและประมวลผลแล้ว)</strong></p>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p><strong>BFS = ข่าวลือแบบวงขยาย:</strong> คุณบอกเพื่อนสนิททุกคน (ระดับ 1) แล้วเพื่อนสนิทแต่ละคนไปบอกเพื่อนของเขา (ระดับ 2) … ข่าวลามเป็นวงกลม
+<strong>DFS = ไต่ถ้ำ:</strong> เดินลึกสุดทางก่อน ตันค่อยย้อนกลับไปแยกทางอื่น</p></div>
+
+<h3>Trace BFS จาก A (เรียงเพื่อนบ้านตามตัวอักษร)</h3>
+<figure class="diagram">
+<svg viewBox="0 0 700 300" width="700" role="img" aria-label="BFS DFS example graph">
+  <line x1="120" y1="52" x2="55" y2="108" class="te"/><line x1="120" y1="52" x2="185" y2="108" class="te"/>
+  <line x1="42" y1="124" x2="18" y2="178" class="te"/><line x1="58" y1="124" x2="82" y2="178" class="te"/>
+  <line x1="182" y1="124" x2="158" y2="178" class="te"/><line x1="198" y1="124" x2="222" y2="178" class="te"/>
+  <line x1="20" y1="200" x2="75" y2="248" class="te"/><line x1="88" y1="202" x2="88" y2="242" class="te"/><line x1="152" y1="200" x2="100" y2="248" class="te"/>
+  <g><circle cx="120" cy="42" r="19" class="nd hot"/><text x="120" y="47" text-anchor="middle" class="nlab">A</text></g>
+  <g><circle cx="50" cy="118" r="19" class="nd"/><text x="50" y="123" text-anchor="middle" class="nlab">B</text></g>
+  <g><circle cx="190" cy="118" r="19" class="nd"/><text x="190" y="123" text-anchor="middle" class="nlab">C</text></g>
+  <g><circle cx="15" cy="188" r="17" class="nd"/><text x="15" y="193" text-anchor="middle" class="nlab">D</text></g>
+  <g><circle cx="85" cy="188" r="17" class="nd"/><text x="85" y="193" text-anchor="middle" class="nlab">E</text></g>
+  <g><circle cx="155" cy="188" r="17" class="nd"/><text x="155" y="193" text-anchor="middle" class="nlab">F</text></g>
+  <g><circle cx="225" cy="188" r="17" class="nd"/><text x="225" y="193" text-anchor="middle" class="nlab">G</text></g>
+  <g><circle cx="88" cy="260" r="17" class="nd"/><text x="88" y="265" text-anchor="middle" class="nlab">H</text></g>
+  <text x="350" y="52" class="slab">เส้นเชื่อม: A–B, A–C · B–D, B–E · C–F, C–G · D–H, E–H, F–H</text>
+  <text x="350" y="78" class="slab">เพื่อนบ้านเรียงตามตัวอักษร (A: B→C, B: D→E, …)</text>
+  <text x="350" y="126" class="slab-b">BFS order: A, B, C, D, E, F, G, H (ชั้น 0→1→2→3)</text>
+  <text x="350" y="152" class="slab-b">DFS order: A, B, D, H, E, C, F, G (ลึกก่อน ย้อนกลับทีหลัง)</text>
+  <text x="350" y="184" class="tag">ชั้นของ BFS: A=0 · B,C=1 · D,E,F,G=2 · H=3</text>
+  <text x="350" y="210" class="tag">DFS: หลัง H ย้อนกลับ (E ยังไม่เคยเหยียบ → เข้า E) แล้วค่อยกลับไปฝั่ง C</text>
+</svg>
+<figcaption><b>กราฟตัวอย่าง</b> สำหรับ trace BFS/DFS ด้านล่าง</figcaption>
+</figure>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th class="num">step</th><th>dequeue</th><th>เพื่อนบ้านที่ enqueue ใหม่</th><th>Queue หลัง step</th><th>BFS order สะสม</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="num">A</td><td>B, C</td><td class="num">(B, C)</td><td class="num">A</td></tr>
+<tr><td class="num">2</td><td class="num">B</td><td>D, E</td><td class="num">(C, D, E)</td><td class="num">A, B</td></tr>
+<tr><td class="num">3</td><td class="num">C</td><td>F, G</td><td class="num">(D, E, F, G)</td><td class="num">A, B, C</td></tr>
+<tr><td class="num">4</td><td class="num">D</td><td>H</td><td class="num">(E, F, G, H)</td><td class="num">A, B, C, D</td></tr>
+<tr><td class="num">5</td><td class="num">E</td><td>— (H เคยค้นพบแล้ว)</td><td class="num">(F, G, H)</td><td class="num">A, B, C, D, E</td></tr>
+<tr><td class="num">6</td><td class="num">F</td><td>—</td><td class="num">(G, H)</td><td class="num">…F</td></tr>
+<tr><td class="num">7</td><td class="num">G</td><td>—</td><td class="num">(H)</td><td class="num">…G</td></tr>
+<tr><td class="num">8</td><td class="num">H</td><td>—</td><td class="num">()</td><td class="num">A, B, C, D, E, F, G, H ✅</td></tr>
+</tbody></table></div>
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>กุญแจสำคัญ: mark "discovered" ตอน enqueue</div>
+<p>สังเกต step 5: E ไม่ enqueue H อีก เพราะ H โดน mark ตั้งแต่ตอน D ส่งเข้าคิว — <strong>เช็คก่อน enqueue ทุกครั้ง</strong>
+ไม่งั้นจุดเดียวจะเข้าคิวซ้ำหลายรอบ ผล trace พังทันที (คำถามสไลด์ "What if enqueue(B)?" = ถ้าไม่เช็ค ก็จะวนไม่รู้จบ!)</p></div>
+
+<pre><code><span class="kw">void</span> <span class="fn">bfs</span>() {
+  Queue&lt;Vertex&gt; q;
+  <span class="kw">for all</span> v <span class="kw">in</span> V: d[v] = ∞      <span class="cm">// ทุกจุด unvisited</span>
+  q.<span class="fn">enqueue</span>(startVertex);
+  d[startVertex] = 0;            <span class="cm">// จุดเริ่ม: ระยะ 0</span>
+  <span class="kw">while</span> (!q.<span class="fn">isEmpty</span>()) {
+    u = q.<span class="fn">dequeue</span>();
+    <span class="kw">for each</span> w <span class="fn">adjacent to</span> u {
+      <span class="kw">if</span> (d[w] == ∞) {           <span class="cm">// ยังไม่เคยเจอ</span>
+        d[w] = d[u] + 1;         <span class="cm">// ระยะ = ระยะพ่อ + 1 → BFS ให้ "จำนวนเส้นน้อยสุด" ในกราฟไม่มีน้ำหนักฟรี ๆ!</span>
+        path[w] = u;             <span class="cm">// จำว่ามาจากไหน (ย้อนเส้นทางได้)</span>
+        q.<span class="fn">enqueue</span>(w);
+      }
+    }
+  }
+}</code></pre>
+
+<h2 id="dfs">🕳️ DFS — Depth-First Search (ลึกก่อน ใช้สแตก/recursion)</h2>
+<p>trace DFS แบบ recursive จาก A (เลือกเพื่อนบ้านตัวอักษรแรกก่อนเสมอ) — "call stack" คือสายโซ่ recursion ที่ลึกอยู่:</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th class="num">step</th><th>สิ่งที่เกิด</th><th>Call stack (ลึกสุดขวา)</th><th>DFS order สะสม</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td>dfs(A) → เพื่อนตัวแรกคือ B → ดำดิ่ง</td><td class="num">(A B)</td><td class="num">A</td></tr>
+<tr><td class="num">2</td><td>dfs(B) → D (A เยี่ยมแล้ว)</td><td class="num">(A B D)</td><td class="num">A, B</td></tr>
+<tr><td class="num">3</td><td>dfs(D) → H</td><td class="num">(A B D H)</td><td class="num">A, B, D, H</td></tr>
+<tr><td class="num">4</td><td>dfs(H) → D แล้ว แต่ <b>E ยังไม่เคยเหยียบ</b> → เข้า E</td><td class="num">(A B D H E)</td><td class="num">A, B, D, H, E</td></tr>
+<tr><td class="num">5</td><td>dfs(E) ตัน (B, H หมด) → ย้อนกลับ (backtrack) ทีละชั้นจนถึง A</td><td class="num">(A)</td><td class="num">…E</td></tr>
+<tr><td class="num">6</td><td>กลับที่ A → เหลือ C → dfs(C) → F → (H แล้ว) → G → ครบทุกจุด</td><td class="num">()</td><td class="num">A, B, D, H, E, C, F, G ✅</td></tr>
+</tbody></table></div>
+<pre><code><span class="cm">// แบบ recursive — เขียนสั้นและสวยที่สุด</span>
+<span class="kw">void</span> <span class="fn">dfs</span>(Vertex v) {
+  <span class="kw">if</span> (v.visited) <span class="kw">return</span>;
+  v.visited = <span class="kw">true</span>;                  <span class="cm">// mark ตอน "เหยียบ"</span>
+  <span class="cm">// process v …</span>
+  <span class="kw">for each</span> w <span class="fn">adjacent to</span> v
+    <span class="kw">if</span> (!w.visited) <span class="fn">dfs</span>(w);           <span class="cm">// ดำดิ่งลงไปก่อน ย้อนกลับ (backtrack) เองโดย call stack</span>
+}
+
+<span class="cm">// แบบ iterative ด้วยสแตก (pre-order)</span>
+<span class="kw">void</span> <span class="fn">dfsIter</span>() {
+  Stack&lt;Vertex&gt; s;  s.<span class="fn">push</span>(startVertex);  startVertex.visited = <span class="kw">true</span>;
+  <span class="kw">while</span> (!s.<span class="fn">isEmpty</span>()) {
+    u = s.<span class="fn">pop</span>();
+    <span class="cm">// process u …</span>
+    <span class="kw">for each</span> w <span class="fn">adjacent to</span> u
+      <span class="kw">if</span> (!w.visited) { w.visited = <span class="kw">true</span>; s.<span class="fn">push</span>(w); }
+  }
+}</code></pre>
+<div class="box basic"><div class="box-title"><span class="em">💡</span>BFS vs DFS — หัวใจที่ออกเทียบบ่อย</div>
+<p>โครงเดียวกันหมด ต่างกันแค่ <strong>โครงสร้างข้อมูล</strong>: BFS ใช้ <strong>Queue</strong> (เอาตัวเก่าสุดออกก่อน = วงกว้าง)
+DFS ใช้ <strong>Stack/recursive</strong> (เอาตัวใหม่สุดออกก่อน = วงลึก) · ทั้งคู่ O(V + E) · BFS ได้เส้นทาง "เส้นน้อยสุด" ในกราฟไม่มีน้ำหนักฟรี ๆ จาก d[] และ path[]</p></div>
+<h2 id="mst">🌲 MST — Minimum Spanning Tree</h2>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>ศัพท์ที่ต้องเข้าใจก่อน</div>
+<ul>
+<li><strong>Spanning tree</strong> ของกราฟ connected, undirected = subgraph ที่ (1) มี <strong>จุดครบทุกจุด</strong> (2) ต่อถึงกันหมด (3) <strong>ไม่มีวงวน</strong> → เส้นพอดี <strong>V − 1 เส้น</strong> (หนึ่งกราฟมี spanning tree ได้หลายแบบ)</li>
+<li><strong>MST</strong> = spanning tree ที่ "ผลรวมน้ำหนักเส้นน้อยสุด" — ใช้จริง: ต่อสายไฟทั้งหมู่บ้านด้วยลวดสั้นสุด, วางท่อ/ถนนเชื่อมทุกจุดถูกสุด</li>
+<li>ถ้าน้ำหนักทุกเส้นต่างกันหมด → MST จะ<strong>มีแบบเดียว</strong> (ถ้ามีเส้นน้ำหนักซ้ำอาจมีหลาย MST)</li>
+</ul></div>
+
+<h3>Prim's Algorithm — "โตต้นไม้จาก 1 จุด"</h3>
+<p>เริ่มจากจุดไหนก็ได้ แล้ววนซ้ำ: เลือก <strong>เส้นที่ถูกสุดที่ยื่นออกนอกต้นไม้</strong> (ปลายหนึ่งในต้นไม้ อีกปลายอยู่นอก) ดึงเข้ามา จนครบทุกจุด —
+เหมือนหยอดกระดุมเม็ดแรกแล้วค่อย ๆ ดึงกระดุมใกล้สุดทีละเม็ด · ใช้ priority queue เก็บ key[v] = เส้นถูกสุดที่พา v เข้าต้นไม้ → <strong>O(E log V)</strong></p>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>Trace Prim จากสไลด์</div>
+<p>เส้น: A–B 10, A–C 10, B–D 12, C–D 20, D–E 15, C–G 7, G–F 15, G–I 5, F–H 5, H–I 18 (เริ่มที่ A)</p>
+<details class="sol"><summary>เฉลยทีละรอบ</summary><div class="sol-body">
+<table>
+<thead><tr><th class="num">รอบ</th><th>หยิบจุด (key น้อยสุดในคิว)</th><th>เส้นที่เพิ่มเข้า MST</th><th>อัปเดต key</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td>A (key 0)</td><td>—</td><td>B=10, C=10</td></tr>
+<tr><td class="num">2</td><td>B (10)</td><td>A–B (10)</td><td>D=12</td></tr>
+<tr><td class="num">3</td><td>C (10)</td><td>A–C (10)</td><td>G=7 (C–D 20 แพงกว่า D เดิม ไม่เอา)</td></tr>
+<tr><td class="num">4</td><td>G (7)</td><td>C–G (7)</td><td>F=15, I=5</td></tr>
+<tr><td class="num">5</td><td>I (5)</td><td>G–I (5)</td><td>H=18</td></tr>
+<tr><td class="num">6</td><td>D (12)</td><td>B–D (12)</td><td>E=15</td></tr>
+<tr><td class="num">7</td><td>F (15)</td><td>G–F (15)</td><td>H: F–H=5 &lt; 18 → H=5</td></tr>
+<tr><td class="num">8</td><td>H (5)</td><td>F–H (5)</td><td>—</td></tr>
+<tr><td class="num">9</td><td>E (15)</td><td>D–E (15)</td><td>ครบ 9 จุด = 8 เส้น จบ ✅</td></tr>
+</tbody>
+<p style="margin-top:8px">MST = {A–B 10, A–C 10, C–G 7, G–I 5, B–D 12, G–F 15, F–H 5, D–E 15} · รวม <strong>79</strong></p>
+</div></details>
+</div>
+
+<h2 id="dijkstra">🗺️ Dijkstra — หาเส้นทาง "ถูกสุด" จากจุดเดียวไปทุกจุด</h2>
+<p><strong>Single-Source Shortest Path:</strong> ให้จุดเริ่ม s หาเส้นทางน้ำหนักรวมน้อยสุดไป "ทุกจุด" ที่ไปถึง (ข้อบังคับ: <strong>น้ำหนักไม่ติดลบ</strong>) —
+คือหัวใจของ GPS/Google Maps ผลลัพธ์ 2 อย่าง: <code>dist[v]</code> = ระยะสั้นสุดถึง v, <code>prev[v]</code> = จุดก่อนหน้า (ย้อนทางได้)</p>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>หัวใจ: Relaxation (คลายเส้น)</div>
+<p>"ลองเดินผ่าน u ไปหา v จะดีกว่าเดิมไหม?" — <code>alt = dist[u] + w(u,v)</code> ถ้า <code>alt &lt; dist[v]</code> → อัปเดต dist[v] = alt, prev[v] = u
+ทำกับทุกเส้นของจุดที่ "ดีที่สุดในคิว" ที่เพิ่งหยิบออก · greedy: ทุกครั้งหยิบจุดที่ dist น้อยสุดจากคิวมาปลดล็อก (จุดนั้นเรามั่นใจสุดแล้ว)</p></div>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>แนวข้อสอบตรง (Final 66/67): trace Dijkstra พร้อมตาราง</div>
+<p>กราฟจากสไลด์ (เริ่มที่ A): เส้น A–B 4, A–C 2, A–E 15, C–D 5, B–D 1, B–E 3, D–E 3, D–F 0, F–D 2, F–H 4 · G ไม่มีเส้นใดต่อ</p>
+<details class="sol"><summary>เฉลย: ตาราง trace แบบเดียวกับสไลด์</summary><div class="sol-body">
+<table>
+<thead><tr><th class="num">รอบ</th><th>pop (dist, u)</th><th>เกิดอะไร</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th><th class="num">E</th><th class="num">F</th><th class="num">G</th><th class="num">H</th></tr></thead>
+<tbody>
+<tr><td class="num">0</td><td class="num">เริ่ม: push(0,A)</td><td>dist เริ่ม ∞ หมด ยกเว้น A=0</td><td class="num">0</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">1</td><td class="num">(0, A)</td><td>ผ่อน B: 0+4=4 ✓ · C: 2 ✓ · E: 15 ✓</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">∞</td><td class="num">15</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">2</td><td class="num">(2, C)</td><td>ผ่อน D: 2+5=7 ✓</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">7</td><td class="num">15</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">3</td><td class="num">(4, B)</td><td>D: 4+1=5 &lt; 7 → อัปเดต · E: 4+3=7 &lt; 15 → อัปเดต</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">5</td><td class="num">7</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">4</td><td class="num">(5, D)</td><td>E: 5+3=8 ≥ 7 ข้าม · F: 5+0=5 ✓</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">5</td><td class="num">7</td><td class="num">5</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">5</td><td class="num">(5, F)</td><td>D: 5+2=7 ≥ 5 ข้าม · H: 5+4=9 ✓</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">5</td><td class="num">7</td><td class="num">5</td><td class="num">∞</td><td class="num">9</td></tr>
+<tr><td class="num">6</td><td class="num">(7, D)</td><td>stale! (7 &gt; dist[D]=5) → continue</td><td colspan="8" style="text-align:center">ไม่เปลี่ยน</td></tr>
+<tr><td class="num">7</td><td class="num">(7, E)</td><td>E ไม่มีเส้นออก</td><td colspan="8" style="text-align:center">ไม่เปลี่ยน</td></tr>
+<tr><td class="num">8</td><td class="num">(9, H)</td><td>H ไม่มีเส้นออก</td><td colspan="8" style="text-align:center">ไม่เปลี่ยน</td></tr>
+<tr><td class="num">9</td><td class="num">(15, E)</td><td>stale → continue · คิวหมด จบ</td><td class="num">0</td><td class="num">4</td><td class="num">2</td><td class="num">5</td><td class="num">7</td><td class="num">5</td><td class="num">∞</td><td class="num">9</td></tr>
+</tbody></table>
+<p><strong>ผลลัพธ์:</strong> dist = {A:0, B:4, C:2, D:5, E:7, F:5, G:∞, H:9} · prev = {B:A, C:A, D:B, E:B, F:D, H:F} (G ไปไม่ถึง)
+— เส้นทางไป H = A→C? ไม่ใช่: ย้อนจาก prev: H ← F ← D ← B ← A = A→B→D→F→H (4+1+0+4 = 9 ✓)</p>
+<p class="small">"stale" คือของเก่าจาก lazy queue — พอดึงมาเจอว่า dist ปัจจุบันดีกว่าแล้ว ก็ข้าม (ดูโค้ดข้างล่าง)</p>
+</div></details>
+</div>
+
+<h3>Lazy Queue — เทคนิคเขียนจริงเมื่อ PQ ไม่มี decreaseKey</h3>
+<pre><code><span class="fn">push</span>(pq, 0, s)
+<span class="kw">while</span> (!pq.<span class="fn">empty</span>()) {
+  (du, u) = <span class="fn">extractMin</span>(pq)
+  <span class="kw">if</span> (du &gt; dist[u]) <span class="kw">continue</span>;   <span class="cm">// ของเก่า (เคยเจอทางสั้นกว่าแล้ว) → ทิ้งเลย นี่คือ "visited check" ของ lazy</span>
+  <span class="kw">for each</span> edge (u, v, w):
+    <span class="kw">if</span> (du + w &lt; dist[v]) {
+      dist[v] = du + w;
+      prev[v] = u;
+      <span class="fn">push</span>(pq, dist[v], v);      <span class="cm">// แทรกของใหม่เพิ่มเข้าไปเฉย ๆ ไม่ต้องไปแก้ของเก่า</span>
+    }
+}
+<span class="cm">// อยากได้แค่ s→t: เพิ่ม if (u == t) break; ตอน pop (early exit)</span></code></pre>
+<p class="small">Complexity: insert เกิดได้มากสุด O(E) ครั้ง → <strong>O(E log V)</strong> (โดยรวมเต็ม ๆ O(|V| + |E| log |V|)) — Prim แบบ lazy ก็ O(E log V) เท่ากัน</p>
+
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>MST ≠ เส้นทางสั้นสุด!</div>
+<p>คำถามคลาสสิก: "MST ใช้เป็นเส้นทางสั้นสุดได้ไหม?" — <strong>ไม่ได้!</strong> MST มองภาพรวม (ผลรวมเส้นน้อยสุด)
+แต่ Dijkstra มองรายจุด (จาก s ไปแต่ละจุดสั้นสุด) — เส้นทางใน MST ไป A→B อาจแย่กว่าเส้นตรงที่ไม่ได้อยู่ใน MST · ตารางเทียบตรง ๆ:</p></div>
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>Prim (MST)</th><th>Dijkstra (Shortest Path)</th></tr></thead>
+<tbody>
+<tr><td>เป้าหมาย</td><td>ผลรวมน้ำหนักเส้นน้อยสุด ต่อทุกจุดให้ครบ</td><td>ระยะสั้นสุดจาก s ไป "แต่ละจุด"</td></tr>
+<tr><td>เริ่มที่</td><td>จุดไหนก็ได้</td><td>จุด source s ที่กำหนด</td></tr>
+<tr><td>คิวจัดอันดับด้วย</td><td>key[v] = เส้นถูกสุดที่พา v เข้า tree</td><td>dist[v] = ระยะสั้นสุดที่เคยเจอจาก s</td></tr>
+<tr><td>อัปเดต</td><td>w(u,v) &lt; key[v] → เอาเส้นใหม่</td><td>dist[u] + w(u,v) &lt; dist[v] → ผ่อนเส้น</td></tr>
+<tr><td>ผลลัพธ์</td><td>MST จาก parent[]</td><td>Shortest-path tree จาก prev[]</td></tr>
+<tr><td>กราฟที่ใช้ได้</td><td>connected, undirected</td><td>directed/undirected น้ำหนัก ≥ 0</td></tr>
+</tbody></table></div>
+
+<h2 id="unionfind">🤝 Union-Find — ตามว่า "ใครอยู่กลุ่มเดียวกัน"</h2>
+<p>โครงสร้างจัดการ <strong>กลุ่มที่ไม่ซ้อนกัน (disjoint sets)</strong> ด้วย 2 คำสั่ง:</p>
+<ul>
+<li><code>find(x)</code> — คืน "หัวหน้ากลุ่ม" (root) ของ x → สองตัวอยู่กลุ่มเดียวกัน ⟺ find เท่ากัน</li>
+<li><code>union(a, b)</code> — รวมกลุ่มของ a กับ b (ถ้าคนละกลุ่ม)</li>
+</ul>
+<p>แนวคิด: จำ "parent" ของแต่ละตัวใน array — ตัวที่ parent ชี้ตัวเอง = หัวหน้า · ตรวจว่าจุด 2 จุดต่อถึงกันในกราฟหรือยัง ก็แค่เทียบหัวหน้า! (นี่คือเครื่องมือกันวงวนของ Kruskal)</p>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>ตัวอย่างจากสไลด์: union by rank</div>
+<p>เริ่ม 5 ตัวล้วนเป็นกลุ่มตัวเอง (rank ทุกตัว = 0) · ทำ union(0,1), union(1,2), union(2,3)</p>
+<details class="sol"><summary>เฉลยทีละขั้น</summary><div class="sol-body">
+<ol>
+<li><strong>union(0,1):</strong> find(0)=0 (rank 0), find(1)=1 (rank 0) → เท่ากัน เลือก 1 เป็นหัว: parent[0]=1, rank[1] = 1</li>
+<li><strong>union(1,2):</strong> find(1)=1 (rank 1), find(2)=2 (rank 0) → rank 1 &gt; rank 0 → parent[2]=1 (ต้นสั้นติดใต้ต้นสูง)</li>
+<li><strong>union(2,3):</strong> find(2)=1 (rank 1), find(3)=3 (rank 0) → parent[3]=1</li>
+</ol>
+<p>ผล: {0,1,2,3} อยู่ใต้หัว 1 และ {4} อยู่โดด — 2 components</p>
+<p><strong>Path compression:</strong> ตอน find วิ่งผ่านตัวไหน "รีด" ให้ตัวนั้นชี้ตรงหัวเลย (parent[x] = find(parent[x)) — ครั้งหน้า find เร็วสุด ๆ
+ทั้งสองเทคนิครวมกัน → find/union ≈ <strong>O(α(n)) ≈ O(1)</strong> (α = ฟังก์ชันกลับด้าว Acker­mann โตช้ากว่า log อีก)</p>
+</div></details>
+</div>
+<pre><code><span class="kw">public int</span> <span class="fn">find</span>(<span class="kw">int</span> x) {
+  <span class="kw">if</span> (parent[x] != x)
+    parent[x] = <span class="fn">find</span>(parent[x]);    <span class="cm">// path compression — รีดทางให้ชี้ตรง root</span>
+  <span class="kw">return</span> parent[x];
+}
+<span class="kw">public void</span> <span class="fn">union</span>(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+  <span class="kw">int</span> rootA = <span class="fn">find</span>(a), rootB = <span class="fn">find</span>(b);
+  <span class="kw">if</span> (rootA == rootB) <span class="kw">return</span>;        <span class="cm">// กลุ่มเดียวกันแล้ว — รวมไม่ได้ (สำคัญมากกับ Kruskal!)</span>
+  <span class="kw">if</span> (rank[rootA] &lt; rank[rootB])      parent[rootA] = rootB;   <span class="cm">// ต้นสั้นขึ้นไปใต้ต้นสูง</span>
+  <span class="kw">else if</span> (rank[rootA] &gt; rank[rootB]) parent[rootB] = rootA;
+  <span class="kw">else</span> { parent[rootB] = rootA; rank[rootA]++; }               <span class="cm">// เท่ากัน: เลือกได้ + เพิ่ม rank</span>
+}</code></pre>
+
+<h2 id="kruskal">🌉 Kruskal's Algorithm — เรียงเส้นถูกสุด แล้วเลือกทีละเส้น (ออกสอบ!)</h2>
+<p>ต่างจาก Prim ที่โตทีละต้น — Kruskal เริ่มจาก "ป่าของจุดโดด" แล้วคัดเส้นจากถูกสุดไปแพงสุด:
+เจอเส้นที่ <strong>เชื่อมสองกลุ่มที่ยังแยกกัน</strong> → รับเลย · เจอเส้นที่จบสองข้างอยู่กลุ่มเดียวกัน (จะสร้างวง) → ทิ้ง
+ใช้ Union-Find เป็นเครื่องตรวจ "กลุ่มเดียวกันไหม" — ต้นทุนหลักคือการเรียงเส้น <strong>O(E log E)</strong></p>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์รุ่นพี่ตรง: หา MST ด้วย Kruskal</div>
+<p>จุด A–G เส้น: A–B 7, B–C 8, A–D 5, B–D 9, B–E 7, C–E 5, D–E 15, D–F 6, E–F 8, F–G 11, E–G 9</p>
+<details class="sol"><summary>เฉลย: เรียงเส้น → รับ/ทิ้ง ด้วย Union-Find (เขียนตารางนี้ในข้อสอบ)</summary><div class="sol-body">
+<table>
+<thead><tr><th class="num">ลำดับ</th><th>เส้น (w)</th><th>find(u) vs find(v)</th><th>ตัดสิน</th><th>กลุ่มหลังรวม / เหตุผล</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="num">A–D (5)</td><td>{A} vs {D}</td><td class="good">รับ ✓</td><td>{A,D}</td></tr>
+<tr><td class="num">2</td><td class="num">C–E (5)</td><td>{C} vs {E}</td><td class="good">รับ ✓</td><td>{C,E}</td></tr>
+<tr><td class="num">3</td><td class="num">D–F (6)</td><td>{A,D} vs {F}</td><td class="good">รับ ✓</td><td>{A,D,F}</td></tr>
+<tr><td class="num">4</td><td class="num">A–B (7)</td><td>{A,D,F} vs {B}</td><td class="good">รับ ✓</td><td>{A,B,D,F}</td></tr>
+<tr><td class="num">5</td><td class="num">B–E (7)</td><td>{A,B,D,F} vs {C,E}</td><td class="good">รับ ✓</td><td>{A,B,C,D,E,F} (รวม 2 กลุ่ม)</td></tr>
+<tr><td class="num">6</td><td class="num">B–C (8)</td><td>ทั้งคู่ในกลุ่มเดียว</td><td class="bad">ทิ้ง ✗ (สร้างวง)</td><td>—</td></tr>
+<tr><td class="num">7</td><td class="num">E–F (8)</td><td>กลุ่มเดียว</td><td class="bad">ทิ้ง ✗</td><td>—</td></tr>
+<tr><td class="num">8</td><td class="num">E–G (9)</td><td>… vs {G}</td><td class="good">รับ ✓</td><td>ครบ 7 จุด = 6 เส้น = V−1 → <b>จบ!</b></td></tr>
+</tbody></table>
+<p><strong>MST = {A–D 5, C–E 5, D–F 6, A–B 7, B–E 7, E–G 9}</strong> · รวมน้ำหนัก = <strong>39</strong> (จำนวนเส้น 6 = 7−1 ✓)</p>
+</div></details>
+</div>
+
+<h2 id="summary">📌 สรุป 4 อัลกอริทึม + แนวข้อสอบ</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>ปัญหา</th><th>อัลกอริทึม</th><th>ไอเดียหลัก</th><th>ผลลัพธ์</th></tr></thead>
+<tbody>
+<tr><td>MST</td><td>Prim</td><td>โตต้นไม้จาก 1 จุด ด้วย key น้อยสุด</td><td>MST (parent[])</td></tr>
+<tr><td>Shortest path</td><td>Dijkstra</td><td>ผ่อนเส้น (relax) ด้วย dist น้อยสุด</td><td>dist[] + prev[]</td></tr>
+<tr><td>Connected component</td><td>Union-Find</td><td>กลุ่ม disjoint + find/union</td><td>สมาชิกกลุ่ม</td></tr>
+<tr><td>MST</td><td>Kruskal</td><td>เรียงเส้น รับเส้นที่คนละกลุ่ม</td><td>MST</td></tr>
+</tbody></table></div>
+
+<div class="mcq" data-q="1">
+  <div class="q">1) กราฟมี 7 จุด — MST ที่ได้ต้องมีกี่เส้น?</div>
+  <div class="opts">
+    <button class="opt">5 เส้น</button>
+    <button class="opt" data-correct="1">6 เส้น</button>
+    <button class="opt">7 เส้น</button>
+    <button class="opt">ขึ้นกับจำนวนเส้นเดิม</button>
+  </div>
+  <div class="explain">✅ MST = tree → เส้น = V − 1 เส้นเสมอ (7 จุด = 6 เส้น) ใช้เช็คคำตอบตอนสอบได้ทันที</div>
+</div>
+<div class="mcq" data-q="2">
+  <div class="q">2) Dijkstra ห้ามใช้กับกราฟแบบไหน?</div>
+  <div class="opts">
+    <button class="opt">กราฟที่มี cycle</button>
+    <button class="opt">กราฟ directed</button>
+    <button class="opt" data-correct="1">กราฟที่มีน้ำหนักติดลบ</button>
+    <button class="opt">กราฟไม่ต่อกันทั้งก้อน</button>
+  </div>
+  <div class="explain">✅ เงื่อนไขคือ "น้ำหนักไม่ติดลบ" — greedy ของ Dijkstra อาศัยความจริงว่า "ต่อไปยิ่งเดินยิ่งไกลขึ้น" น้ำหนักลบพังสมมติฐานนี้ทันที</div>
+</div>
+<div class="mcq" data-q="3">
+  <div class="q">3) ใน Kruskal เจอเส้น (u,v) ที่ find(u) == find(v) — ทำอย่างไร?</div>
+  <div class="opts">
+    <button class="opt">รับเส้นนี้แล้ว union ทับ</button>
+    <button class="opt" data-correct="1">ทิ้งเส้นนี้ เพราะจะสร้าง cycle</button>
+    <button class="opt">เริ่ม Kruskal ใหม่</button>
+    <button class="opt">เรียงเส้นใหม่ทั้งหมด</button>
+  </div>
+  <div class="explain">✅ จบสองข้างกลุ่มเดียวกัน = เส้นนี้ทำให้เกิดวงวน (tree ห้ามมีวง) → ทิ้งทันที ไม่ต้องสนใจอีก</div>
+</div>
+
+<div class="pager">
+  <a href="avltree.html"><span class="dir">← บทก่อน</span><span class="pt">L11 AVL · RB · Splay</span></a>
+  <a href="exam.html" class="next"><span class="dir">บทถัดไป →</span><span class="pt">แนวข้อสอบรวม</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · L12 Graph · <a href="exam.html">หน้าถัดไป: แนวข้อสอบรวม →</a></div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>

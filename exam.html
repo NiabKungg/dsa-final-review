@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>แนวข้อสอบรวม — เว็บติวสอบ Final DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-exam">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html" class="active">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn" href="short-note.html" title="Short Note 1 แผ่น (พิมพ์ได้)" style="text-decoration:none;font-size:.72rem;font-weight:800">📄 A4</a>
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญ แนวข้อสอบ <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#outline">โครงข้อสอบจริง 2 ปีล่าสุด</a>
+    <a href="#drill-sort">Drill 1: trace Sorting</a>
+    <a href="#drill-heap">Drill 2: Heap insert / delete min</a>
+    <a href="#drill-bst">Drill 3: สร้าง BST + searchIter</a>
+    <a href="#drill-avl">Drill 4: AVL rebalance</a>
+    <a href="#drill-splay">Drill 5: Splay delete</a>
+    <a href="#drill-kruskal">Drill 6: Kruskal MST</a>
+    <a href="#drill-dijkstra">Drill 7: Dijkstra</a>
+    <a href="#drill-fill">Drill 8: เติมคำ 15 ข้อ</a>
+    <a href="#drill-binary">Drill 9: Binary String (โค้ด)</a>
+    <a href="#checklist">Checklist หน้าห้องสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">แนวข้อสอบจากรุ่นพี่ · Final 66 + Final 67</div>
+  <h1>แนวข้อสอบรวม + Drill ทำซ้ำได้</h1>
+  <p class="lead">รวมทุกแนวที่รุ่นพี่รีวิวมาเป็น "แบบฝึกหัดตัวจริง" — ทุก drill เป็นโจทย์ชุดใหม่ (เลขไม่ซ้ำกับตัวอย่างในบทเรียน)
+  ให้ทำเองก่อนแล้วค่อยกดดูเฉลยทีละขั้น · ปี 66 อนุญาตให้นำ <strong>Short Note 1 แผ่น</strong> เข้าห้องสอบ → เรามี
+  <a href="short-note.html">📄 Short Note พร้อมพิมพ์</a> ให้ด้วย!</p>
+  <div class="meta">
+    <span class="chip">🎯 ทำจริงก่อนเปิดเฉลย</span>
+    <span class="chip">⏱️ จับเวลา drill ละ 5–8 นาที</span>
+    <span class="chip">📄 พิมพ์ short note 1 แผ่น</span>
+  </div>
+</section>
+
+<h2 id="outline">📋 โครงข้อสอบจริง 2 ปีล่าสุด (จากรีวิวรุ่นพี่)</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>หัวข้อ</th><th>Final 66 (อ.บุญหทัย + อ.สันธนะ)</th><th>Final 67</th></tr></thead>
+<tbody>
+<tr><td><b>Sorting</b></td><td>ให้ชุดตัวเลข แสดงขั้นตอน sort แบบละเอียด + ผลลัพธ์สุดท้าย (Bubble, Insertion, Selection)</td><td>trace Quick + Selection + Insertion · เติมคำ 15 ข้อ (Sort, Search, Big-O)</td></tr>
+<tr><td><b>Priority Queue</b></td><td>มี tree ให้ ถ้า insert เลขนี้ tree ใหม่เป็นยังไง</td><td>Min Heap · delete min node</td></tr>
+<tr><td><b>BST</b></td><td>เติมโค้ดที่หาย 1 บรรทัด ⇒ <code>searchIter(int key)</code> · แสดงขั้นตอนสร้าง BST + ผลลัพธ์</td><td>เขียน BST จากชุดตัวเลข</td></tr>
+<tr><td><b>Advanced Tree</b></td><td>มี unbalanced tree → แสดงขั้นตอน balance + ผลลัพธ์</td><td>เขียน AVL Tree · Delete Splay Tree</td></tr>
+<tr><td><b>MST</b></td><td>แสดงขั้นตอนหา MST ด้วย <b>Kruskal</b></td><td>—</td></tr>
+<tr><td><b>Shortest Path</b></td><td>แสดงขั้นตอน + ผลลัพธ์ (โจทย์เป็นรูป เปลี่ยนเลข)</td><td>หา Shortest Path</td></tr>
+<tr><td><b>โปรแกรม</b></td><td>—</td><td>เขียนโปรแกรม Binary String รับค่า K, เงื่อนไข: 1 ห้ามติดกัน</td></tr>
+<tr><td><b>ภาพรวม</b></td><td colspan="2">"มีให้วาด tree ไปแล้วครึ่งนึง ออกทฤษฎีเกือบหมด มีแลป(โค้ด)แค่ข้อเดียว" — ฝึกวาด trace ให้คล่อง = ครึ่งข้อสอบ! · ปี 66 นำ Short Note 1 แผ่นเข้าได้</td></tr>
+</tbody></table></div>
+<button class="icon-btn" style="width:auto;padding:0 14px;height:38px;font-weight:700;font-size:.85rem" data-action="toggle-solutions" data-open="1">เปิดเฉลยทั้งหมด</button>
+
+<h2 id="drill-sort">✏️ Drill 1: trace Sorting 3 แบบ (ออกทุกปี)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: ข้อมูล <b>[5, 1, 4, 2, 8]</b> — แสดงขั้นตอนละเอียดพร้อมผลลัพธ์สุดท้าย ของ (ก) Bubble (ข) Selection (ค) Insertion (ง) Quick</div>
+<p class="small">เคล็ด: เขียน array ใหม่ทุกครั้งที่สลับ/วาง + ระบุรอบ — อย่าลืม "รอบสุดท้ายที่ไม่มีการสลับ" ของ improved bubble</p>
+<details class="sol"><summary>เฉลย (ก) Bubble Sort</summary><div class="sol-body">
+<p>Pass 1: (5,1)สลับ → [1,5,4,2,8] · (5,4)สลับ → [1,4,5,2,8] · (5,2)สลับ → [1,4,2,5,8] · (5,8)ไม่สลับ → จบ pass: <strong>[1,4,2,5,8]</strong> (8 ล็อกท้าย)</p>
+<p>Pass 2: (1,4)ไม่สลับ · (4,2)สลับ → [1,2,4,5,8] · (4,5)ไม่สลับ → <strong>[1,2,4,5,8]</strong></p>
+<p>Pass 3: (1,2)ไม่สลับ · (2,4)ไม่สลับ → ไม่มีการสลับเลย → เรียงเสร็จ หยุด (improved) ✅</p>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — รวม 7 เทียบ 5 สลับ</p>
+</div></details>
+<details class="sol"><summary>เฉลย (ข) Selection Sort</summary><div class="sol-body">
+<p>รอบ 1: min ของทั้งแถว = 1 (index 1) → สลับกับ index 0 → <strong>[1, 5, 4, 2, 8]</strong></p>
+<p>รอบ 2: min ของ {5,4,2,8} = 2 → สลับกับ index 1 → <strong>[1, 2, 4, 5, 8]</strong></p>
+<p>รอบ 3: min ของ {4,5,8} = 4 → อยู่ที่ถูกแล้ว ไม่สลับ · รอบ 4: min {5,8} = 5 อยู่แล้ว</p>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — เทียบ 10 ครั้ง (ตายตัว) สลับแค่ 2 ครั้ง</p>
+</div></details>
+<details class="sol"><summary>เฉลย (ค) Insertion Sort</summary><div class="sol-body">
+<p>หยิบ 1: 5 &gt; 1 เลื่อน 5 → <strong>[1, 5, 4, 2, 8]</strong> · หยิบ 4: เลื่อน 5 → <strong>[1, 4, 5, 2, 8]</strong></p>
+<p>หยิบ 2: เลื่อน 5, 4 → <strong>[1, 2, 4, 5, 8]</strong> · หยิบ 8: ใหญ่สุดแล้ว ไม่เลื่อน</p>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — จำนวน "เลื่อน" = จำนวน inversions = 4 (คู่ 5-1, 5-4, 5-2, 4-2)</p>
+</div></details>
+<details class="sol"><summary>เฉลย (ง) Quick Sort (pivot = ตัวท้ายเสมอ)</summary><div class="sol-body">
+<p><strong>รอบแรก:</strong> [5, 1, 4, 2, 8] pivot = 8 → ทุกตัว ≤ 8 → pivot อยู่ที่เดิม index 4 → ซ้าย {5,1,4,2}, ขวาว่าง</p>
+<p><strong>quicksort [5,1,4,2]:</strong> pivot = 2 → เจอ 1 ≤ 2 สลับมาหน้า → [1, 5, 4, 2] → จบ partition สลับ pivot เข้าที่ index 1 → <strong>[1, 2, 4, 5]</strong> → ซ้าย {1} ขวา {4,5}</p>
+<p><strong>quicksort [4,5]:</strong> pivot = 5 → 4 ≤ 5 → pivot คงที่ → เรียงแล้ว</p>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — สังเกตว่า pivot 8 แย่สุด ๆ (ข้อมูลเกือบเรียง) = โจทย์จงใจให้เห็น worst-ish case แต่ก็ยังเรียงได้</p>
+</div></details>
+</div>
+
+<h2 id="drill-heap">✏️ Drill 2: Min Heap insert + delete min (Final 66/67)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ (ก): min heap เป็น array <b>[1, 3, 6, 5, 9, 8]</b> — ถ้า insert(2) heap ใหม่เป็นอย่างไร? (ข): จาก heap หลัง insert แล้ว delete min → เป็นอย่างไร?</div>
+<details class="sol"><summary>เฉลย (ก) insert(2) — เคาะขึ้น</summary><div class="sol-body">
+<div class="steps">
+<div class="step"><span class="step-t">วาง 2 ที่ index 6 (ลูกขวาของ 8)</span>[1, 3, 6, 5, 9, 8, <strong>2</strong>] · แม่ของ 2 = index (6−1)/2 = 2 → ค่า 6</div>
+<div class="step"><span class="step-t">2 &lt; 6 → สลับ</span>[1, 3, <strong>2</strong>, 5, 9, 8, <strong>6</strong>] · ตอนนี้ 2 อยู่ index 2 แม่ = index 0 → ค่า 1</div>
+<div class="step"><span class="step-t">2 &gt; 1 → หยุด ✅</span><strong>ผลลัพธ์: [1, 3, 2, 5, 9, 8, 6]</strong> — แม่≤ลูกทุกคู่: (1≤3,2), (3≤5,9), (2≤8,6) ✓</div>
+</div>
+</div></details>
+<details class="sol"><summary>เฉลย (ข) delete min — เคาะลง</summary><div class="sol-body">
+<div class="steps">
+<div class="step"><span class="step-t">ดึง root (1) ออก = คำตอบที่ return</span>ค่าน้อยสุดคือ 1</div>
+<div class="step"><span class="step-t">ยกใบสุดท้าย (6) ขึ้น root</span>[<strong>6</strong>, 3, 2, 5, 9, 8] (size 6)</div>
+<div class="step"><span class="step-t">ลูกของ 6 = 3 (index1), 2 (index2) → ตัวเล็กกว่าคือ 2 → สลับ</span>[<strong>2</strong>, 3, <strong>6</strong>, 5, 9, 8]</div>
+<div class="step"><span class="step-t">ลูกของ 6 (ตอนนี้ index 2) = index 5 (8) ลูกเดียว (index 6 เกิน size) → 6 &lt; 8 → หยุด ✅</span><strong>ผลลัพธ์: [2, 3, 6, 5, 9, 8]</strong> · return 1</div>
+</div>
+</div></details>
+</div>
+
+<h2 id="drill-bst">✏️ Drill 3: สร้าง BST + เติม searchIter (Final 66/67)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ (ก): แสดงขั้นตอนสร้าง BST จาก <b>50, 30, 70, 20, 40, 60, 80</b> (ข): เติมโค้ดบรรทัดที่หายของ searchIter</div>
+<details class="sol"><summary>เฉลย (ก)</summary><div class="sol-body">
+<ol>
+<li>50 → root</li>
+<li>30 &lt; 50 → ซ้ายของ 50</li>
+<li>70 &gt; 50 → ขวาของ 50</li>
+<li>20 &lt; 50, &lt; 30 → ซ้ายของ 30</li>
+<li>40 &lt; 50, &gt; 30 → ขวาของ 30</li>
+<li>60 &gt; 50, &lt; 70 → ซ้ายของ 70</li>
+<li>80 &gt; 50, &gt; 70 → ขวาของ 70</li>
+</ol>
+<p>ผลลัพธ์: 50(30(20, 40), 70(60, 80)) — ต้นสมมาตรพอดี · ตรวจ in-order: 20,30,40,50,60,70,80 เรียง ✅</p>
+</div></details>
+<details class="sol"><summary>เฉลย (ข) searchIter — โครงคือ "เดินตามกฎจน null"</summary><div class="sol-body">
+<pre><code>TreeNode <span class="fn">searchIter</span>(<span class="kw">int</span> key) {
+  TreeNode cur = root;
+  <span class="kw">while</span> (cur != <span class="kw">null</span>) {
+    <span class="kw">if</span> (key == cur.data) <span class="kw">return</span> cur;          <span class="cm">// ← บรรทัดที่มักให้เติม</span>
+    <span class="kw">else if</span> (key &lt; cur.data) cur = cur.left;  <span class="cm">// ← หรือบรรทัดนี้</span>
+    <span class="kw">else</span> cur = cur.right;                     <span class="cm">// ← หรือบรรทัดนี้</span>
+  }
+  <span class="kw">return null</span>;
+}</code></pre>
+<p>จำหลัก: <strong>เท่ากัน return · น้อยกว่าไปซ้าย · มากกว่าไปขวา · หลุดใบคืน null</strong></p>
+</div></details>
+</div>
+
+<h2 id="drill-avl">✏️ Drill 4: AVL rebalance (Final 66)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: มี BST ต่อไปนี้ (เพิ่ง insert 25 แล้ว unbalanced) — แสดงขั้นตอนทำให้ balance พร้อมผลลัพธ์สุดท้าย</div>
+<figure class="diagram">
+<svg viewBox="0 0 300 260" width="300">
+  <line x1="130" y1="40" x2="70" y2="98" class="te"/><line x1="130" y1="40" x2="190" y2="98" class="te"/>
+  <line x1="196" y1="122" x2="218" y2="158" class="te"/>
+  <line x1="222" y1="182" x2="236" y2="218" class="te"/>
+  <g><circle cx="130" cy="30" r="20" class="nd"/><text x="130" y="35" text-anchor="middle" class="nlab">10</text></g>
+  <g><circle cx="70" cy="108" r="19" class="nd"/><text x="70" y="113" text-anchor="middle" class="nlab">5</text></g>
+  <g><circle cx="190" cy="108" r="19" class="nd"/><text x="190" y="113" text-anchor="middle" class="nlab">15</text></g>
+  <g><circle cx="220" cy="172" r="18" class="nd hot"/><text x="220" y="177" text-anchor="middle" class="nlab">20</text></g>
+  <g><circle cx="238" cy="232" r="18" class="nd hot"/><text x="238" y="237" text-anchor="middle" class="nlab">25</text></g>
+</svg>
+<figcaption>ลูกศรตามชั้น: 15 → 20 (ลูกขวา) → 25 (ลูกขวาต่อ) — เพิ่ง insert 25 แล้ว unbalanced</figcaption>
+</figure>
+<details class="sol"><summary>เฉลยทีละขั้น</summary><div class="sol-body">
+<div class="steps">
+<div class="step"><span class="step-t">1. คำนวณ BF ทุก node บนเส้นทางของ 25</span>25: ใบ · 20: ใบ · 15: h(ซ้าย)=−1, h(ขวา)=1 → BF = −2 ❌ พังที่ <strong>15</strong>! · 10: h(5)=1 − h(15 subtree)=3 → BF = −2 — แต่หยุดแก้ที่ node ต่ำสุดที่พังก่อน (15)</div>
+<div class="step"><span class="step-t">2. หาเคส: เส้นทาง 15→20→25 ขวา-ขวา = เคส RR (นอก)</span>ลูกขวา (20) BF = −1 ≤ 0 ยืนยันเคสนอก</div>
+<div class="step"><span class="step-t">3. หมุนซ้ายที่ 15</span>20 ขึ้นเป็นหัว subtree: 20(15, 25) · 15 กลายเป็นลูกซ้ายของ 20</div>
+<div class="step"><span class="step-t">4. ต่อกลับกับแม่เดิม</span>10 ชี้ขวามาที่ 20 (แทนที่ 15 เดิม)</div>
+</div>
+<p><strong>ผลลัพธ์สุดท้าย:</strong> 10(5, 20(15, 25)) — เช็ค: BF(10)= 1−2 = −1 ✓, BF(20)=0 ✓, ทุก node |BF| ≤ 1 ✅ in-order: 5,10,15,20,25 เรียง ✅</p>
+<p class="small">ระวัง: ถ้าเส้นทางเป็น ขวา-ซ้าย ให้หมุนขวาที่ลูกก่อน (คู่) — ตาราง 4 เคสอยู่ใน <a href="avltree.html#rotations">บท AVL</a></p>
+</div></details>
+</div>
+
+<h2 id="drill-splay">✏️ Drill 5: Splay delete (Final 67)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: BST จาก insert 10, 5, 15, 3, 7, 12, 20 (10 เป็น root) — <b>delete 10</b> ด้วยวิธี Splay</div>
+<details class="sol"><summary>เฉลยทีละขั้น</summary><div class="sol-body">
+<p>โครง tree เริ่มต้น: 10(5(3, 7), 15(12, 20))</p>
+<div class="steps">
+<div class="step"><span class="step-t">1. search 10 + splay ขึ้น root</span>10 เป็น root อยู่แล้ว ข้ามได้</div>
+<div class="step"><span class="step-t">2. หา max ของ subtree ซ้าย (5(3,7)) = 7 แล้ว splay 7 ขึ้นหัว subtree ซ้าย</span>7 เป็นลูกขวาของ 5 (พ่อคือ root ของ subtree) → เคส Zig → หมุนซ้ายที่ 5 → subtree ซ้ายใหม่: <strong>7(5(3,−), −)</strong></div>
+<div class="step"><span class="step-t">3. root ใหม่ = 7 · ต่อ subtree ขวาเดิมไว้ลูกขวา</span>7(5(3,−), <strong>15(12, 20)</strong>) — ตัด 10 ทิ้ง จบ ✅</div>
+</div>
+<p><strong>ผลลัพธ์:</strong> 7(5(3, −), 15(12, 20)) — BST ยังถูกกฎ (5,7 &lt; 15 ฝั่งขวา ยัง &gt; 7 ทั้งก้อน ✓)</p>
+<p class="small">ทำไม max ของซ้าย? เพราะมันคือ "ค่าใหญ่สุดฝั่งซ้าย" = ใกล้ค่าที่ลบที่สุด ต่อเข้าเป็น root ใหม่แล้ว ทุกตัวซ้าย ≤ มัน ≤ ทุกตัวขวา กฎ BST ไม่พัง</p>
+</div></details>
+</div>
+<h2 id="drill-kruskal">✏️ Drill 6: Kruskal MST (Final 66)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: จุด {1,2,3,4,5} เส้น: 1–2 (2), 1–3 (3), 2–3 (4), 3–4 (5), 3–5 (6), 4–5 (7), 2–5 (8) — แสดงขั้นตอน Kruskal</div>
+<details class="sol"><summary>เฉลย: ตารางเรียงเส้น + Union-Find</summary><div class="sol-body">
+<p>เรียงเส้นตามน้ำหนัก: 1–2(2), 1–3(3), 2–3(4), 3–4(5), 3–5(6), 4–5(7), 2–5(8)</p>
+<table>
+<thead><tr><th class="num">รอบ</th><th>เส้น</th><th>ตรวจกลุ่ม (find)</th><th>ตัดสิน</th><th>กลุ่มหลัง union</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td class="num">1–2 (2)</td><td>{1} vs {2}</td><td class="good">รับ ✓</td><td>{1,2}</td></tr>
+<tr><td class="num">2</td><td class="num">1–3 (3)</td><td>{1,2} vs {3}</td><td class="good">รับ ✓</td><td>{1,2,3}</td></tr>
+<tr><td class="num">3</td><td class="num">2–3 (4)</td><td>หัวเดียวกัน</td><td class="bad">ทิ้ง ✗ (วง!)</td><td>—</td></tr>
+<tr><td class="num">4</td><td class="num">3–4 (5)</td><td>{1,2,3} vs {4}</td><td class="good">รับ ✓</td><td>{1,2,3,4}</td></tr>
+<tr><td class="num">5</td><td class="num">3–5 (6)</td><td>… vs {5}</td><td class="good">รับ ✓</td><td>{1,2,3,4,5} → 4 เส้น = 5−1 → <b>จบ</b></td></tr>
+</tbody></table>
+<p><strong>MST = {1–2, 1–3, 3–4, 3–5} · รวม = 2+3+5+6 = 16</strong> — เขียนตารางแบบนี้ในข้อสอบ = ได้คะแนนเต็มเรื่องขั้นตอน</p>
+</div></details>
+</div>
+
+<h2 id="drill-dijkstra">✏️ Drill 7: Dijkstra Shortest Path (Final 66/67)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ (สไตล์ "รูปเดิมเปลี่ยนเลข"): จาก A — เส้น: A–B 10, A–C 3, C–B 4, B–D 2, C–D 8, B–E 5, D–E 7</div>
+<figure class="diagram">
+<svg viewBox="0 0 460 210" width="460" role="img" aria-label="Dijkstra drill graph">
+  <defs><marker id="arwex" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#8a94a0"/></marker></defs>
+  <g class="te">
+    <line x1="80" y1="60" x2="200" y2="52" class="te"/><text x="140" y="44" class="wlab">10</text>
+    <line x1="70" y1="82" x2="110" y2="152" class="te"/><text x="72" y="128" class="wlab">3</text>
+    <line x1="140" y1="150" x2="215" y2="80" class="te"/><text x="150" y="112" class="wlab">4</text>
+    <line x1="240" y1="55" x2="330" y2="48" class="te"/><text x="285" y="40" class="wlab">2</text>
+    <line x1="132" y1="165" x2="340" y2="162" class="te"/><text x="230" y="182" class="wlab">8</text>
+    <line x1="255" y1="66" x2="360" y2="145" class="te"/><text x="330" y="92" class="wlab">5</text>
+    <line x1="358" y1="72" x2="392" y2="142" class="te"/><text x="398" y="112" class="wlab">7</text>
+  </g>
+  <g><circle cx="65" cy="52" r="20" class="nd hot"/><text x="65" y="57" text-anchor="middle" class="nlab">A</text></g>
+  <g><circle cx="225" cy="50" r="20" class="nd"/><text x="225" y="55" text-anchor="middle" class="nlab">B</text></g>
+  <g><circle cx="122" cy="165" r="20" class="nd"/><text x="122" y="170" text-anchor="middle" class="nlab">C</text></g>
+  <g><circle cx="352" cy="45" r="20" class="nd"/><text x="352" y="50" text-anchor="middle" class="nlab">D</text></g>
+  <g><circle cx="400" cy="158" r="20" class="nd"/><text x="400" y="163" text-anchor="middle" class="nlab">E</text></g>
+</svg>
+<figcaption>กราฟมีทิศตามลูกศร (A→B ฯลฯ) เริ่มหาจาก A</figcaption>
+</figure>
+<details class="sol"><summary>เฉลย: ตาราง trace</summary><div class="sol-body">
+<table>
+<thead><tr><th class="num">รอบ</th><th>pop</th><th>ผ่อนเส้น (relax)</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th><th class="num">E</th></tr></thead>
+<tbody>
+<tr><td class="num">0</td><td class="num">—</td><td>push(0,A)</td><td class="num">0</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">1</td><td class="num">(0, A)</td><td>B: 10 ✓ · C: 3 ✓</td><td class="num">0</td><td class="num">10</td><td class="num">3</td><td class="num">∞</td><td class="num">∞</td></tr>
+<tr><td class="num">2</td><td class="num">(3, C)</td><td>B: 3+4=7 &lt; 10 → อัปเดต · D: 3+8=11 ✓</td><td class="num">0</td><td class="num">7</td><td class="num">3</td><td class="num">11</td><td class="num">∞</td></tr>
+<tr><td class="num">3</td><td class="num">(7, B)</td><td>D: 7+2=9 &lt; 11 → อัปเดต · E: 7+5=12 ✓</td><td class="num">0</td><td class="num">7</td><td class="num">3</td><td class="num">9</td><td class="num">12</td></tr>
+<tr><td class="num">4</td><td class="num">(9, D)</td><td>E: 9+7=16 ≥ 12 ข้าม</td><td class="num">0</td><td class="num">7</td><td class="num">3</td><td class="num">9</td><td class="num">12</td></tr>
+<tr><td class="num">5</td><td class="num">(12, E)</td><td>— · คิวหมด จบ</td><td class="num">0</td><td class="num">7</td><td class="num">3</td><td class="num">9</td><td class="num">12</td></tr>
+</tbody></table>
+<p><strong>ผลลัพธ์:</strong> dist = {A:0, B:7, C:3, D:9, E:12} · prev = {B:C, C:A, D:B, E:B}</p>
+<p>เส้นทางไป E: ย้อน prev — E ← B ← C ← A = <strong>A→C→B→E</strong> (3+4+5 = 12 ✓ สังเกตว่า A→B ตรง ๆ แพงกว่า!)</p>
+</div></details>
+</div>
+
+<h2 id="drill-fill">✏️ Drill 8: เติมคำ 15 ข้อแนว (Sort · Search · Big-O)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: เติมคำในช่องว่าง — ทำในใจ/กระดาษก่อนกดเฉลย</div>
+<div class="cols2">
+<ol>
+<li>การเรียงที่ใช้พื้นที่เพิ่มเท่ากัน O(1) เรียกว่า ______ sort</li>
+<li>การเรียงที่ข้อมูล key เท่ากันคงลำดับเดิมเรียกว่า ______ sort</li>
+<li>ขอบเขตล่างของ comparison sort คือ O(______)</li>
+<li>Insertion sort best case คือ O(______) เมื่อข้อมูลเรียงมาแล้ว</li>
+<li>Quick sort worst case O(n²) เกิดเมื่อ ______ เลือกแย่</li>
+<li>Merge sort ต้องใช้หน่วยความจำเพิ่ม O(______)</li>
+<li>Counting sort stable ต่อเมื่อวางของจาก ______ ไปซ้าย</li>
+<li>Radix sort ใช้เวลา O(n · ______) เมื่อ d คือจำนวนหลัก</li>
+<li>ค้นข้อมูลใน BST แบบ balanced ใช้เวลา O(______)</li>
+<li>ใน BST ค่ามากสุดอยู่ที่ node ที่วิ่ง______ไปสุด</li>
+<li>Binary search ต้องการข้อมูลที่เรียง______ก่อน</li>
+<li>Big-O ของ linear search คือ O(______)</li>
+<li>In-order traversal ของ BST ให้ข้อมูลเรียง______</li>
+<li>Binary search ตัดข้อมูลทิ้งครึ่งหนึ่งต่อ ______ ครั้ง</li>
+<li>Heap ชนิดที่ root ค่าน้อยสุดเรียกว่า ______ heap</li>
+</ol>
+</div>
+<details class="sol"><summary>เฉลย 15 ข้อ</summary><div class="sol-body">
+<ol>
+<li><b>in-place</b></li>
+<li><b>stable</b></li>
+<li>O(<b>n log n</b>)</li>
+<li>O(<b>n</b>)</li>
+<li><b>pivot</b> (เช่นข้อมูลเรียงมาแล้วแล้วเลือกตัวแรก/ท้าย)</li>
+<li>O(<b>n</b>)</li>
+<li>จาก<b>ขวา</b>ไปซ้าย</li>
+<li>O(n · <b>d</b>)</li>
+<li>O(<b>log n</b>)</li>
+<li>วิ่ง<b>ขวา</b>ไปสุด</li>
+<li>เรียง<b>แล้ว</b> (sorted)</li>
+<li>O(<b>n</b>)</li>
+<li>เรียง<b>จากน้อยไปมาก</b> (ascending)</li>
+<li>ต่อ<b>1 ครั้ง/log n ครั้ง</b> (ตัดครึ่งทีละรอบ → log₂n รอบ)</li>
+<li><b>min</b> heap</li>
+</ol>
+</div></details>
+</div>
+
+<h2 id="drill-binary">✏️ Drill 9: เขียนโปรแกรม Binary String (โค้ดข้อเดียวของปี 67)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: เขียนโปรแกรมรับค่า K ใด ๆ แล้วแสดง binary string ความยาว K ทั้งหมด โดยเงื่อนไข "1 ห้ามติดกัน"</div>
+<p class="small">เช่น K = 3 → ต้องได้ 000, 001, 010, 100, 101 (ส่วน 011, 110, 111 มี 1 ติดกัน → ตัด)</p>
+<details class="sol"><summary>แนวคิด: สร้างเป็น "ต้นไม้การตัดสินใจ" (recursion)</summary><div class="sol-body">
+<p>สร้าง string ทีละตำแหน่งจากซ้ายไปขวา — ทุกตำแหน่งเลือกได้ 2 ทาง (0 หรือ 1) ยกเว้น: <strong>ถ้าตัวก่อนหน้าเป็น 1 → ตำแหน่งนี้เลือกได้แค่ 0</strong>
+ลองวาดเป็นต้นไม้ K = 3 (เริ่มก่อนตัวแรกด้วย "ไม่มี 1" จึงวาง 0 หรือ 1 ได้อิสระ):</p>
+<figure class="diagram">
+<svg viewBox="0 0 700 260" width="700" role="img" aria-label="Binary string decision tree K=3">
+  <line x1="350" y1="46" x2="200" y2="96" class="te"/><line x1="350" y1="46" x2="500" y2="96" class="te"/>
+  <text x="262" y="66" class="tag">วาง 0</text><text x="432" y="66" class="tag">วาง 1</text>
+  <line x1="200" y1="116" x2="110" y2="166" class="te"/><line x1="200" y1="116" x2="290" y2="166" class="te"/>
+  <line x1="500" y1="116" x2="410" y2="166" class="te"/>
+  <text x="140" y="140" class="tag">0</text><text x="252" y="140" class="tag">1</text><text x="440" y="140" class="tag">0 (บังคับ! 1 เพิ่งวาง)</text>
+  <line x1="110" y1="186" x2="70" y2="226" class="te"/><line x1="110" y1="186" x2="150" y2="226" class="te"/>
+  <line x1="290" y1="186" x2="250" y2="226" class="te"/>
+  <line x1="410" y1="186" x2="370" y2="226" class="te"/><line x1="410" y1="186" x2="450" y2="226" class="te"/>
+  <text x="64" y="244" class="tag">000</text><text x="146" y="244" class="tag">001</text><text x="250" y="244" class="tag">010</text><text x="364" y="244" class="tag">100</text><text x="450" y="244" class="tag">101</text>
+  <g><circle cx="350" cy="36" r="22" class="nd hot"/><text x="350" y="41" text-anchor="middle" class="tag">เริ่ม</text></g>
+  <g><circle cx="200" cy="106" r="16" class="nd"/><text x="200" y="111" text-anchor="middle" class="tag">0</text></g>
+  <g><circle cx="500" cy="106" r="16" class="nd"/><text x="500" y="111" text-anchor="middle" class="tag">1</text></g>
+  <text x="610" y="130" class="slab">กิ่งขวา (เพิ่งวาง 1) เลือกต่อได้แค่ 0</text>
+  <text x="610" y="150" class="slab">→ ต้นไม้บางลงเองตามเงื่อนไข</text>
+  <text x="610" y="170" class="slab">ใบทั้งหมด = คำตอบ (5 ใบ)</text>
+</svg>
+<figcaption><b>ต้นไม้การตัดสินใจ</b> — เดินทุกใบ แต่กิ่งที่ผิดเงื่อนไขถูกตัดตั้งแต่กลางทาง (นี่คือ DFS เหมือนบท Graph!)</figcaption>
+</figure>
+<pre><code><span class="kw">public class</span> <span class="fn">BinaryString</span> {
+  <span class="kw">static void</span> <span class="fn">gen</span>(String s, <span class="kw">int</span> k, <span class="kw">char</span> last) {
+    <span class="kw">if</span> (s.length() == k) {                    <span class="cm">// ครบ K ตัว = ถึงใบ → พิมพ์</span>
+      System.out.<span class="fn">println</span>(s);
+      <span class="kw">return</span>;
+    }
+    <span class="fn">gen</span>(s + "0", k, '0');                     <span class="cm">// ทางเลือก 1: วาง 0 ได้เสมอ</span>
+    <span class="kw">if</span> (last != '1')                          <span class="cm">// ทางเลือก 2: วาง 1 ได้เฉพาะเมื่อตัวก่อนไม่ใช่ 1</span>
+      <span class="fn">gen</span>(s + "1", k, '1');
+  }
+  <span class="kw">public static void</span> <span class="fn">main</span>(String[] args) {
+    <span class="kw">int</span> k = 3;                                <span class="cm">// รับค่า K ใด ๆ</span>
+    <span class="fn">gen</span>("", k, '0');                          <span class="cm">// เริ่มด้วย last='0' → ตัวแรกวาง 1 ได้อิสระ</span>
+  }
+}
+<span class="cm">// K=3 → 000, 001, 010, 100, 101 (5 แบบ)</span></code></pre>
+<p><strong>จำนวน string ทั้งหมด = เลขฟีโบนัชชี!</strong> K=1→2, K=2→3, K=3→5, K=4→8 (จำนวนที่ยาว n ไม่มี 1 ติดกัน = จำนวน(ยาว n−1) + จำนวน(ยาว n−2))
+— เหตุผล: string ยาว n จบด้วย 0 → หน้าเป็นอะไรก็ได้ของ n−1 · จบด้วย 1 → หน้าต้องจบ 0 ของ n−2</p>
+</div></details>
+</div>
+
+<h2 id="checklist">✅ Checklist ก่อนเข้าห้องสอบ</h2>
+<div class="steps">
+  <div class="step"><span class="step-t">พิมพ์ Short Note 1 แผ่น</span><a href="short-note.html">📄 หน้า Short Note</a> ออกแบบให้พอดี A4 (2 ด้าน) — ตรวจว่าพิมพ์ละเอียดอ่านได้</div>
+  <div class="step"><span class="step-t">รู้จักกับดักทุกบท</span>Bubble/Insertion/Selection trace ทีละคู่ · Heap เลือกลูกเล็กกว่าตอนเคาะลง · BST ลบ 2 ลูกใช้ max ซ้าย · AVL ดู 2 ก้าวสุดท้ายก่อนเลือกเคส · RB นับ black รวม NIL · Kruskal ทิ้งเส้นที่กลุ่มเดียวกัน · Dijkstra น้ำหนักห้ามติดลบ</div>
+  <div class="step"><span class="step-t">ตรวจคำตอบเสมอ 3 จุด</span>(1) tree: in-order ต้องเรียง (2) MST: ครบ V จุด, E = V−1, ไม่มีวง (3) heap: แม่≤ลูกทุกคู่</div>
+  <div class="step"><span class="step-t">อ่านโจทย์ว่า min หรือ max, asc หรือ desc</span>คำเดียวเปลี่ยนทั้งข้อ — ขีดเส้นใต้คำสำคัญก่อนลงมือ</div>
+</div>
+
+<div class="pager">
+  <a href="graph.html"><span class="dir">← บทก่อน</span><span class="pt">L12 Graph</span></a>
+  <a href="short-note.html" class="next"><span class="dir">หน้าสุดท้าย →</span><span class="pt">📄 Short Note 1 แผ่น</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · แนวข้อสอบรวม · <a href="short-note.html">📄 Short Note 1 แผ่น</a></div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>

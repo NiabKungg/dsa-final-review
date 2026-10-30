@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L10 Binary Search Tree — เว็บติวสอบ Final DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-bst">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html" class="active">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญ BST <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#tree">Tree คืออะไร + ศัพท์ทุกคำ</a>
+    <a href="#balance">Balanced vs Deformed</a>
+    <a href="#repr">เก็บ tree ไว้ในโค้ดยังไง</a>
+    <a href="#traversal">Traversal 3 แบบ</a>
+    <a href="#bstprop">BST property</a>
+    <a href="#insert">สร้าง BST จากลำดับ insert</a>
+    <a href="#code">search / searchIter / insert</a>
+    <a href="#delete">delete 3 เคส</a>
+    <a href="#challenge">findMax &amp; rangeSumBST</a>
+    <a href="#summary">สรุป + แนวข้อสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">L10 · Binary Search Tree</div>
+  <h1>BST — ต้นไม้ที่จัดให้ "เลขน้อยซ้าย มากขวา"</h1>
+  <p class="lead">รีวิวรุ่นพี่มีชัด ๆ ว่าออก 2 แนว: <strong>(1) เติมโค้ดที่หาย 1 บรรทัด ⇒ <code>searchIter(int key)</code></strong>
+  และ <strong>(2) ให้ชุดตัวเลข แสดงขั้นตอนการสร้าง BST พร้อมผลลัพธ์สุดท้าย</strong> — แถมรุ่นพี่บอกว่าข้อสอบ
+  "มีให้วาด tree ไปแล้วครึ่งนึง" หน้านี้ฝึกวาดจนมือเย็น</p>
+  <div class="meta">
+    <span class="chip">⭐ เติมโค้ด searchIter</span>
+    <span class="chip">⭐ trace สร้าง BST</span>
+    <span class="chip">⭐ delete 3 เคส</span>
+    <span class="chip">⭐ in-order = เรียงแล้ว</span>
+  </div>
+</section>
+
+<h2 id="tree">🌳 Tree คืออะไร + ศัพท์ที่ต้องออกเวลาเติมคำ</h2>
+<p><strong>Tree</strong> คือ ADT ที่ข้อมูล "โยงกันแบบกิ่งก้าน" — แตกต่างจาก array/linked list ที่เป็นเส้นตรง (linear):
+tree แตกทางได้ จึงหาข้อมูลได้เร็วขึ้นด้วยการ "ตัดสินใจเลือกทาง" ทุกชั้น (เหมือนเล่น 20 questions: หนึ่งคำถามตัดความเป็นไปได้ครึ่งหนึ่ง)</p>
+
+<figure class="diagram">
+<svg viewBox="0 0 700 300" width="700" role="img" aria-label="Tree terminology">
+  <line x1="350" y1="70" x2="200" y2="150" class="te"/><line x1="350" y1="70" x2="500" y2="150" class="te"/>
+  <line x1="200" y1="170" x2="110" y2="245" class="te"/><line x1="200" y1="170" x2="290" y2="245" class="te"/>
+  <line x1="500" y1="170" x2="410" y2="245" class="te"/><line x1="500" y1="170" x2="590" y2="245" class="te"/>
+  <g><circle cx="350" cy="60" r="22" class="nd hot"/><text x="350" y="66" text-anchor="middle" class="nlab">R</text></g>
+  <g><circle cx="200" cy="160" r="22" class="nd"/><text x="200" y="166" text-anchor="middle" class="nlab">B</text></g>
+  <g><circle cx="500" cy="160" r="22" class="nd"/><text x="500" y="166" text-anchor="middle" class="nlab">C</text></g>
+  <g><circle cx="110" cy="255" r="22" class="nd"/><text x="110" y="261" text-anchor="middle" class="nlab">D</text></g>
+  <g><circle cx="290" cy="255" r="22" class="nd"/><text x="290" y="261" text-anchor="middle" class="nlab">E</text></g>
+  <g><circle cx="410" cy="255" r="22" class="nd"/><text x="410" y="261" text-anchor="middle" class="nlab">F</text></g>
+  <g><circle cx="590" cy="255" r="22" class="nd"/><text x="590" y="261" text-anchor="middle" class="nlab">G</text></g>
+  <text x="350" y="22" text-anchor="middle" class="slab-b">Root — จุดเริ่มของ tree (ไม่มีแม่)</text>
+  <text x="200" y="120" text-anchor="middle" class="slab-b">B, C = children ของ R</text>
+  <text x="200" y="200" text-anchor="middle" class="slab-b">B, C = siblings (พี่น้อง แม่เดียวกัน)</text>
+  <text x="110" y="298" text-anchor="middle" class="slab-b">D, E, F, G = Leaf (ไม่มีลูก)</text>
+  <text x="420" y="200" text-anchor="middle" class="slab">เส้นจาก R ถึง F = 1 edge…</text>
+  <text x="620" y="160" text-anchor="start" class="slab">Depth ของ node = จำนวน edge</text>
+  <text x="620" y="178" text-anchor="start" class="slab">จาก root ลงมาถึง node (R=0, B=1, F=2)</text>
+  <text x="620" y="196" text-anchor="start" class="slab">Height ของ tree = depth มากสุด</text>
+  <text x="620" y="214" text-anchor="start" class="slab">ของ tree นี้ = 2</text>
+  <text x="620" y="232" text-anchor="start" class="slab">Subtree ของ B = ต้นย่อยที่เริ่ม B</text>
+</svg>
+<figcaption><b>ศัพท์ต้นไม้:</b> Root / Node / Parent–Child / Siblings / Leaf / Depth / Height / Subtree / Ancestor (แม่, แม่ของแม่, …)</figcaption>
+</figure>
+
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบให้จำขึ้นใจ</div>
+<p>นึกถึง <strong>แผนผังองค์กร</strong>: ผู้จัดการใหญ่ = root, ทีมใต้สังกัด = subtree, พนักงานที่ไม่มีใครใต้บังคับบัญชา = leaf,
+"ระดับชั้น" จากบอส = depth — ทุกศัพท์แมปกับที่ทำงานได้หมด</p></div>
+
+<h2 id="balance">⚖️ Balanced vs Deformed — หัวใจของความเร็ว</h2>
+<figure class="diagram">
+<svg viewBox="0 0 700 230" width="700" role="img" aria-label="Balanced vs deformed tree">
+  <g>
+    <text x="170" y="16" text-anchor="middle" class="slab-b">Balanced — สูง O(log n) → ค้นไว</text>
+    <line x1="170" y1="56" x2="100" y2="106" class="te"/><line x1="170" y1="56" x2="240" y2="106" class="te"/>
+    <line x1="100" y1="126" x2="55" y2="176" class="te"/><line x1="100" y1="126" x2="145" y2="176" class="te"/>
+    <line x1="240" y1="126" x2="195" y2="176" class="te"/><line x1="240" y1="126" x2="285" y2="176" class="te"/>
+    <g><circle cx="170" cy="46" r="20" class="nd"/><text x="170" y="51" text-anchor="middle" class="nlab">7</text></g>
+    <g><circle cx="100" cy="116" r="20" class="nd"/><text x="100" y="121" text-anchor="middle" class="nlab">3</text></g>
+    <g><circle cx="240" cy="116" r="20" class="nd"/><text x="240" y="121" text-anchor="middle" class="nlab">12</text></g>
+    <g><circle cx="55" cy="186" r="20" class="nd"/><text x="55" y="191" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="145" cy="186" r="20" class="nd"/><text x="145" y="191" text-anchor="middle" class="nlab">5</text></g>
+    <g><circle cx="195" cy="186" r="20" class="nd"/><text x="195" y="191" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="285" cy="186" r="20" class="nd"/><text x="285" y="191" text-anchor="middle" class="nlab">15</text></g>
+    <text x="170" y="226" text-anchor="middle" class="tag">1,000 node สูงแค่ ~10 ชั้น → ค้น ~10 ครั้งจบ</text>
+  </g>
+  <g>
+    <text x="530" y="16" text-anchor="middle" class="slab-b">Deformed — สูงโน้มเป็น O(n) = พัง!</text>
+    <line x1="460" y1="60" x2="460" y2="100" class="te"/><line x1="460" y1="130" x2="460" y2="170" class="te"/><line x1="460" y1="200" x2="460" y2="206" class="te"/>
+    <g><circle cx="460" cy="50" r="20" class="nd"/><text x="460" y="55" text-anchor="middle" class="nlab">1</text></g>
+    <g><circle cx="460" cy="120" r="20" class="nd"/><text x="460" y="125" text-anchor="middle" class="nlab">2</text></g>
+    <g><circle cx="460" cy="190" r="20" class="nd"/><text x="460" y="195" text-anchor="middle" class="nlab">3</text></g>
+    <text x="500" y="120" class="tag">insert 1,2,3,4… (เรียงมาแล้ว)</text>
+    <text x="500" y="140" class="tag">→ กลายเป็น linked list ตรง ๆ</text>
+    <text x="500" y="160" class="tag">→ ค้นกลายเป็น O(n) เท่ากับไล่หามือ</text>
+    <text x="500" y="196" class="tag">เหตุผลที่ต้องมี AVL/Red-Black (บทถัดไป!)</text>
+  </g>
+</svg>
+<figcaption><b>สมดุลคือชีวิต</b> — BST เก่งแค่ไหนขึ้นกับ "ความเอียง" ของต้น</figcaption>
+</figure>
+
+<h2 id="repr">🧱 เก็บ tree ไว้ในโค้ดยังไง</h2>
+<ul>
+  <li>แบบ heap เราใช้ <strong>array</strong> (ได้เพราะ complete tree) — แต่ tree ทั่วไปเอียง ๆ array จะมีรูโหล ๆ เปลืองมาก</li>
+  <li>ปกติจึงใช้ <strong>node + references</strong> เหมือน linked list แต่กิ่งก้านมากกว่า:</li>
+</ul>
+<pre><code><span class="cm">// แบบทั่วไป: ลูกกี่คนก็ได้ (เหมือนโครงสร้างโฟลเดอร์)</span>
+<span class="kw">class</span> <span class="fn">TreeNode</span> {
+  <span class="kw">int</span> data;
+  LinkedList&lt;TreeNode&gt; children;
+}
+
+<span class="cm">// แบบ binary: ลูกได้แค่ 2 คน = ซ้ายกับขวา (BST ใช้แบบนี้)</span>
+<span class="kw">class</span> <span class="fn">TreeNode</span> {
+  <span class="kw">int</span> data;
+  TreeNode left, right, parent;
+}</code></pre>
+
+<h2 id="traversal">🚶 Traversal — เดินเก็บทุก node ให้ครบ (3 ลำดับ)</h2>
+<p>การเดิน tree คือการ "ค้นพบและจัดการ" ข้อมูลทุกตัว โดยแต่ละ node มี 3 สถานะ: <strong>undiscovered → discovered → processed</strong>
+(binary tree มีลำดับเดิน 3 แบบ — ต่างกันแค่จุดที่ "จัดการ node กลาง" เท่านั้น!):</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>ลำดับ</th><th>สูตรจำ</th><th>เมื่อไรจัดการ node กลาง</th><th>ใช้ทำอะไร</th></tr></thead>
+<tbody>
+<tr><td><b>Pre-order</b></td><td class="num">Root → Left → Right</td><td>ก่อนลูก</td><td>copy tree, เขียน prefix expression</td></tr>
+<tr><td><b>In-order</b></td><td class="num">Left → Root → Right</td><td>ระหว่างลูกสองฝั่ง</td><td>ดึงข้อมูลจาก BST ออกมา "เรียงแล้ว"!</td></tr>
+<tr><td><b>Post-order</b></td><td class="num">Left → Right → Root</td><td>หลังลูก</td><td>ลบ tree ทั้งต้น (ต้องลบลูกก่อนแม่), หาขนาด subtree</td></tr>
+</tbody></table></div>
+
+<figure class="diagram">
+<svg viewBox="0 0 700 240" width="700" role="img" aria-label="Traversal example tree">
+  <line x1="350" y1="66" x2="215" y2="126" class="te"/><line x1="350" y1="66" x2="485" y2="126" class="te"/>
+  <line x1="215" y1="146" x2="140" y2="196" class="te"/><line x1="215" y1="146" x2="290" y2="196" class="te"/>
+  <line x1="485" y1="146" x2="410" y2="196" class="te"/><line x1="485" y1="146" x2="560" y2="196" class="te"/>
+  <g><circle cx="350" cy="56" r="21" class="nd hot"/><text x="350" y="61" text-anchor="middle" class="nlab">60</text></g>
+  <g><circle cx="215" cy="136" r="21" class="nd"/><text x="215" y="141" text-anchor="middle" class="nlab">30</text></g>
+  <g><circle cx="485" cy="136" r="21" class="nd"/><text x="485" y="141" text-anchor="middle" class="nlab">80</text></g>
+  <g><circle cx="140" cy="206" r="20" class="nd"/><text x="140" y="211" text-anchor="middle" class="nlab">20</text></g>
+  <g><circle cx="290" cy="206" r="20" class="nd"/><text x="290" y="211" text-anchor="middle" class="nlab">40</text></g>
+  <g><circle cx="410" cy="206" r="20" class="nd"/><text x="410" y="211" text-anchor="middle" class="nlab">70</text></g>
+  <g><circle cx="560" cy="206" r="20" class="nd"/><text x="560" y="211" text-anchor="middle" class="nlab">90</text></g>
+  <text x="350" y="20" text-anchor="middle" class="slab-b">ตัวอย่าง tree ที่ใช้เดิน (ตัวเลือกลำดับมีผลกับ node กลางของแต่ละ subtree)</text>
+</svg>
+<figcaption><b>Tree ตัวอย่าง</b> — จำไว้: ใบทุกใบ "ถูกจัดการ" ตอนที่รอบถึงมันเสมอ ต่างกันแค่ node กลาง (30, 60, 80)</figcaption>
+</figure>
+
+<div class="cols2">
+<div class="box basic"><div class="box-title"><span class="em">🚶</span>เดินแบบ in-order ทีละก้าว</div>
+<p>ให้ทำ subtree: ลูกซ้ายก่อน → ตัวเอง → ลูกขวา<br>
+จาก tree ข้างบน: (20,30,40) → 60 → (70,80,90)<br>
+subtree 30: 20 → 30 → 40 · subtree 80: 70 → 80 → 90<br>
+<strong>รวม: 20, 30, 40, 60, 70, 80, 90 — เรียงจากน้อยไปมากเลย!</strong> (ใช้เช็ค BST ในข้อสอบได้: in-order แล้วไม่เรียง = ไม่ใช่ BST)</p></div>
+<div class="box basic"><div class="box-title"><span class="em">🚶</span>เดินแบบ pre-order / post-order</div>
+<p><strong>Pre-order:</strong> 60 → (30 → 20 → 40) → (80 → 70 → 90) = 60, 30, 20, 40, 80, 70, 90 (root มาก่อนเสมอ — ใช้วาด tree จากลิสต์ได้)<br>
+<strong>Post-order:</strong> (20 → 40 → 30) → (70 → 90 → 80) → 60 = 20, 40, 30, 70, 90, 80, 60 (root มาท้ายสุด — ลบ tree จากใบขึ้น root)</p></div>
+</div>
+
+<pre><code><span class="cm">// โค้ดจริง 3 แบบ — ต่างกันแค่ตำแหน่งบรรทัด print!</span>
+<span class="kw">void</span> <span class="fn">printPreOrder</span>(TreeNode node)  { <span class="kw">if</span>(node==<span class="kw">null</span>) <span class="kw">return</span>;
+  System.out.<span class="fn">println</span>(node.data); <span class="fn">printPreOrder</span>(node.left); <span class="fn">printPreOrder</span>(node.right); }
+<span class="kw">void</span> <span class="fn">printInOrder</span>(TreeNode node)   { <span class="kw">if</span>(node==<span class="kw">null</span>) <span class="kw">return</span>;
+  <span class="fn">printInOrder</span>(node.left); System.out.<span class="fn">println</span>(node.data); <span class="fn">printInOrder</span>(node.right); }
+<span class="kw">void</span> <span class="fn">printPostOrder</span>(TreeNode node) { <span class="kw">if</span>(node==<span class="kw">null</span>) <span class="kw">return</span>;
+  <span class="fn">printPostOrder</span>(node.left); <span class="fn">printPostOrder</span>(node.right); System.out.<span class="fn">println</span>(node.data); }
+<span class="cm">// เรียกใช้: printInOrder(root); — ส่ง root เข้าไปเป็นพารามิเตอร์เพื่อ recursion</span></code></pre>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>พื้นฐาน: ทำไมใช้ recursion ได้สวยงาม</div>
+<p>ทุก subtree ก็คือ "tree" ต้นเล็ก — ปัญหาเดิมเป๊ะ แค่เล็กลง = โครงสร้าง recursive ตามธรรมชาติ
+ฐานหยุดคือ <code>node == null</code> (กิ่งโล้น ไม่มีอะไรเดิน) — แนวคิดเดียวกันจะโผล่อีกทั้ง BST delete, AVL, Red-Black, Dijkstra recursion และโจทย์ Binary String ในหน้าแนวข้อสอบ!</p></div>
+<h2 id="bstprop">🔍 BST Property — กฎทองเส้นเดียว</h2>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>กฎของ Binary Search Tree</div>
+<p>ที่ <strong>ทุก node</strong> (ไม่ใช่แค่ root!): ค่าใน node ≥ ค่าลูกซ้ายทั้งฝั่ง และ ≤ ค่าลูกขวาทั้งฝั่ง
+หรือพูดง่าย ๆ <strong>"ซ้ายน้อยกว่าแม่ ขวามากกว่าแม่ — บังคับทุก node"</strong></p>
+<p>กฎนี้ทำให้การค้นเหมือน binary search: เทียบค่าที่ต้องการกับ node ปัจจุบัน → น้อยกว่าไปซ้าย มากกว่าไปขวา → <strong>ตัดทิ้งครึ่งหนึ่งของ tree ทุกชั้น</strong>
+→ balanced จะเจอใน O(log n) ชั้น แต่ถ้า tree เอียงจะกลายเป็น O(n)</p></div>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p>เหมือนเดาตัวเลข 1–1000 แบบ "มากกว่า 500 ไหม?" ทีละครึ่ง — BST คือการวางคำถามตัดครึ่งไว้เป็นโครงสร้างข้อมูลเลย
+(ส่วน heap ไม่ใช่: heap รู้แค่ว่า root เล็กสุด แต่ค้นค่าอื่นต้องไล่ทั้งต้น! — คำถามชวนเทียบที่ออกบ่อย)</p></div>
+
+<h2 id="insert">🏗️ trace สร้าง BST จากลำดับ (แนวข้อสอบตรง ๆ)</h2>
+<p>โจทย์สไลด์: <code>insert(7), insert(20), insert(5), insert(15), insert(10), insert(4), insert(33), insert(2), insert(25), insert(6)</code> — กฎการวางมีแค่นี้:</p>
+<div class="steps">
+  <div class="step"><span class="step-t">เริ่มจาก root = 7</span>ตัวแรกเป็น root ทันที</div>
+  <div class="step"><span class="step-t">20 → มากกว่า 7 → ขวาของ 7 ว่าง → วาง</span>7.right = 20</div>
+  <div class="step"><span class="step-t">5 → น้อยกว่า 7 → ซ้ายของ 7 ว่าง → วาง</span>7.left = 5</div>
+  <div class="step"><span class="step-t">15 → มากกว่า 7 ไปขวา · น้อยกว่า 20 → ซ้ายของ 20 ว่าง → วาง</span>20.left = 15</div>
+  <div class="step"><span class="step-t">10 → &gt;7 ขวา, &lt;20 ซ้าย, &lt;15 ซ้ายว่าง → วาง</span>15.left = 10</div>
+  <div class="step"><span class="step-t">4 → &lt;7 ซ้าย, &lt;5 ซ้ายว่าง → วาง</span>5.left = 4</div>
+  <div class="step"><span class="step-t">33 → &gt;7 ขวา, &gt;20 ขวาว่าง → วาง</span>20.right = 33</div>
+  <div class="step"><span class="step-t">2 → &lt;7 ซ้าย, &lt;5 ซ้าย, &lt;4 ซ้ายว่าง → วาง</span>4.left = 2</div>
+  <div class="step"><span class="step-t">25 → &gt;7 ขวา, &gt;20 ขวา, &lt;33 ซ้ายว่าง → วาง</span>33.left = 25</div>
+  <div class="step"><span class="step-t">6 → &lt;7 ซ้าย, &gt;5 ขวาว่าง → วาง</span>5.right = 6</div>
+</div>
+
+<figure class="diagram">
+<svg viewBox="0 0 560 270" width="560" role="img" aria-label="Final BST from insert sequence">
+  <line x1="280" y1="60" x2="150" y2="130" class="te"/><line x1="280" y1="60" x2="410" y2="130" class="te"/>
+  <line x1="150" y1="150" x2="85" y2="210" class="te"/><line x1="150" y1="150" x2="215" y2="210" class="te"/>
+  <line x1="410" y1="150" x2="345" y2="210" class="te"/><line x1="410" y1="150" x2="475" y2="210" class="te"/>
+  <line x1="85" y1="230" x2="55" y2="244" class="te"/>
+  <line x1="345" y1="230" x2="345" y2="244" class="te"/>
+  <line x1="475" y1="230" x2="475" y2="244" class="te"/>
+  <g><circle cx="280" cy="50" r="22" class="nd hot"/><text x="280" y="56" text-anchor="middle" class="nlab">7</text></g>
+  <g><circle cx="150" cy="140" r="22" class="nd"/><text x="150" y="146" text-anchor="middle" class="nlab">5</text></g>
+  <g><circle cx="410" cy="140" r="22" class="nd"/><text x="410" y="146" text-anchor="middle" class="nlab">20</text></g>
+  <g><circle cx="85" cy="220" r="21" class="nd"/><text x="85" y="226" text-anchor="middle" class="nlab">4</text></g>
+  <g><circle cx="215" cy="220" r="21" class="nd"/><text x="215" y="226" text-anchor="middle" class="nlab">6</text></g>
+  <g><circle cx="345" cy="220" r="21" class="nd"/><text x="345" y="226" text-anchor="middle" class="nlab">15</text></g>
+  <g><circle cx="475" cy="220" r="21" class="nd"/><text x="475" y="226" text-anchor="middle" class="nlab">33</text></g>
+  <g><circle cx="45" cy="254" r="20" class="nd"/><text x="45" y="259" text-anchor="middle" class="nlab">2</text></g>
+  <g><circle cx="345" cy="254" r="20" class="nd"/><text x="345" y="259" text-anchor="middle" class="nlab">10</text></g>
+  <g><circle cx="475" cy="254" r="20" class="nd"/><text x="475" y="259" text-anchor="middle" class="nlab">25</text></g>
+</svg>
+<figcaption><b>ผลลัพธ์สุดท้าย</b> — ตรวจเช็คตัวเอง: เดิน in-order ได้ 2,4,5,6,7,10,15,20,25,33 = เรียงแล้ว ✅ (ถ้าไม่เรียง แปลว่าวาดผิดแน่)</figcaption>
+</figure>
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>ข้อควรระวังเวลา trace</div>
+<p>• ค่าที่ <strong>เท่ากัน</strong> สไลด์ใช้กฎ <code>!(d &lt; current.data)</code> = เท่ากันวิ่ง<strong>ขวา</strong> — อ่านโค้ดในข้อสอบให้แม่น<br>
+• insert เข้า "ตามลำดับ" มีผลกับรูปทรงเสมอ: insert ตามเลขเรียง (1,2,3,4) → tree เอียงเป็นเส้น → ค้น O(n)<br>
+• ท้ายข้อ วาดใหม่รวบรวม + เขียน in-order ตรวจว่าเรียงไหม = เช็คฟรี 10 วินาที</p></div>
+
+<h2 id="code">💻 search / searchIter / insert — โค้ดที่เติมในข้อสอบ</h2>
+<h3>search แบบ recursive (จากสไลด์)</h3>
+<pre><code><span class="cm">// แบบเรียกสวย: search(d) → searchRecurse(d, root)</span>
+TreeNode <span class="fn">searchRecurse</span>(<span class="kw">int</span> d, TreeNode node) {
+  <span class="kw">if</span> (node == <span class="kw">null</span>) <span class="kw">return null</span>;      <span class="cm">// วิ่งหลุดใบ = ไม่มีข้อมูลนี้</span>
+  <span class="kw">if</span> (d == node.data) <span class="kw">return</span> node;   <span class="cm">// เจอแล้ว</span>
+  <span class="kw">if</span> (d &lt; node.data) <span class="kw">return</span> <span class="fn">searchRecurse</span>(d, node.left);   <span class="cm">// น้อยกว่า → ซ้าย</span>
+  <span class="kw">return</span> <span class="fn">searchRecurse</span>(d, node.right);                      <span class="cm">// มากกว่า → ขวา</span>
+}</code></pre>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>ออกสอบจริง (Final 66): เติมโค้ด 1 บรรทัด ⇒ searchIter(int key)</div>
+<p>โจทย์ให้โครงมาครึ่งหนึ่ง หายไปบรรทัดเดียว — เฉลยเต็มที่ควรเขียน:</p>
+<details class="sol"><summary>เฉลย searchIter แบบเต็ม</summary><div class="sol-body">
+<pre><code>TreeNode <span class="fn">searchIter</span>(<span class="kw">int</span> key) {
+  TreeNode cur = root;                     <span class="cm">// เริ่มที่ root</span>
+  <span class="kw">while</span> (cur != <span class="kw">null</span>) {                    <span class="cm">// วิ่งจนหลุดใบ</span>
+    <span class="kw">if</span> (key == cur.data) <span class="kw">return</span> cur;      <span class="cm">// ← จุดที่โจทย์มักให้เติม: เจอ = คืน node</span>
+    <span class="kw">else if</span> (key &lt; cur.data) cur = cur.left;   <span class="cm">// น้อยกว่า → เลี้ยวซ้าย</span>
+    <span class="kw">else</span>                     cur = cur.right;  <span class="cm">// มากกว่า → เลี้ยวขวา</span>
+  }
+  <span class="kw">return null</span>;                             <span class="cm">// หลุดใบโดยไม่เจอ</span>
+}</code></pre>
+<p>ถ้าโจทย์เติมแค่ 1 บรรทัด มักเป็น <code>cur = cur.left;</code> / <code>cur = cur.right;</code> (เลี้ยวตาม BST property)
+หรือ <code>if (key == cur.data) return cur;</code> — จำโครง "เดินตามกฎซ้าย-ขวาจน null" ให้ได้</p>
+</div></details>
+</div>
+
+<h3>insert แบบ iterative (มีช่องว่าง <code>your code 1/2</code> ตามสไลด์)</h3>
+<pre><code><span class="kw">void</span> <span class="fn">insert</span>(<span class="kw">int</span> d) {
+  <span class="kw">if</span> (root == <span class="kw">null</span>) { root = <span class="kw">new</span> TreeNode(d); <span class="kw">return</span>; }  <span class="cm">// ต้นเปล่า → ตัวแรกเป็น root</span>
+  TreeNode current = root;
+  <span class="kw">while</span> (current != <span class="kw">null</span>) {
+    <span class="kw">if</span> (d &lt; current.data) {
+      <span class="kw">if</span> (current.left != <span class="kw">null</span>)  current = current.left;      <span class="cm">// มีที่วิ่งต่อซ้าย</span>
+      <span class="kw">else</span> { current.left = <span class="kw">new</span> TreeNode(d);              <span class="cm">/* your code 1: ซ้ายว่าง → สร้าง node ใหม่ผูกซ้าย */</span>
+             current.left.parent = current; <span class="kw">return</span>; }
+    } <span class="kw">else</span> {
+      <span class="kw">if</span> (current.right != <span class="kw">null</span>) current = current.right;     <span class="cm">/* your code 2: มีที่วิ่งต่อขวา */</span>
+      <span class="kw">else</span> { current.right = <span class="kw">new</span> TreeNode(d);
+             current.right.parent = current; <span class="kw">return</span>; }
+    }
+  }
+}</code></pre>
+<p class="small">เห็นไหมว่า insert = "search หาช่องว่างแล้ววาง" — ต้นทางเดียวกับ search เป๊ะ จึงรันเวลาเท่ากัน O(log n) ถ้า balanced, O(n) ถ้าเอียง</p>
+
+<h2 id="delete">🗑️ delete — 3 เคสที่ต้องเล่าให้ได้</h2>
+<p>ลบ node จาก BST ต้องรักษากฎ "ซ้ายน้อยขวามาก" ไว้ แบ่งเป็น 3 เคสตามจำนวนลูก:</p>
+<div class="steps">
+  <div class="step"><span class="step-t">เคส 1: ลบใบ (ไม่มีลูก)</span>ง่ายสุด — ตัด node ออก ตั้ง pointer ของแม่ชี้ null (ไม่กระทบใคร)</div>
+  <div class="step"><span class="step-t">เคส 2: มีลูกเดียว</span>ยกลูกขึ้นมาแทนที่ตัวเอง — แม่ของเราเลี้ยวไปหาลูกของเราตรง ๆ (เหมือนคนลาออก ให้ลูกน้องรับช่วงตำแหน่ง)</div>
+  <div class="step"><span class="step-t">เคส 3: มีสองลูก (ยาก!)</span>หา "ตัวแทน" มานั่งตำแหน่งเดิม: <strong>ค่ามากสุดของ subtree ซ้าย (in-order predecessor)</strong> หรือ <strong>ค่าน้อยสุดของ subtree ขวา (in-order successor)</strong> — สองตัวนี้เป็นค่าที่ "อยู่ติดขอบ" พอดี จึงขยับมาแทนได้โดยกฎ BST ไม่พัง แล้วลบตัวแทนออกจากที่เดิม (ตัวแทนมีลูกมากสุด 1 คน → กลับไปเคส 1 หรือ 2)</div>
+</div>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 260" width="760" role="img" aria-label="Delete two-children trace">
+  <defs><marker id="arwb" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8a94a0"/></marker></defs>
+  <!-- before -->
+  <g>
+    <text x="190" y="14" text-anchor="middle" class="slab-b">ลบ 20 (มีสองลูก 18 กับ 30)</text>
+    <line x1="190" y1="56" x2="105" y2="116" class="te"/><line x1="190" y1="56" x2="275" y2="116" class="te"/>
+    <line x1="275" y1="136" x2="240" y2="176" class="te"/>
+    <g><circle cx="190" cy="46" r="21" class="nd bad"/><text x="190" y="52" text-anchor="middle" class="nlab">20</text></g>
+    <g><circle cx="105" cy="126" r="21" class="nd"/><text x="105" y="132" text-anchor="middle" class="nlab">18</text></g>
+    <g><circle cx="275" cy="126" r="21" class="nd"/><text x="275" y="132" text-anchor="middle" class="nlab">30</text></g>
+    <g><circle cx="240" cy="186" r="20" class="nd hot"/><text x="240" y="192" text-anchor="middle" class="nlab">19</text></g>
+    <text x="190" y="232" text-anchor="middle" class="tag">ตัวแทน = max ของฝั่งซ้าย = 19 (18 ไม่มีลูกขวา นอกจาก 19)</text>
+  </g>
+  <g>
+    <text x="430" y="14" text-anchor="middle" class="slab-b">ขั้นกลาง: ดึง 19 ออกจากที่เดิมก่อน</text>
+    <line x1="430" y1="66" x2="355" y2="126" class="te"/><line x1="430" y1="66" x2="505" y2="126" class="te"/>
+    <line x1="505" y1="146" x2="470" y2="186" class="te"/>
+    <g><circle cx="430" cy="56" r="21" class="nd bad"/><text x="430" y="62" text-anchor="middle" class="nlab">20</text></g>
+    <g><circle cx="355" cy="136" r="21" class="nd"/><text x="355" y="142" text-anchor="middle" class="nlab">18</text></g>
+    <g><circle cx="505" cy="136" r="21" class="nd"/><text x="505" y="142" text-anchor="middle" class="nlab">30</text></g>
+    <g><circle cx="470" cy="196" r="20" class="nd hot"/><text x="470" y="202" text-anchor="middle" class="nlab">25</text></g>
+    <text x="430" y="232" text-anchor="middle" class="tag">(ตัวอย่างสไลด์: ลบ 19 จาก subtree 18 → 18 ไม่มีลูกขวาแล้ว)</text>
+  </g>
+  <line x1="285" y1="90" x2="345" y2="90" class="te dash" marker-end="url(#arwb)"/>
+  <line x1="525" y1="90" x2="585" y2="90" class="te dash" marker-end="url(#arwb)"/>
+  <!-- after -->
+  <g>
+    <text x="640" y="14" text-anchor="middle" class="slab-b">วาง 19 แทนที่ 20 + ต่อลูกทั้งคู่</text>
+    <line x1="640" y1="56" x2="565" y2="116" class="te"/><line x1="640" y1="56" x2="715" y2="116" class="te"/>
+    <line x1="715" y1="136" x2="680" y2="176" class="te"/>
+    <g><circle cx="640" cy="46" r="21" class="nd good"/><text x="640" y="52" text-anchor="middle" class="nlab">19</text></g>
+    <g><circle cx="565" cy="126" r="21" class="nd good"/><text x="565" y="132" text-anchor="middle" class="nlab">18</text></g>
+    <g><circle cx="715" cy="126" r="21" class="nd good"/><text x="715" y="132" text-anchor="middle" class="nlab">30</text></g>
+    <g><circle cx="680" cy="186" r="20" class="nd"/><text x="680" y="192" text-anchor="middle" class="nlab">25</text></g>
+    <text x="640" y="232" text-anchor="middle" class="tag">q.left = 18, q.right = 30 · กฎ BST ยังครบ ✅ (18&lt;19&lt;30, 25&gt;19)</text>
+  </g>
+</svg>
+<figcaption><b>เคส 2 ลูก</b> — ตามขั้นตอนในสไลด์: (1) เลือก 19 = max ฝั่งซ้าย (2) ลบ 19 ออกจากที่เดิม (3) ต่อ parent เดิมเข้าหา 19 (4) 19 รับลูกทั้งคู่ของ 20</figcaption>
+</figure>
+
+<h3>โค้ด delete (โครงจากสไลด์ — ใช้ parent pointer)</h3>
+<pre><code><span class="kw">void</span> <span class="fn">delete</span>(<span class="kw">int</span> d, TreeNode node) {
+  <span class="kw">if</span> (node == <span class="kw">null</span>) <span class="kw">return</span>;              <span class="cm">// ไม่เจอ</span>
+  <span class="kw">if</span> (d &lt; node.data) { <span class="fn">delete</span>(d, node.left); }    <span class="cm">// หาทางซ้าย</span>
+  <span class="kw">else if</span> (d &gt; node.data) { <span class="fn">delete</span>(d, node.right); }  <span class="cm">// หาทางขวา</span>
+  <span class="kw">else</span> {  <span class="cm">// เจอ node ที่มีค่า == d</span>
+    <span class="kw">if</span> (node.left == <span class="kw">null</span> || node.right == <span class="kw">null</span>) {   <span class="cm">// เคส 1-2: ลูก 0 หรือ 1 คน</span>
+      TreeNode q = (node.left == <span class="kw">null</span>) ? node.right : node.left;  <span class="cm">// q = ลูกที่มีอยู่ (อาจ null)</span>
+      <span class="kw">if</span> (node.parent != <span class="kw">null</span>) {
+        <span class="kw">if</span> (node.parent.left == node) node.parent.left = q;   <span class="cm">// แม่เลี้ยวไปหา q แทนเรา</span>
+        <span class="kw">else</span>                          node.parent.right = q;
+        <span class="kw">if</span> (q != <span class="kw">null</span>) q.parent = node.parent;  <span class="cm">// อัปเดต parent ของ q ด้วย</span>
+      } <span class="kw">else</span> root = q;                         <span class="cm">// เราคือ root → q ขึ้นเป็น root</span>
+    } <span class="kw">else</span> {   <span class="cm">// เคส 3: สองลูก</span>
+      TreeNode q = <span class="fn">findMaxFrom</span>(node.left);    <span class="cm">// ตัวแทน = predecessor</span>
+      <span class="fn">delete</span>(q.data, node.left);               <span class="cm">// ลบตัวแทนออกจากที่เดิมก่อน (เคส 1-2 เท่านั้น)</span>
+      <span class="kw">if</span> (node.parent == <span class="kw">null</span>) root = q;      <span class="cm">// ต่อ parent เดิมเข้าหาตัวแทน</span>
+      <span class="kw">else if</span> (node.parent.left == node) node.parent.left = q;
+      <span class="kw">else</span>                               node.parent.right = q;
+      q.left = node.left;   <span class="kw">if</span> (q.left != <span class="kw">null</span>)  q.left.parent = q;   <span class="cm">// รับลูกซ้าย</span>
+      q.right = node.right; <span class="kw">if</span> (q.right != <span class="kw">null</span>) q.right.parent = q;  <span class="cm">// รับลูกขวา</span>
+      q.parent = node.parent;
+    }
+  }
+}
+<span class="cm">// อีกแนว (สั้นกว่า): swap ค่าของ successor เข้ามาแทนใน node นี้ แล้ว delete ตัว successor จริง ๆ ใน subtree ขวา</span></code></pre>
+
+<h2 id="challenge">🏅 Example Challenge จากสไลด์ (แนวข้อสอบสายโค้ด)</h2>
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ 1: findMax จาก BST</div>
+<p>กำหนด BST สร้างจาก <code>{5, 3, 8, 2, 4, 7, 9}</code> — เขียน <code>findMax(bst)</code> คืนค่ามากสุด (เฉลย 9)</p>
+<details class="sol"><summary>เฉลย</summary><div class="sol-body">
+<p>กฎของ BST บอกว่า "ค่ามากสุด = node ที่วิ่ง<strong>ขวา</strong>ไปสุด" (แค่ไหนก็ขวาจนหลุด) — ไม่ต้อง traverse ทั้งต้นเลย:</p>
+<pre><code><span class="kw">private static int</span> <span class="fn">findMax</span>(MyBST_Basic bst) {
+  Node node = bst.root;
+  <span class="kw">if</span> (node == <span class="kw">null</span>) <span class="kw">return</span> -1;          <span class="cm">// tree ว่าง</span>
+  <span class="kw">while</span> (node.right != <span class="kw">null</span>)            <span class="cm">// ลื่นไปทางขวาจนสุด</span>
+    node = node.right;
+  <span class="kw">return</span> node.val;
+}</code></pre>
+<p>O(h) — balanced คือ O(log n) (เช่นเดียวกัน findMin = วิ่งซ้ายสุด)</p>
+</div></details>
+</div>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ 2: rangeSumBST(node, low, high) — ผลรวมค่าในช่วง [4..8] (เฉลย 24)</div>
+<details class="sol"><summary>เฉลยทีละบรรทัด + trace ตามสไลด์</summary><div class="sol-body">
+<pre><code><span class="kw">private static int</span> <span class="fn">rangeSumBST</span>(Node node, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+  <span class="kw">if</span> (node == <span class="kw">null</span>)   <span class="kw">return</span> 0;                        <span class="cm">/*A*/</span>
+  <span class="kw">if</span> (node.val &lt; low)  <span class="kw">return</span> <span class="fn">rangeSumBST</span>(node.right, low, high); <span class="cm">/*B*/ ตัวนี้เล็กเกิน → ฝั่งซ้ายเล็กกว่าอีก ตัดทิ้ง!</span>
+  <span class="kw">if</span> (node.val &gt; high) <span class="kw">return</span> <span class="fn">rangeSumBST</span>(node.left, low, high);  <span class="cm">/*C*/ ตัวนี้ใหญ่เกิน → ฝั่งขวาใหญ่กว่าอีก ตัดทิ้ง!</span>
+  <span class="kw">return</span> node.val + <span class="fn">rangeSumBST</span>(node.left, low, high)              <span class="cm">/*D*/ อยู่ในช่วง → นับ + สองฝั่งยังอาจมีของในช่วง</span>
+                  + <span class="fn">rangeSumBST</span>(node.right, low, high);
+}</code></pre>
+<p>trace กับ BST {5,3,8,2,4,7,9} เรียก rangeSumBST(root,4,8) — ตามขั้นที่สไลด์เฉลย:</p>
+<ol>
+<li>node 5 → อยู่ในช่วง (เคส D) → 5 + sum(ซ้าย=3) + sum(ขวา=8)</li>
+<li>sum(3): 3 &lt; low=4 (เคส B) → วิ่งขวาเท่านั้น → rangeSumBST(4, 4, 8)</li>
+<li>node 4 → อยู่ในช่วง (เคส D) → 4 + sum(null) + sum(null) = <strong>4</strong></li>
+<li>sum(8): อยู่ในช่วง (เคส D) → 8 + sum(7) + sum(9)</li>
+<li>node 7 → 7 + 0 + 0 = <strong>7</strong></li>
+<li>node 9 → 9 &gt; high=8 (เคส C) → วิ่งซ้าย = null → <strong>0</strong></li>
+</ol>
+<p>รวม: 4 + 5 + (7 + 8 + 0) = <strong>24</strong> ✅ — จุดขายของโค้ดนี้คือใช้ BST property "ตัดทาง" (B, C) เหมือน search แทนการไล่ทั้งต้น</p>
+</div></details>
+</div>
+
+<h2 id="summary">📌 สรุปบท + แนวข้อสอบ</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>การทำงาน</th><th class="num">Balanced</th><th class="num">Deformed (เอียง)</th><th>หัวใจ</th></tr></thead>
+<tbody>
+<tr><td>search / insert / delete</td><td class="num">O(log n)</td><td class="num bad">O(n)</td><td>ทุกอย่าง = "เดินตามกฎซ้าย-ขวา"</td></tr>
+<tr><td>in-order traversal</td><td class="num" colspan="2">O(n) เสมอ</td><td>คืนข้อมูลเรียงแล้ว (BST เท่านั้น)</td></tr>
+<tr><td>findMax / findMin</td><td class="num">O(log n)</td><td class="num">O(n)</td><td>วิ่งขวาสุด / ซ้ายสุด</td></tr>
+</tbody></table></div>
+
+<div class="mcq" data-q="1">
+  <div class="q">1) in-order traversal ของ BST ที่ถูกต้องจะให้ผลแบบไหน?</div>
+  <div class="opts">
+    <button class="opt" data-correct="1">เรียงจากน้อยไปมากเสมอ</button>
+    <button class="opt">เรียงจากมากไปน้อย</button>
+    <button class="opt">สุ่มตามลำดับ insert</button>
+    <button class="opt">เรียงตามชั้น (level order)</button>
+  </div>
+  <div class="explain">✅ Left → Root → Right บนกฎ BST = น้อยไปมากเสมอ — ใช้ตรวจคำตอบตอนวาด tree ในห้องสอบได้ทันที</div>
+</div>
+<div class="mcq" data-q="2">
+  <div class="q">2) ลบ node ที่มี 2 ลูก ใช้ "ตัวแทน" ตัวไหนได้บ้าง?</div>
+  <div class="opts">
+    <button class="opt">ค่าน้อยสุดของ subtree ซ้าย</button>
+    <button class="opt" data-correct="1">ค่ามากสุดของ subtree ซ้าย หรือค่าน้อยสุดของ subtree ขวา</button>
+    <button class="opt">ค่าใดก็ได้ใน tree</button>
+    <button class="opt">ลูกซ้ายของ node นั้นเสมอ</button>
+  </div>
+  <div class="explain">✅ predecessor (max ซ้าย) หรือ successor (min ขวา) — สองตัวนี้คือค่า "ติดขอบ" ที่กฎ BST ไม่พังตอนย้ายมาแทน (และมันมีลูก ≤ 1 คน ลบง่าย)</div>
+</div>
+<div class="mcq" data-q="3">
+  <div class="q">3) insert ลำดับ 1,2,3,4,5 ลง BST เปล่า — ความสูงของ tree เป็นเท่าไร?</div>
+  <div class="opts">
+    <button class="opt">2</button>
+    <button class="opt" data-correct="1">4 (เอียงเป็นเส้นเดียว)</button>
+    <button class="opt">5</button>
+    <button class="opt">log n ≈ 2.3</button>
+  </div>
+  <div class="explain">✅ ทุกตัวมากกว่าตัวก่อน → วิ่งขวาตลอด → เป็น linked list สูง 4 (n−1) ค้นกลายเป็น O(n) — เหตุผลที่บทถัดไป (AVL/Red-Black) ถือกำเนิด!</div>
+</div>
+
+<div class="pager">
+  <a href="heap.html"><span class="dir">← บทก่อน</span><span class="pt">L09 Heap &amp; PQ</span></a>
+  <a href="avltree.html" class="next"><span class="dir">บทถัดไป →</span><span class="pt">L11 AVL · Red-Black · Splay</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · L10 Binary Search Tree</div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>

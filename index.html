@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Final Prep — ติวสอบ Final Data Structures &amp; Algorithms</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-home">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html" class="active">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญหน้านี้ <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#map">แผนที่เนื้อหาทั้งหมด</a>
+    <a href="#topics">หัวข้อทั้ง 5 บท</a>
+    <a href="#bigo">ตาราง Big-O รวมทุกบท</a>
+    <a href="#trends">อะไรออกสอบบ่อย</a>
+    <a href="#tips">เทคนิคทำข้อสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">Data Structures &amp; Algorithms · Final Exam</div>
+  <h1>เว็บติวสอบ Final DSA — เนื้อหาครบทั้ง 5 บท อ่านจบในเว็บเดียว</h1>
+  <p class="lead">สรุปจากสไลด์ L08–L12 (Sorting, Priority Queue, BST, Advanced Tree, Graph) อธิบายละเอียดตั้งแต่พื้นฐาน
+  มีภาพประกอบทีละขั้นตอน (step-by-step) เปรียบเทียบกับของจริงในชีวิตประจำวัน และคัด "แนวข้อสอบ" จากโจทย์ Example Challenge
+  ที่อาจารย์ใส่มาในสไลด์ — อ่านได้ทั้งคอมและมือถือ</p>
+  <div class="meta">
+    <span class="chip">📖 อธิบายละเอียด + พื้นฐานแทรก</span>
+    <span class="chip">🖼️ ภาพประกอบทุกหัวข้อยาก</span>
+    <span class="chip">📝 แนวข้อสอบ + เฉลย step-by-step</span>
+    <span class="chip">📱 อ่านได้บนมือถือ</span>
+  </div>
+</section>
+
+<h2 id="map">🗺️ แผนที่เนื้อหา — บทไหนต่อกันยังไง</h2>
+<p>เนื้อหา 5 บทนี้ไม่ได้แยกกันเป๊ะ ๆ แต่ <strong>ต่อยอดกันเป็นโซ่</strong> ถ้าเข้าใจโซ่นี้ การทวนคืนจะเร็วขึ้นมาก:</p>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 250" width="760" role="img" aria-label="แผนที่ความสัมพันธ์ของบทเรียน">
+  <defs>
+    <marker id="arw" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto">
+      <path d="M0,0 L8,4.5 L0,9 z" fill="#8a94a0"/>
+    </marker>
+  </defs>
+  <!-- Array/Basics -->
+  <rect x="20" y="90" width="120" height="60" rx="12" fill="var(--bg-soft)" stroke="var(--line)"/>
+  <text x="80" y="115" text-anchor="middle" class="tlabel">พื้นฐาน</text>
+  <text x="80" y="135" text-anchor="middle" class="tag">Array · Big-O · Recursion</text>
+
+  <!-- Sorting -->
+  <rect x="180" y="20" width="130" height="60" rx="12" fill="var(--accent-soft)" stroke="#0f766e"/>
+  <text x="245" y="45" text-anchor="middle" class="tlabel">L08 Sorting</text>
+  <text x="245" y="65" text-anchor="middle" class="tag">จัดข้อมูลให้เป็นระเบียบ</text>
+
+  <!-- PQ/Heap -->
+  <rect x="180" y="160" width="130" height="60" rx="12" fill="var(--accent-soft)" stroke="#b45309"/>
+  <text x="245" y="185" text-anchor="middle" class="tlabel">L09 Heap &amp; PQ</text>
+  <text x="245" y="205" text-anchor="middle" class="tag">ตัวเบาสุด/หนักสุดก่อน</text>
+
+  <!-- BST -->
+  <rect x="360" y="90" width="130" height="60" rx="12" fill="var(--accent-soft)" stroke="#1d4ed8"/>
+  <text x="425" y="115" text-anchor="middle" class="tlabel">L10 BST</text>
+  <text x="425" y="135" text-anchor="middle" class="tag">ต้นไม้ค้นหาแบบทวิภาค</text>
+
+  <!-- AVL/RB/Splay -->
+  <rect x="540" y="20" width="150" height="60" rx="12" fill="var(--accent-soft)" stroke="#a21caf"/>
+  <text x="615" y="45" text-anchor="middle" class="tlabel">L11 AVL·RB·Splay</text>
+  <text x="615" y="65" text-anchor="middle" class="tag">รักษาความสมดุลของ BST</text>
+
+  <!-- Graph -->
+  <rect x="540" y="160" width="150" height="60" rx="12" fill="var(--accent-soft)" stroke="#b91c1c"/>
+  <text x="615" y="185" text-anchor="middle" class="tlabel">L12 Graph</text>
+  <text x="615" y="205" text-anchor="middle" class="tag">เครือข่าย + Prim/Dijkstra/…</text>
+
+  <line x1="140" y1="110" x2="176" y2="60" class="te dash" marker-end="url(#arw)"/>
+  <line x1="140" y1="130" x2="176" y2="180" class="te dash" marker-end="url(#arw)"/>
+  <line x1="310" y1="60" x2="356" y2="105" class="te dash" marker-end="url(#arw)"/>
+  <line x1="310" y1="180" x2="356" y2="140" class="te dash" marker-end="url(#arw)"/>
+  <line x1="490" y1="110" x2="536" y2="60" class="te dash" marker-end="url(#arw)"/>
+  <line x1="490" y1="130" x2="536" y2="180" class="te dash" marker-end="url(#arw)"/>
+  <text x="403" y="82" text-anchor="middle" class="tag">Heap sort = Heap + Sorting</text>
+  <text x="403" y="160" text-anchor="middle" class="tag">BST เอียง = ช้าเหมือน linked list</text>
+</svg>
+<figcaption><b>โซ่ความรู้:</b> จัดข้อมูล (Sorting) → หยิบของสำคัญก่อน (Heap) → จัดเป็นต้นไม้เพื่อค้นเร็ว (BST) → กันต้นไม้เอียง (AVL/RB/Splay) → ต่อยอดเป็นเครือข่าย (Graph)</figcaption>
+</figure>
+
+<h2 id="topics">📚 หัวข้อทั้ง 5 บท + หน้าแนวข้อสอบ</h2>
+<div class="topic-grid">
+  <a class="tcard" href="sorting.html">
+    <span class="t-badge" style="background:#e4f4f1;color:#0b5a54">L08</span>
+    <h3>Sorting — การเรียงลำดับ</h3>
+    <p>Bubble / Selection / Insertion / Quick / Merge / Radix / Counting / Bucket / Shell / Heap sort — เทียบความเร็ว, memory, stability พร้อมภาพไล่ทีละรอบ</p>
+  </a>
+  <a class="tcard" href="heap.html">
+    <span class="t-badge" style="background:#f9efe2;color:#8a410c">L09</span>
+    <h3>Priority Queue &amp; Heap</h3>
+    <p>คิวแบบมีสิทธิ์, Min/Max Heap, เก็บใน array ยังไง, insert (percolate up) / remove (percolate down), heapify และ Heap Sort</p>
+  </a>
+  <a class="tcard" href="bst.html">
+    <span class="t-badge" style="background:#e8eefc;color:#1a3fae">L10</span>
+    <h3>Binary Search Tree</h3>
+    <p>ศัพท์ต้นไม้ทุกคำ, traversal 3 แบบ, search/insert ใน O(log n), delete 3 เคส (ใบ / ลูกเดียว / 2 ลูก) พร้อมโจทย์ findMax, rangeSumBST</p>
+  </a>
+  <a class="tcard" href="avltree.html">
+    <span class="t-badge" style="background:#f7e9f8;color:#7d1587">L11</span>
+    <h3>AVL · Red-Black · Splay</h3>
+    <p>3 วิธีกันต้นไม้เอียง: AVL (หมุน 4 เคส), Red-Black (เปลี่ยนสี/หมุน, trace 9 ค่า), Splay (ดึงตัวที่เพิ่งใช้ขึ้นหัว) — แนวข้อสอบออกระคัง</p>
+  </a>
+  <a class="tcard" href="graph.html">
+    <span class="t-badge" style="background:#fceaea;color:#921616">L12</span>
+    <h3>Graph — กราฟ</h3>
+    <p>ศัพท์กราฟ, matrix vs list, BFS/DFS, MST (Prim), เส้นทางสั้นสุด (Dijkstra), Union-Find, Kruskal — พร้อมตาราง trace ตามสไลด์</p>
+  </a>
+  <a class="tcard" href="exam.html">
+    <span class="t-badge" style="background:#eff5e4;color:#3c620c">★</span>
+    <h3>แนวข้อสอบรวม</h3>
+    <p>รวมโจทย์จากรีวิวรุ่นพี่ Final 66/67 + Example Challenge ในสไลด์ ทุกข้อมีเฉลยละเอียดทีละขั้น และแบบทดสอบกดตอบได้ในทุกบท</p>
+  </a>
+  <a class="tcard" href="short-note.html">
+    <span class="t-badge" style="background:#eff5e4;color:#3c620c">📄</span>
+    <h3>Short Note 1 แผ่น (A4)</h3>
+    <p>สรุปทุกสูตร/ทุกตาราง จัดแน่น ๆ ใน 1 แผ่น A4 (2 หน้า) กดพิมพ์ได้ทันที — สำหรับนำเข้าห้องสอบตามกฎปี 66</p>
+  </a>
+</div>
+
+<h2 id="bigo">⏱️ ตาราง Big-O รวมทุกบท (ท่องก่อนเข้าห้องสอบ)</h2>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>อ่าน Big-O อย่างไรให้เป็นเรื่องง่าย</div>
+<p><strong>Big-O คือ "อัตราการโตของเวลา เมื่อข้อมูลเยอะขึ้น"</strong> — เปรียบเหมือนการหาชื่อคนในสมุดโทรศัพท์:
+ถ้าเปิดทีละหน้าจากหน้าแรก = O(n) เปิดครึ่งเล่มทิ้งครึ่งเล่มไปเรื่อย ๆ = O(log n)
+(1,000 รายชื่อใช้แค่ ~10 ครั้ง, 1,000,000 รายชื่อใช้แค่ ~20 ครั้ง — ข้อมูลโต 100 เท่า งานโตแค่ 2 เท่า!)
+ส่วน O(n²) คือเทียบทุกคู่ ข้อมูลโต 10 เท่า งานโต 100 เท่า ถึงเวลาสอบเราเลยใช้ Big-O เป็น "คะแนนความเร็ว"</p></div>
+
+<div class="tbl-wrap"><table>
+<thead><tr><th>บท</th><th>อัลกอริทึม / การทำงาน</th><th class="num">Best</th><th class="num">Average</th><th class="num">Worst</th><th>Memory</th><th>Stable?</th></tr></thead>
+<tbody>
+  <tr><td rowspan="5"><b>L08 Sorting</b></td><td>Bubble sort</td><td class="num">O(n)</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>O(1)</td><td class="good">Yes</td></tr>
+  <tr><td>Selection sort</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>O(1)</td><td class="bad">No</td></tr>
+  <tr><td>Insertion sort</td><td class="num">O(n)</td><td class="num">O(n²)</td><td class="num">O(n²)</td><td>O(1)</td><td class="good">Yes</td></tr>
+  <tr><td>Quick sort</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td class="num bad">O(n²) pivot แย่</td><td>O(log n)</td><td class="bad">No</td></tr>
+  <tr><td>Merge sort</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td>O(n)</td><td class="good">Yes</td></tr>
+  <tr><td rowspan="4"></td><td>Heap sort</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td class="num">O(n log n)</td><td>O(n)</td><td class="bad">No</td></tr>
+  <tr><td>Radix sort</td><td class="num">O(nd)</td><td class="num">O(nd)</td><td class="num">O(nd)</td><td>O(n+d)</td><td class="good">Yes</td></tr>
+  <tr><td>Counting / Bucket sort</td><td class="num">O(n) / O(n)</td><td class="num">O(m+n)</td><td class="num">O(m+n)</td><td>O(m)</td><td class="good">Yes</td></tr>
+  <tr><td>Shell sort</td><td class="num">—</td><td class="num">ขึ้นกับชุด gap</td><td class="num">แย่กว่า O(n log n)</td><td>O(1)</td><td class="bad">No</td></tr>
+
+  <tr><td rowspan="3"><b>L09 Heap/PQ</b></td><td>insert (percolate up)</td><td class="num">O(1)</td><td class="num">O(1)</td><td class="num">O(log n)</td><td>—</td><td>—</td></tr>
+  <tr><td>remove min (percolate down)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td>—</td><td>—</td></tr>
+  <tr><td>heapify (build heap ทั้ง array)</td><td class="num">—</td><td class="num">O(n)</td><td class="num">O(n)</td><td>—</td><td>—</td></tr>
+
+  <tr><td rowspan="3"><b>L10 BST</b></td><td>search / insert (balanced)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td>—</td><td>—</td></tr>
+  <tr><td>search / insert (deformed เอียงสุด)</td><td class="num">—</td><td class="num">—</td><td class="num bad">O(n)</td><td>—</td><td>—</td></tr>
+  <tr><td>delete (3 เคส)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td class="num">O(n) เมื่อเอียง</td><td>—</td><td>—</td></tr>
+
+  <tr><td rowspan="3"><b>L11 Balance</b></td><td>AVL search / insert / delete</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td>—</td><td>—</td></tr>
+  <tr><td>Red-Black search / insert / delete</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td class="num">O(log n)</td><td>—</td><td>—</td></tr>
+  <tr><td>Splay (amortized — เฉลี่ย M ครั้ง)</td><td class="num">—</td><td class="num">O(log n)</td><td class="num">O(n) เป็นครั้งคราว</td><td>—</td><td>—</td></tr>
+
+  <tr><td rowspan="4"><b>L12 Graph</b></td><td>BFS / DFS traversal</td><td class="num">O(V+E)</td><td class="num">O(V+E)</td><td class="num">O(V+E)</td><td>—</td><td>—</td></tr>
+  <tr><td>Prim (adj list + lazy PQ)</td><td class="num">—</td><td class="num">O(E log V)</td><td class="num">O(E log V)</td><td>—</td><td>—</td></tr>
+  <tr><td>Dijkstra (lazy PQ)</td><td class="num">—</td><td class="num">O(E log V)</td><td class="num">O(E log V)</td><td>—</td><td>—</td></tr>
+  <tr><td>Kruskal (เรียงขอบ + Union-Find)</td><td class="num">—</td><td class="num">O(E log E)</td><td class="num">O(E log E)</td><td>—</td><td>—</td></tr>
+</tbody>
+</table></div>
+<p class="small">หมายเหตุ: n = จำนวนข้อมูล, d = จำนวนหลักของตัวเลข, m = ค่ามากสุดของ key, V/E = จำนวนจุดยอด/เส้นเชื่อมของกราฟ</p>
+
+<h2 id="trends">🎯 อะไรออกสอบบ่อย (ดูจาก Example Challenge ในสไลด์)</h2>
+<p>อาจารย์แปะ "Example Challenge" ไว้ท้ายแทบทุกบท — นั่นคือสัญญาณแนวข้อสอบที่ชัดที่สุด:</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>บท</th><th>แนวโจทย์ที่สไลด์ชี้บ่อย</th><th>ตัวอย่างจริงจากสไลด์</th></tr></thead>
+<tbody>
+<tr><td>L08 Sorting</td><td>เทียบ complexity/stability, trace การเรียงทีละรอบ, บอกว่าอัลกอริทึมไหนเหมาะกับสถานการณ์ไหน</td><td>ตาราง Big-O ทุกตัว, "sort แบบ stable ต้องใช้อะไร"</td></tr>
+<tr><td>L09 Heap</td><td>trace insert/remove ทีละสเต็ป, heap เป็น array index ยังไง, โจทย์เก็บคะแนน k อันดับบน</td><td>insert(8), remove 3 เคส (ไม่มีลูก/ลูกเดียว/สองลูก), <b>Kth highest score</b></td></tr>
+<tr><td>L10 BST</td><td>วาดต้นไม้จากลำดับ insert, delete 3 เคส, traversal in/pre/post-order</td><td>insert 7,20,5,15,10,4,33,2,25,6 · <b>findMax</b> · <b>rangeSumBST(4,8)=24</b></td></tr>
+<tr><td>L11 Advanced Tree</td><td>หมุน AVL 4 เคส, ตรวจว่า Red-Black valid ไหม, trace insert RB ทีละค่า, Splay zig/zig-zig/zig-zag</td><td>8 เคสตรวจ RB tree, trace {10,20,30,15,25,27,5,1,7}, สร้าง AVL จาก 13 ค่า</td></tr>
+<tr><td>L12 Graph</td><td>วาดกราฟจาก edge list + เขียน adjacency list, trace BFS/DFS พร้อม queue/stack, trace Prim/Dijkstra/Kruskal พร้อมตาราง</td><td>roads [[0,6,7],…] · Dijkstra ตาราง dist A–H · Kruskal A–G · Union-Find union(0,1)(1,2)(2,3)</td></tr>
+</tbody>
+</table></div>
+
+<h2 id="tips">✍️ เทคนิคทำข้อสอบ DSA</h2>
+<div class="steps">
+  <div class="step"><span class="step-t">โจทย์ trace — วาดไปทีละสเต็ป อย่าทำในหัว</span>แทบทุกข้อ trace (insert heap/BST/AVL/RB, BFS/DFS, Dijkstra) ทำผิดเพราะ "ข้ามขั้น" จับโจทย์วาดต้นไม้/ตารางไปทีละค่า แล้วเช็คเงื่อนไขทุกครั้ง (เช่น หลัง insert AVL ต้องเช็ค balance factor ทุก node บนเส้นทาง)</div>
+  <div class="step"><span class="step-t">ข้อเทียบ complexity — จำ "คู่ตรงข้าม"</span>Quick sort เร็วแต่ worst O(n²) ↔ Merge sort ทนแต่กิน memory O(n) · AVL ค้นไว (สูงไม่เกิน 1.44 log n) ↔ Red-Black แก้ง่าย (หมุน ≤ 2 ครั้งตอน insert) · อย่าลืม Stability: Merge/Insertion/Bubble ได้, Selection/Quick/Heap เสีย</div>
+  <div class="step"><span class="step-t">โจทย์เขียนโค้ด — เริ่มจาก skeleton ในสไลด์</span>ข้อสอบมักให้โค้ดครึ่งหนึ่งมาเติม (เช่น <code>/* your code 1 */</code> ใน BST insert) ฝึกเขียนจากโครงในสไลด์: heap insert/remove, BST delete 3 เคส, Dijkstra lazy queue, Union-Find</div>
+  <div class="step"><span class="step-t">อ่านโจทย์ให้ครบ — ระวังคำกุญแจ</span>"min heap หรือ max heap?" · "stable?" · "in-place?" · "directed/undirected?" · "amortized?" คำเดียวเปลี่ยนคำตอบทั้งข้อ เช่น Counting sort จะ stable ต่อเมื่อวางของ<strong>จากขวาไปซ้าย</strong></div>
+  <div class="step"><span class="step-t">เช็คคำตอบด้วย property</span>BST → ทุก node ลูกซ้าย &lt; แม่ &lt; ลูกขวา? · Heap → แม่ ≤ ลูกทุกต้น? · RB → root ดำ + แดงไม่ติดกัน + black-height เท่ากันทุกเส้นทาง? · MST → ครบ V จุด, ไม่มีวง, E = V−1 เส้น?</div>
+</div>
+
+<div class="pager">
+  <a href="sorting.html" class="next"><span class="dir">เริ่มบทแรก →</span><span class="pt">L08 Sorting</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep — เว็บติวสอบจากสไลด์ L08–L12 · เขียนเพื่อความเข้าใจ อ่านสบายทั้งคอมและมือถือ</div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L11 AVL · Red-Black · Splay — เว็บติวสอบ Final DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="topic-avltree">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html" class="active">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+<aside class="toc">
+  <div class="toc-head">สารบัญ Advanced Tree <span class="chev">▾</span></div>
+  <div class="toc-body">
+    <a href="#why">ทำไมต้อง balance</a>
+    <a href="#strategies">3 กลยุทธ์ balance</a>
+    <a href="#avl">AVL: balance factor</a>
+    <a href="#rotations">4 เคสหมุน (LL RR LR RL)</a>
+    <a href="#trace">trace สร้าง AVL 13 ค่า</a>
+    <a href="#avlcode">โค้ดหมุน + การลบ</a>
+    <a href="#rb">Red-Black Tree: กฎ 5 ข้อ</a>
+    <a href="#rbcheck">ตรวจ tree ว่า RB ได้ไหม</a>
+    <a href="#rbinsert">RB insert + trace 9 ค่า</a>
+    <a href="#splay">Splay Tree</a>
+    <a href="#summary">สรุป + แนวข้อสอบ</a>
+  </div>
+</aside>
+
+<main>
+<section class="hero">
+  <div class="kicker">L11 · Advanced Tree (Self-balancing BST)</div>
+  <h1>AVL · Red-Black · Splay — กันไม่ให้ BST เอียง</h1>
+  <p class="lead">รุ่นพี่เจอ: <strong>"มี Unbalanced Tree แสดงขั้นตอนทำให้ Balance พร้อมผลลัพธ์สุดท้าย"</strong> (Final 66)
+  และ <strong>"เขียน AVL Tree, Delete Splay Tree"</strong> (Final 67) — หัวใจของบทนี้คือการหมุน (rotation) 4 แบบ
+  กับการเช็ค Red-Black ว่า valid ไหม ซึ่งสไลด์ยกเป็นเคสมาถึง 8 ข้อ!</p>
+  <div class="meta">
+    <span class="chip">⭐ AVL rebalance ทีละขั้น</span>
+    <span class="chip">⭐ ตรวจ RB tree valid/invalid</span>
+    <span class="chip">⭐ RB insert trace</span>
+    <span class="chip">⭐ Splay delete</span>
+  </div>
+</section>
+
+<h2 id="why"> 😤 ปัญหาเดิม: BST ไม่ยอมสมดุลเอง</h2>
+<p>บทที่แล้วเราเห็นแล้วว่า BST สวยตอน balanced (O(log n)) แต่ถ้า insert ข้อมูลตามลำดับมันจะเอนไปเป็น linked list (O(n))
+— ปัญหาคือ <strong>tree ไม่รู้ตัว</strong> ว่าตัวเองเอียง ใครจะมาทำให้มันตั้งไข่ไข่ได้? 3 กลยุทธ์ (ตามสไลด์):</p>
+
+<h2 id="strategies">🥋 3 กลยุทธ์ทำให้สมดุล</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th>กลยุทธ์</th><th>วิธี</th><th>ข้อดี / ข้อเสีย</th></tr></thead>
+<tbody>
+<tr><td><b>1. Keep it balance</b><br>(สมดุลสมบูรณ์)</td><td>เรียงข้อมูลก่อน แล้ว build tree จากกึ่งกลางทุกชั้น</td><td>ต้นสวยสุด แต่แพง: O(n log n) ต่อการเพิ่ม 1 ตัว — ใช้ได้เฉพาะข้อมูลนิ่ง ๆ ไม่ค่อยอัปเดต</td></tr>
+<tr><td><b>2. Keep it pretty balance</b><br>(พอประมาณ)</td><td><b>AVL Tree</b> / <b>Red-Black Tree</b> — แทรก bookkeeping แล้วหมุนแก้ทันทีตอน insert/delete</td><td>รับประกันสูง O(log n) เสมอ · ต้องจ่ายค่าจัดการตลอด</td></tr>
+<tr><td><b>3. ตัวที่เพิ่งใช้ไว้บนสุด</b><br>(Splay Tree)</td><td>ทุกครั้งที่ access ให้ "หมุนดึง" node นั้นขึ้น root</td><td>ไม่แคร์สมดุลเลย แต่ของที่ใช้บ่อยจะลอยขึ้นบน เร็วแบบ amortized</td></tr>
+</tbody></table></div>
+<p class="small">สไลด์เตือน: "ปล่อยให้ดวงจัดการ (ไม่ balance) เป็น bad practice มาก" — ส่วนตัวเลือกที่ 1 แก้ด้วยการ sort ก่อน build: วิธี build balanced BST จาก sorted list ถูกทิ้งไว้เป็นการบ้าน (นึกถึง binary search: หยิบกลางเป็น root แล้ววนซ้ำสองครึ่ง)</p>
+
+<h2 id="avl">🌳 AVL Tree — เช็คสมดุลด้วย Balance Factor</h2>
+<p>AVL (Adelson-Velsky และ Landis) คือ BST แรกที่ self-balancing ในโลก กฎมันเด็ดขาดว่า:</p>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>พื้นฐานที่ต้องท่อง</div>
+<ul>
+<li><strong>height(node)</strong>: ใบ = 0, node ปกติ = 1 + max(height ลูกซ้าย, height ลูกขวา), <strong>ช่องว่าง (null) = −1</strong></li>
+<li><strong>Balance Factor (BF) = height(ซ้าย) − height(ขวา)</strong> — ค่าที่อนุญาต: <strong>−1, 0, +1 เท่านั้น</strong></li>
+<li>BF &gt; 0 = ถนัดซ้าย (left-heavy), BF &lt; 0 = ถนัดขวา (right-heavy)</li>
+<li>ต้นที่เป็น AVL มีความสูง <strong>h &lt; 1.44 log₂ n</strong> — "สวยพอ" และ search/insert/delete ยัง O(log n)</li>
+</ul></div>
+<figure class="diagram">
+<svg viewBox="0 0 720 200" width="720" role="img" aria-label="Balance factor examples">
+  <!-- tree 1 -->
+  <g>
+    <text x="140" y="14" text-anchor="middle" class="slab-b">BF = h(ซ้าย) − h(ขวา)</text>
+    <line x1="140" y1="60" x2="75" y2="110" class="te"/><line x1="140" y1="60" x2="205" y2="110" class="te"/>
+    <line x1="75" y1="130" x2="35" y2="170" class="te"/>
+    <g><circle cx="140" cy="50" r="20" class="nd"/><text x="140" y="55" text-anchor="middle" class="nlab">21</text><text x="170" y="42" class="wlab">BF = +1</text></g>
+    <g><circle cx="75" cy="120" r="20" class="nd"/><text x="75" y="125" text-anchor="middle" class="nlab">9</text><text x="42" y="98" class="wlab">BF = +1</text></g>
+    <g><circle cx="205" cy="120" r="20" class="nd"/><text x="205" y="125" text-anchor="middle" class="nlab">26</text><text x="235" y="98" class="wlab">BF = 0</text></g>
+    <g><circle cx="35" cy="180" r="18" class="nd"/><text x="35" y="185" text-anchor="middle" class="nlab">4</text><text x="35" y="212" text-anchor="middle" class="tag">ใบ h=0</text></g>
+    <text x="140" y="225" text-anchor="middle" class="tag">h(9)=1, h(26)=1 → BF(21) = 1−1 = 0? โอ๊ะ ดูตัวอย่างขวาให้ชัด ↓</text>
+  </g>
+  <!-- tree 2 -->
+  <g>
+    <text x="500" y="14" text-anchor="middle" class="slab-b">ตัวอย่างคำนวณจริง</text>
+    <line x1="500" y1="60" x2="420" y2="110" class="te"/><line x1="500" y1="60" x2="580" y2="110" class="te"/>
+    <line x1="420" y1="130" x2="375" y2="170" class="te"/><line x1="420" y1="130" x2="465" y2="170" class="te"/>
+    <g><circle cx="500" cy="50" r="20" class="nd"/><text x="500" y="55" text-anchor="middle" class="nlab">21</text><text x="530" y="42" class="wlab">BF = +1</text></g>
+    <g><circle cx="420" cy="120" r="20" class="nd"/><text x="420" y="125" text-anchor="middle" class="nlab">9</text><text x="345" y="105" class="wlab">BF = +1</text></g>
+    <g><circle cx="580" cy="120" r="20" class="nd"/><text x="580" y="125" text-anchor="middle" class="nlab">26</text><text x="610" y="105" class="wlab">BF = −1</text></g>
+    <g><circle cx="375" cy="180" r="18" class="nd"/><text x="375" y="185" text-anchor="middle" class="nlab">4</text><text x="348" y="196" class="tag">h=0</text></g>
+    <g><circle cx="465" cy="180" r="18" class="nd"/><text x="465" y="185" text-anchor="middle" class="nlab">14</text><text x="478" y="196" class="tag">h=0</text></g>
+    <text x="500" y="225" text-anchor="middle" class="tag">h(4)=0, h(14)=0 → BF(9) = 0−(−1) = +1 · h(9)=1 → BF(21) = 1−0 = +1 · ทุกตัว |BF| ≤ 1 ✅</text>
+  </g>
+</svg>
+<figcaption><b>นับ height ให้เป็น</b> — โมฆะ (ไม่มีลูก) นับ −1 ตามสไลด์ · BF ที่ |BF| ≥ 2 = ต้องหมุนทันที</figcaption>
+</figure>
+
+<h2 id="rotations">🔄 4 เคสหมุน (หัวใจที่สุดของบท)</h2>
+<p>เมื่อ insert/delete ทำให้ node ไหน BF เป็น ±2 เรา "หมุน" แก้ตรงจุด — ชื่อเคสตั้งตาม "ทางเดินของเส้นทาง insert 2 ก้าวสุดท้าย":</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>เคส</th><th>รูปแบบ</th><th>วิธีแก้</th><th>จำง่าย</th></tr></thead>
+<tbody>
+<tr><td><b>LL</b></td><td>ซ้าย-ซ้าย (BF +2, ลูกซ้าย BF ≥ 0)</td><td><b>หมุนขวา</b> ที่ node</td><td>เคส "นอก" (outside) — หมุนเดียวจบ</td></tr>
+<tr><td><b>RR</b></td><td>ขวา-ขวา (BF −2, ลูกขวา BF ≤ 0)</td><td><b>หมุนซ้าย</b> ที่ node</td><td>เคส "นอก" — หมุนเดียวจบ</td></tr>
+<tr><td><b>LR</b></td><td>ซ้าย-ขวา (BF +2, ลูกซ้าย BF &lt; 0)</td><td><b>หมุนซ้ายที่ลูกซ้าย แล้วหมุนขวาที่ node</b></td><td>เคส "ใน" (inside) — หมุน 2 ครั้ง</td></tr>
+<tr><td><b>RL</b></td><td>ขวา-ซ้าย (BF −2, ลูกขวา BF &gt; 0)</td><td><b>หมุนขวาที่ลูกขวา แล้วหมุนซ้ายที่ node</b></td><td>เคส "ใน" — หมุน 2 ครั้ง</td></tr>
+</tbody></table></div>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 420" width="760" role="img" aria-label="Four rotation cases">
+  <!-- RR case -->
+  <g transform="translate(10,10)">
+    <text x="90" y="14" text-anchor="middle" class="slab-b">RR → หมุนซ้าย</text>
+    <line x1="90" y1="60" x2="40" y2="110" class="te"/><line x1="90" y1="60" x2="140" y2="110" class="te"/>
+    <line x1="140" y1="130" x2="100" y2="170" class="te"/><line x1="140" y1="130" x2="180" y2="170" class="te"/>
+    <g><circle cx="90" cy="50" r="20" class="nd bad"/><text x="90" y="55" text-anchor="middle" class="nlab">21</text><text x="58" y="34" class="tag">BF−2</text></g>
+    <g><circle cx="40" cy="120" r="18" class="nd dim"/><text x="40" y="125" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="140" cy="120" r="20" class="nd hot"/><text x="140" y="125" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="100" cy="180" r="18" class="nd dim"/><text x="100" y="185" text-anchor="middle" class="nlab">T2</text></g>
+    <g><circle cx="180" cy="180" r="18" class="nd hot"/><text x="180" y="185" text-anchor="middle" class="nlab">30</text></g>
+    <text x="90" y="225" text-anchor="middle" class="tag">ก่อน</text>
+  </g>
+  <text x="212" y="105" class="slab-b">→</text>
+  <g transform="translate(235,10)">
+    <line x1="90" y1="60" x2="40" y2="110" class="te"/><line x1="90" y1="60" x2="140" y2="110" class="te"/>
+    <line x1="40" y1="130" x2="40" y2="160" class="te"/>
+    <g><circle cx="90" cy="50" r="20" class="nd good"/><text x="90" y="55" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="40" cy="120" r="20" class="nd good"/><text x="40" y="125" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="140" cy="120" r="18" class="nd good"/><text x="140" y="125" text-anchor="middle" class="nlab">30</text></g>
+    <g><circle cx="40" cy="170" r="18" class="nd good"/><text x="40" y="175" text-anchor="middle" class="nlab">9</text></g>
+    <text x="90" y="225" text-anchor="middle" class="tag">หลัง — T2 (ลูกซ้ายของ 30) มาเป็นลูกขวาของ 21</text>
+  </g>
+  <!-- LL case -->
+  <g transform="translate(500,10)">
+    <text x="90" y="14" text-anchor="middle" class="slab-b">LL → หมุนขวา</text>
+    <line x1="90" y1="60" x2="40" y2="110" class="te"/><line x1="90" y1="60" x2="140" y2="110" class="te"/>
+    <line x1="40" y1="130" x2="0" y2="170" class="te"/><line x1="40" y1="130" x2="80" y2="170" class="te"/>
+    <g><circle cx="90" cy="50" r="20" class="nd bad"/><text x="90" y="55" text-anchor="middle" class="nlab">21</text><text x="122" y="34" class="tag">BF+2</text></g>
+    <g><circle cx="40" cy="120" r="20" class="nd hot"/><text x="40" y="125" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="140" cy="120" r="18" class="nd dim"/><text x="140" y="125" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="0" cy="180" r="18" class="nd hot"/><text x="0" y="185" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="80" cy="180" r="18" class="nd dim"/><text x="80" y="185" text-anchor="middle" class="nlab">T2</text></g>
+    <text x="90" y="225" text-anchor="middle" class="tag">ก่อน</text>
+  </g>
+  <text x="702" y="105" class="slab-b">→</text>
+  <g transform="translate(725,10)">
+    <line x1="40" y1="60" x2="-10" y2="110" class="te"/><line x1="40" y1="60" x2="90" y2="110" class="te"/>
+    <line x1="90" y1="130" x2="90" y2="160" class="te"/>
+    <g><circle cx="40" cy="50" r="20" class="nd good"/><text x="40" y="55" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="-10" cy="120" r="18" class="nd good"/><text x="-10" y="125" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="90" cy="120" r="20" class="nd good"/><text x="90" y="125" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="90" cy="170" r="18" class="nd good"/><text x="90" y="175" text-anchor="middle" class="nlab">26</text></g>
+    <text x="40" y="225" text-anchor="middle" class="tag">หลัง — T2 มาเป็นลูกซ้ายของ 21</text>
+  </g>
+  <!-- LR case -->
+  <g transform="translate(10,240)">
+    <text x="90" y="14" text-anchor="middle" class="slab-b">LR → หมุนซ้ายที่ลูก แล้วขวาที่ node</text>
+    <line x1="90" y1="60" x2="40" y2="110" class="te"/><line x1="90" y1="60" x2="140" y2="110" class="te"/>
+    <line x1="40" y1="130" x2="0" y2="170" class="te"/><line x1="40" y1="130" x2="80" y2="170" class="te"/>
+    <g><circle cx="90" cy="50" r="20" class="nd bad"/><text x="90" y="55" text-anchor="middle" class="nlab">21</text><text x="58" y="34" class="tag">BF+2</text></g>
+    <g><circle cx="40" cy="120" r="20" class="nd hot"/><text x="40" y="125" text-anchor="middle" class="nlab">9</text><text x="8" y="98" class="tag">BF−1</text></g>
+    <g><circle cx="140" cy="120" r="18" class="nd dim"/><text x="140" y="125" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="0" cy="180" r="18" class="nd dim"/><text x="0" y="185" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="80" cy="180" r="18" class="nd hot"/><text x="80" y="185" text-anchor="middle" class="nlab">14</text></g>
+    <text x="90" y="235" text-anchor="middle" class="tag">ก่อน: insert 14 (ซ้ายแล้วขวา)</text>
+  </g>
+  <text x="212" y="335" class="slab-b">→</text>
+  <g transform="translate(235,240)">
+    <line x1="90" y1="60" x2="40" y2="110" class="te"/><line x1="90" y1="60" x2="140" y2="110" class="te"/>
+    <line x1="40" y1="130" x2="0" y2="170" class="te"/><line x1="40" y1="130" x2="80" y2="170" class="te"/>
+    <line x1="140" y1="130" x2="140" y2="160" class="te"/>
+    <g><circle cx="90" cy="50" r="20" class="nd good"/><text x="90" y="55" text-anchor="middle" class="nlab">14</text></g>
+    <g><circle cx="40" cy="120" r="20" class="nd good"/><text x="40" y="125" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="140" cy="120" r="20" class="nd good"/><text x="140" y="125" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="0" cy="180" r="18" class="nd good"/><text x="0" y="185" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="80" cy="180" r="18" class="nd good"/><text x="80" y="185" text-anchor="middle" class="nlab">T2</text></g>
+    <g><circle cx="140" cy="170" r="18" class="nd good"/><text x="140" y="175" text-anchor="middle" class="nlab">26</text></g>
+    <text x="90" y="235" text-anchor="middle" class="tag">หลัง: 14 ขึ้นกลาง ทุก BF กลับเป็น ±1/0</text>
+  </g>
+  <!-- RL case -->
+  <g transform="translate(500,240)">
+    <text x="115" y="14" text-anchor="middle" class="slab-b">RL → หมุนขวาที่ลูก แล้วซ้ายที่ node</text>
+    <line x1="115" y1="60" x2="65" y2="110" class="te"/><line x1="115" y1="60" x2="165" y2="110" class="te"/>
+    <line x1="165" y1="130" x2="125" y2="170" class="te"/><line x1="165" y1="130" x2="205" y2="170" class="te"/>
+    <g><circle cx="115" cy="50" r="20" class="nd bad"/><text x="115" y="55" text-anchor="middle" class="nlab">21</text><text x="83" y="34" class="tag">BF−2</text></g>
+    <g><circle cx="65" cy="120" r="18" class="nd dim"/><text x="65" y="125" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="165" cy="120" r="20" class="nd hot"/><text x="165" y="125" text-anchor="middle" class="nlab">26</text><text x="200" y="98" class="tag">BF+1</text></g>
+    <g><circle cx="125" cy="180" r="18" class="nd hot"/><text x="125" y="185" text-anchor="middle" class="nlab">14</text></g>
+    <g><circle cx="205" cy="180" r="18" class="nd dim"/><text x="205" y="185" text-anchor="middle" class="nlab">30</text></g>
+    <text x="115" y="235" text-anchor="middle" class="tag">ก่อน: insert 14 (ขวาแล้วซ้าย)</text>
+  </g>
+  <text x="702" y="335" class="slab-b">→</text>
+  <g transform="translate(725,240)">
+    <line x1="40" y1="60" x2="-10" y2="110" class="te"/><line x1="40" y1="60" x2="90" y2="110" class="te"/>
+    <line x1="-10" y1="120" x2="-10" y2="150" class="te"/>
+    <g><circle cx="40" cy="50" r="20" class="nd good"/><text x="40" y="55" text-anchor="middle" class="nlab">14</text></g>
+    <g><circle cx="-10" cy="120" r="20" class="nd good"/><text x="-10" y="125" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="90" cy="120" r="20" class="nd good"/><text x="90" y="125" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="-10" cy="165" r="18" class="nd good"/><text x="-10" y="170" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="90" cy="170" r="18" class="nd good"/><text x="90" y="175" text-anchor="middle" class="nlab">30</text></g>
+    <text x="40" y="235" text-anchor="middle" class="tag">หลัง</text>
+  </g>
+</svg>
+<figcaption><b>4 เคส</b> — T2 คือ subtree ที่ "ย้ายบ้าน" ตอนหมุน (สำคัญมากตอนเขียนโค้ด: T2 เปลี่ยนแม่จาก A เป็น B) · แดง = node ที่ BF พัง, เหลือง = node บนเส้นทาง insert</figcaption>
+</figure>
+
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>วิธีจำให้ไม่งง</div>
+<p>ดู "2 ก้าวสุดท้ายของเส้นทาง insert": ถ้าตรงกัน (LL/RR) = เคสนอก หมุนรอบเดียว<strong>สวนทาง</strong> (LL→ขวา, RR→ซ้าย)
+ถ้าเลี้ยว (LR/RL) = เคสใน หมุน<strong>สองรอบ</strong>: รอบแรกทำให้เส้นทางตรงก่อน แล้วจบเหมือนเคสนอก</p></div>
+
+<h3>ขั้นตอน insert ของ AVL ครบทุกข้อ (ทำในข้อสอบตามนี้เป๊ะ)</h3>
+<div class="steps">
+  <div class="step"><span class="step-t">1. insert ลงแบบ BST ปกติ</span>เดินซ้าย/ขวาตาม BST property แล้ววางเป็นใบ</div>
+  <div class="step"><span class="step-t">2. เดิน "ขึ้น" ตามเส้นทาง คำนวณ BF ทุก node</span>หลังวางใบ height ของบรรพบุรุษเปลี่ยนได้ — เริ่มจากพ่อของใบใหม่ขึ้นไปจนถึง root</div>
+  <div class="step"><span class="step-t">3. เจอ node แรกที่ |BF| = 2 → หมุนที่ node นั้น</span>เลือกเคสจาก 2 ก้าวสุดท้ายของเส้นทาง (LL/RR/LR/RL) — <strong>หมุนครั้งเดียว (เดี่ยวหรือคู่) ก็จบ</strong> ทฤษฎีบท AVL การันตี (insert ต้องหมุนมากสุด 1 ชุด; delete ต่างหากอาจต้องหมุนไล่ขึ้นทุกชั้น)</div>
+  <div class="step"><span class="step-t">4. อัปเดต height ของ node ที่เกี่ยวข้อง</span>หลังหมุน height เปลี่ยน — ถ้าเขียนโค้ดให้ recompute เสมอ (เดี๋ยวดูโค้ดข้างล่าง)</div>
+</div>
+<h2 id="trace">🧪 สร้าง AVL จากสไลด์: 21, 26, 30, 9, 4, 14, 28, 18, 15, 10, 2, 3, 7</h2>
+<p>นี่คือโจทย์ตรงจากสไลด์ — ทำตามได้ = สอบ AVL ได้แน่ สังเกตว่ามันไล่ครบ <strong>ทั้ง 4 เคสหมุน</strong> เลย (RR, LL, LR, RL ครบ) ขั้นตอนละเอียดดังนี้:</p>
+
+<div class="steps">
+  <div class="step"><span class="step-t">1–2: insert 21, 26 → ปกติ</span>21 เป็น root, 26 ไปขวาของ 21 · BF(21) = −1 ยังไหว</div>
+  <div class="step"><span class="step-t">3: insert 30 → พังที่ 21 (BF = −2) เคส RR → หมุนซ้าย</span>เส้นทาง 21→26→30 เลี้ยวขวาสองที ตรงกัน = เคสนอก หมุนเดียวจบ: 26 ขึ้น root</div>
+  <div class="step"><span class="step-t">4: insert 9 → ปกติ</span>9 ไปซ้ายของ 21 · ทุก BF อยู่ใน −1..+1</div>
+  <div class="step"><span class="step-t">5: insert 4 → พังที่ 21 (BF = +2) เคส LL → หมุนขวา</span>เส้นทาง 21→9→4 ตรงกัน หมุนเดียว: 9 ขึ้นแทน 21</div>
+  <div class="step"><span class="step-t">6: insert 14 → พังที่ 26 (BF = +2) เคส LR → หมุนซ้ายที่ 9 แล้วขวาที่ 26</span>เส้นทาง 26→9→21→14 เลี้ยวขวาแล้วซ้าย = เคสใน ต้องหมุนคู่</div>
+  <div class="step"><span class="step-t">7: insert 28 → พังที่ 21 (BF = −2) เคส RR → หมุนซ้าย</span>28 ลงซ้ายของ 30 ทำให้ฝั่งขวาของ 21 สูง 3 ชั้น</div>
+  <div class="step"><span class="step-t">8: insert 18 → ปกติ</span>18 ลงขวาของ 14 · ไม่มี node ไหน |BF| = 2</div>
+  <div class="step"><span class="step-t">9: insert 15 → พังที่ 14 (BF = −2) เคส RL → หมุนขวาที่ 18 แล้วซ้ายที่ 14</span>15 ลงซ้ายของ 18 → subtree 14 เอียงขวาแต่ลูกเอียงซ้าย = เคสใน</div>
+  <div class="step"><span class="step-t">10: insert 10 → ปกติ</span>10 ลงขวาของ 9 · ผ่านหมด</div>
+  <div class="step"><span class="step-t">11: insert 2 → พังที่ 26 (BF = +2) เคส LL → หมุนขวา</span>2 ลงซ้ายของ 4 ทำให้ฝั่งซ้ายของ 26 สูง 4 ชั้น — 21 ขึ้นเป็น root ใหม่</div>
+  <div class="step"><span class="step-t">12: insert 3 → พังที่ 4 (BF = +2) เคส LR → หมุนซ้ายที่ 2 แล้วขวาที่ 4</span>3 ลงขวาของ 2 → subtree เล็ก ๆ ก็หมุนได้</div>
+  <div class="step"><span class="step-t">13: insert 7 → ปกติ — เสร็จสรรพ ✅</span>7 ลงขวาของ 4 · ตรวจ in-order ได้ 2,3,4,7,9,10,21,14,15,18,26,28,30 (เรียง = BST ถูก)</div>
+</div>
+
+<p>ดูภาพ "ก่อน → หลัง" ของทุกจุดที่หมุน (ตัวเลขในวงกลมแดง = node ที่ BF พัง ณ ตอนนั้น):</p>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 150" width="760" role="img" aria-label="AVL trace step 3">
+  <text x="20" y="16" class="slab-b">ขั้น 3: insert 30 → RR ที่ 21 (หมุนซ้าย)</text>
+  <g transform="translate(20,30)">
+    <line x1="80" y1="30" x2="35" y2="70" class="te"/><line x1="80" y1="30" x2="125" y2="70" class="te"/>
+    <line x1="125" y1="88" x2="90" y2="118" class="te"/><line x1="125" y1="88" x2="160" y2="118" class="te"/>
+    <g><circle cx="80" cy="20" r="17" class="nd bad"/><text x="80" y="25" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="35" cy="80" r="16" class="nd dim"/><text x="35" y="85" text-anchor="middle" class="nlab">9?</text></g>
+    <g><circle cx="125" cy="80" r="16" class="nd"/><text x="125" y="85" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="160" cy="128" r="16" class="nd hot"/><text x="160" y="133" text-anchor="middle" class="nlab">30</text></g>
+    <text x="80" y="155" text-anchor="middle" class="tag">ก่อน (BF 21 = −2)</text>
+  </g>
+  <text x="230" y="105" class="slab-b">→</text>
+  <g transform="translate(270,30)">
+    <line x1="80" y1="30" x2="35" y2="70" class="te"/><line x1="80" y1="30" x2="125" y2="70" class="te"/>
+    <g><circle cx="80" cy="20" r="17" class="nd good"/><text x="80" y="25" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="35" cy="80" r="16" class="nd good"/><text x="35" y="85" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="125" cy="80" r="16" class="nd good"/><text x="125" y="85" text-anchor="middle" class="nlab">30</text></g>
+    <text x="80" y="155" text-anchor="middle" class="tag">หลัง: 26 ขึ้น root (21, 30 เป็นลูก)</text>
+  </g>
+  <text x="490" y="105" class="tag">หมายเหตุ: ภาพ "9?" แทน subtree ซ้ายของ 21 ที่ยังไม่มี — หลักการเดิม: subtree กลาง (ลูกซ้ายของ 30)</text>
+  <text x="490" y="123" class="tag">ย้ายไปเป็นลูกขวาของ 21 เสมอ</text>
+</svg>
+</figure>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 170" width="760" role="img" aria-label="AVL trace step 5 and 6">
+  <text x="20" y="16" class="slab-b">ขั้น 5: insert 4 → LL ที่ 21 (หมุนขวา)</text>
+  <g transform="translate(20,28)">
+    <line x1="80" y1="24" x2="35" y2="64" class="te"/><line x1="80" y1="24" x2="125" y2="64" class="te"/>
+    <line x1="35" y1="82" x2="0" y2="112" class="te"/><line x1="35" y1="82" x2="70" y2="112" class="te"/>
+    <g><circle cx="80" cy="16" r="16" class="nd bad"/><text x="80" y="21" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="35" cy="74" r="16" class="nd"/><text x="35" y="79" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="125" cy="74" r="16" class="nd"/><text x="125" y="79" text-anchor="middle" class="nlab">30</text></g>
+    <g><circle cx="0" cy="122" r="15" class="nd hot"/><text x="0" y="127" text-anchor="middle" class="nlab">4</text></g>
+    <text x="55" y="155" text-anchor="middle" class="tag">ก่อน</text>
+  </g>
+  <text x="170" y="105" class="slab-b">→</text>
+  <g transform="translate(210,28)">
+    <line x1="80" y1="24" x2="35" y2="64" class="te"/><line x1="80" y1="24" x2="125" y2="64" class="te"/>
+    <line x1="125" y1="82" x2="90" y2="112" class="te"/><line x1="125" y1="82" x2="160" y2="112" class="te"/>
+    <g><circle cx="80" cy="16" r="16" class="nd good"/><text x="80" y="21" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="35" cy="74" r="16" class="nd good"/><text x="35" y="79" text-anchor="middle" class="nlab">4</text></g>
+    <g><circle cx="125" cy="74" r="16" class="nd good"/><text x="125" y="79" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="160" cy="122" r="15" class="nd dim"/><text x="160" y="127" text-anchor="middle" class="nlab">30</text></g>
+    <text x="100" y="155" text-anchor="middle" class="tag">หลัง (26 ยัง root ด้านบน)</text>
+  </g>
+  <text x="500" y="90" class="slab-b">ขั้น 6: insert 14 → LR ที่ 26</text>
+  <text x="500" y="112" class="tag">ก่อน: 26( 9(4, 21(14,−)), 30 ) → BF(26)=+2</text>
+  <text x="500" y="132" class="tag">แก้: หมุนซ้ายที่ 9 (21 ขึ้น) → หมุนขวาที่ 26 (21 ขึ้น)</text>
+  <text x="500" y="152" class="tag">หลัง: 21( 9(4,−), 26(14, 30) )</text>
+</svg>
+</figure>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 180" width="760" role="img" aria-label="AVL trace step 7 and 9">
+  <text x="20" y="16" class="slab-b">ขั้น 7: insert 28 → RR ที่ 21 (หมุนซ้าย)</text>
+  <text x="20" y="40" class="tag">ก่อน: 21( 9(4,−), 26(14, 30(28,−)) ) → BF(21) = 1−3 = −2</text>
+  <text x="20" y="60" class="tag">หลัง: 26( 21(9(4,−), 14), 30(28,−) ) — 21 ยกลง, 14 มาเป็นลูกขวาของ 21</text>
+  <g transform="translate(20,76)">
+    <line x1="90" y1="20" x2="45" y2="56" class="te"/><line x1="90" y1="20" x2="135" y2="56" class="te"/>
+    <line x1="45" y1="74" x2="10" y2="106" class="te"/><line x1="45" y1="74" x2="80" y2="106" class="te"/>
+    <line x1="135" y1="74" x2="100" y2="106" class="te"/><line x1="135" y1="74" x2="170" y2="106" class="te"/>
+    <g><circle cx="90" cy="14" r="16" class="nd good"/><text x="90" y="19" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="45" cy="66" r="16" class="nd good"/><text x="45" y="71" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="135" cy="66" r="16" class="nd good"/><text x="135" y="71" text-anchor="middle" class="nlab">30</text></g>
+    <g><circle cx="10" cy="116" r="14" class="nd"/><text x="10" y="121" text-anchor="middle" class="nlab">9(4)</text></g>
+    <g><circle cx="80" cy="116" r="14" class="nd"/><text x="80" y="121" text-anchor="middle" class="nlab">14</text></g>
+    <g><circle cx="100" cy="116" r="0"/><text x="108" y="140" class="tag">28 ใต้ 30</text></g>
+    <text x="90" y="160" text-anchor="middle" class="tag">หลังขั้น 7</text>
+  </g>
+  <text x="400" y="110" class="slab-b">ขั้น 9: insert 15 → RL ที่ 14</text>
+  <text x="400" y="132" class="tag">ก่อน: …21( 9(4,−), 14(−, 18(15,−)) ) → BF(14) = −1−1 = −2</text>
+  <text x="400" y="154" class="tag">หลัง: 21( 9(4,−), 15(14, 18) ) — 14 กับ 18 ก้ำกึ่งลงมาเป็นลูกซ้าย/ขวาของ 15</text>
+</svg>
+</figure>
+
+<figure class="diagram">
+<svg viewBox="0 0 760 240" width="760" role="img" aria-label="AVL trace step 11 and 12">
+  <text x="20" y="16" class="slab-b">ขั้น 11: insert 2 → LL ที่ 26 (หมุนขวา: 21 ขึ้นเป็น root)</text>
+  <text x="20" y="38" class="tag">ก่อน: 26( 21( 9(4(2,−),−), 15(14,18) ), 30(28,−) ) → BF(26) = 4−1 = +2</text>
+  <g transform="translate(20,50)">
+    <line x1="80" y1="20" x2="35" y2="56" class="te"/><line x1="80" y1="20" x2="125" y2="56" class="te"/>
+    <line x1="35" y1="74" x2="0" y2="106" class="te"/><line x1="35" y1="74" x2="70" y2="106" class="te"/>
+    <line x1="0" y1="124" x2="0" y2="146" class="te"/>
+    <g><circle cx="80" cy="14" r="16" class="nd bad"/><text x="80" y="19" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="35" cy="66" r="16" class="nd"/><text x="35" y="71" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="125" cy="66" r="16" class="nd"/><text x="125" y="71" text-anchor="middle" class="nlab">30(28)</text></g>
+    <g><circle cx="0" cy="98" r="14" class="nd"/><text x="0" y="103" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="70" cy="98" r="14" class="nd"/><text x="70" y="103" text-anchor="middle" class="nlab">15(14,18)</text></g>
+    <g><circle cx="0" cy="156" r="14" class="nd hot"/><text x="0" y="161" text-anchor="middle" class="nlab">4(2)</text></g>
+    <text x="80" y="190" text-anchor="middle" class="tag">ก่อน</text>
+  </g>
+  <text x="230" y="130" class="slab-b">→</text>
+  <g transform="translate(280,50)">
+    <line x1="80" y1="20" x2="35" y2="56" class="te"/><line x1="80" y1="20" x2="125" y2="56" class="te"/>
+    <line x1="35" y1="74" x2="0" y2="106" class="te"/><line x1="35" y1="74" x2="70" y2="106" class="te"/>
+    <line x1="125" y1="74" x2="90" y2="106" class="te"/><line x1="125" y1="74" x2="160" y2="106" class="te"/>
+    <g><circle cx="80" cy="14" r="16" class="nd good"/><text x="80" y="19" text-anchor="middle" class="nlab">21</text></g>
+    <g><circle cx="35" cy="66" r="16" class="nd good"/><text x="35" y="71" text-anchor="middle" class="nlab">9(4(2),10)</text></g>
+    <g><circle cx="125" cy="66" r="16" class="nd good"/><text x="125" y="71" text-anchor="middle" class="nlab">26</text></g>
+    <g><circle cx="90" cy="116" r="14" class="nd dim"/><text x="90" y="121" text-anchor="middle" class="nlab">15(14,18)</text></g>
+    <g><circle cx="160" cy="116" r="14" class="nd dim"/><text x="160" y="121" text-anchor="middle" class="nlab">30(28)</text></g>
+    <text x="100" y="190" text-anchor="middle" class="tag">หลัง: 15 subtree มาเป็นลูกซ้ายของ 26</text>
+  </g>
+  <text x="600" y="110" class="slab-b">ขั้น 12: insert 3 → LR ที่ 4</text>
+  <text x="600" y="132" class="tag">ก่อน: 9( 4( 2(−,3), −), 10 ) → BF(4)=+2</text>
+  <text x="600" y="154" class="tag">หลัง: 9( 3(2, 4), 10 ) — 3 ขึ้นกลาง</text>
+  <text x="600" y="176" class="tag">สังเกต: subtree เล็กแค่ 3 ตัวก็หมุนได้</text>
+</svg>
+</figure>
+
+<figure class="diagram">
+<svg viewBox="0 0 560 380" width="560" role="img" aria-label="Final AVL tree">
+  <text x="280" y="18" text-anchor="middle" class="slab-b">ผลลัพธ์สุดท้ายหลัง insert ครบ 13 ค่า (ขั้น 13: insert 7 ลงขวาของ 4 ไม่ต้องหมุน)</text>
+  <line x1="280" y1="80" x2="160" y2="140" class="te"/><line x1="280" y1="80" x2="400" y2="140" class="te"/>
+  <line x1="160" y1="160" x2="95" y2="215" class="te"/><line x1="160" y1="160" x2="225" y2="215" class="te"/>
+  <line x1="400" y1="160" x2="335" y2="215" class="te"/><line x1="400" y1="160" x2="465" y2="215" class="te"/>
+  <line x1="95" y1="235" x2="60" y2="285" class="te"/><line x1="95" y1="235" x2="130" y2="285" class="te"/>
+  <line x1="335" y1="235" x2="300" y2="285" class="te"/><line x1="335" y1="235" x2="370" y2="285" class="te"/>
+  <line x1="465" y1="235" x2="465" y2="278" class="te"/>
+  <line x1="136" y1="310" x2="156" y2="330" class="te"/>
+  <g><circle cx="280" cy="70" r="20" class="nd hot"/><text x="280" y="76" text-anchor="middle" class="nlab">21</text></g>
+  <g><circle cx="160" cy="150" r="20" class="nd"/><text x="160" y="156" text-anchor="middle" class="nlab">9</text></g>
+  <g><circle cx="400" cy="150" r="20" class="nd"/><text x="400" y="156" text-anchor="middle" class="nlab">26</text></g>
+  <g><circle cx="95" cy="225" r="19" class="nd"/><text x="95" y="231" text-anchor="middle" class="nlab">3</text></g>
+  <g><circle cx="225" cy="225" r="19" class="nd"/><text x="225" y="231" text-anchor="middle" class="nlab">10</text></g>
+  <g><circle cx="335" cy="225" r="19" class="nd"/><text x="335" y="231" text-anchor="middle" class="nlab">15</text></g>
+  <g><circle cx="465" cy="225" r="19" class="nd"/><text x="465" y="231" text-anchor="middle" class="nlab">30</text></g>
+  <g><circle cx="60" cy="295" r="17" class="nd"/><text x="60" y="300" text-anchor="middle" class="nlab">2</text></g>
+  <g><circle cx="130" cy="295" r="17" class="nd"/><text x="130" y="300" text-anchor="middle" class="nlab">4</text></g>
+  <g><circle cx="300" cy="295" r="17" class="nd"/><text x="300" y="300" text-anchor="middle" class="nlab">14</text></g>
+  <g><circle cx="370" cy="295" r="17" class="nd"/><text x="370" y="300" text-anchor="middle" class="nlab">18</text></g>
+  <g><circle cx="465" cy="290" r="17" class="nd"/><text x="465" y="295" text-anchor="middle" class="nlab">28</text></g>
+  <g><circle cx="166" cy="340" r="17" class="nd good"/><text x="166" y="345" text-anchor="middle" class="nlab">7</text></g>
+  <text x="280" y="372" text-anchor="middle" class="tag">เช็คด้วย in-order: 2,3,4,7,9,10, 21, 14,15,18,26,28,30 — เรียงน้อย→มากครบทุกตัว ✅ (ค่า 7 ต้องเป็นลูกขวาของ 4 เพราะ 7 &gt; 4)</text>
+</svg>
+<figcaption><b>ต้น AVL สุดท้าย</b> — ตอนสอบจบข้อ อย่าลืมเดิน in-order ตรวจว่าเรียงจริง กับเช็ค BF ทุก node ว่าอยู่ใน −1..+1</figcaption>
+</figure>
+<h2 id="avlcode">💻 โค้ดหมุน (จากสไลด์) + การลบ AVL</h2>
+<pre><code><span class="cm">// node class เก็บ height ทั้งสองฝั่ง (ตามสไลด์)</span>
+<span class="kw">class</span> <span class="fn">TreeNode</span> {
+  <span class="kw">int</span> data, h_left=-1, h_right=-1;
+  TreeNode left=<span class="kw">null</span>, right=<span class="kw">null</span>, parent=<span class="kw">null</span>;
+}
+
+<span class="cm">// Left Rotation (แก้ RR) — หมุนที่ n: ลูกขวา p ขึ้นมาแทน</span>
+<span class="kw">void</span> <span class="fn">rotationFromRight</span>(TreeNode n) {
+  TreeNode p = n.right;
+  n.right = p.left;          <span class="cm">/*1*/</span>  <span class="cm">// subtree กลาง (ลูกซ้ายของ p) ย้ายไปเป็นลูกขวาของ n</span>
+  <span class="kw">if</span> (p.left != <span class="kw">null</span>) p.left.parent = n;  <span class="cm">/*2*/</span>
+  <span class="kw">if</span> (n == root) { root = p; p.parent = <span class="kw">null</span>; }       <span class="cm">/*3a*/</span>
+  <span class="kw">else</span> {
+    p.parent = n.parent;                                  <span class="cm">/*3b*/</span>
+    <span class="kw">if</span> (n.parent.left == n) n.parent.left = p;            <span class="cm">/*4*/</span>  <span class="cm">// แม่ชี้มาที่ p แทน</span>
+    <span class="kw">else</span> n.parent.right = p;
+  }
+  p.left = n;                <span class="cm">/*5*/</span>  <span class="cm">// n กลายเป็นลูกซ้ายของ p</span>
+  n.parent = p;              <span class="cm">/*6*/</span>
+  <span class="cm">// …จากนั้น update h_left/h_right ของ n และ p ใหม่เสมอ!</span>
+}
+
+<span class="cm">// Double rotation (แก้ RL): แก้ลูกก่อน แล้วค่อยแก้แม่</span>
+<span class="kw">void</span> <span class="fn">doubleRotationFromRight</span>(TreeNode n) {
+  <span class="fn">rotationFromLeft</span>(n.right);   <span class="cm">// หมุนซ้ายที่ลูกขวา → เส้นทางตรงเป็น RR</span>
+  <span class="fn">rotationFromRight</span>(n);        <span class="cm">// หมุนซ้ายที่ n ตามสูตรเคสนอก</span>
+}</code></pre>
+
+<div class="box basic"><div class="box-title"><span class="em">📗</span>หลักการหมุน (อ่านแล้วเขียนได้ทุกเคส)</div>
+<p>หมุนซ้ายที่ n = ยก <strong>ลูกขวาขึ้นมาแทน</strong>; หมุนขวาที่ n = ยก <strong>ลูกซ้ายขึ้นมาแทน</strong> — สิ่งที่ต้องทำเสมอ 4 อย่าง:
+(1) subtree "กลาง" ของลูกที่ถูกยก ย้ายไปติดกับตัวถูกกด (2) แม่เดิมชี้มาที่ตัวขึ้นใหม่ (3) ต่อ parent ให้ครบ (4) <strong>อัปเดต height</strong> ให้ตัวถูกกดและตัวขึ้นใหม่ (นับจากล่างขึ้นบน)</p></div>
+
+<p>การ<strong>ลบ</strong>ของ AVL: ลบแบบ BST ก่อน แล้ว "เดินขึ้นจากจุดลบ ตรวจ BF ทุกบรรพบุรุษ — เจอพังก็หมุน แล้ว<strong>เดินต่อไปอีก</strong>" เพราะการหมุนหนึ่งครั้งอาจเปลี่ยน height ทำให้ชั้นบนพังตาม (ต่างจาก insert ที่หมุนครั้งเดียวจบ) — โครงเงื่อนไขจากสไลด์:</p>
+<pre><code>n.height = 1 + Math.<span class="fn">max</span>(<span class="fn">height</span>(n.left), <span class="fn">height</span>(n.right));
+<span class="kw">int</span> bf = <span class="fn">getBalance</span>(n);
+<span class="kw">if</span> (bf &gt; 1 &amp;&amp; <span class="fn">getBalance</span>(n.left) &gt;= 0)  <span class="kw">return</span> <span class="fn">rightRotate</span>(n);        <span class="cm">// LL</span>
+<span class="kw">if</span> (bf &gt; 1 &amp;&amp; <span class="fn">getBalance</span>(n.left) &lt; 0)  { n.left = <span class="fn">leftRotate</span>(n.left);  <span class="cm">// LR</span>
+                                          <span class="kw">return</span> <span class="fn">rightRotate</span>(n); }
+<span class="kw">if</span> (bf &lt; -1 &amp;&amp; <span class="fn">getBalance</span>(n.right) &lt;= 0) <span class="kw">return</span> <span class="fn">leftRotate</span>(n);       <span class="cm">// RR</span>
+<span class="kw">if</span> (bf &lt; -1 &amp;&amp; <span class="fn">getBalance</span>(n.right) &gt; 0)  { n.right = <span class="fn">rightRotate</span>(n.right); <span class="cm">// RL</span>
+                                            <span class="kw">return</span> <span class="fn">leftRotate</span>(n); }</code></pre>
+<p class="small">สังเกต: เคสนอก (LL/RR) ดู "ลูก BF ≥ 0 / ≤ 0" — การลบต่างจาก insert ตรงที่ลูก BF = 0 ก็ใช้เคสนอกได้ (ลบแล้ว height ของลูกคงเดิม)</p>
+
+<h3>เลือกใช้ parent pointer หรือไม่? (สไลด์เทียบให้)</h3>
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>มี parent pointer</th><th>ไม่มี (ใช้ recursion)</th></tr></thead>
+<tbody>
+<tr><td>ข้อดี</td><td>เดินขึ้น tree ง่าย (successor, delete), เขียน iterative ได้</td><td>โครงสร้างเรียบง่าย ตามโค้ดง่าย ไม่ต้องอัปเดต parent ให้ครบ</td></tr>
+<tr><td>ข้อเสีย</td><td>เปลือง memory ต่อ node + หมุนต้องอัปเดต pointer เพิ่ม = พลาดง่าย</td><td>หา successor ต้องเดินจาก root, ทำ iterative ยุ่ง</td></tr>
+<tr><td>ใช้จริง</td><td>Red-Black ใน library (Java TreeMap)</td><td>AVL/งานสอนเกือบทั้งหมด</td></tr>
+</tbody></table></div>
+
+<div class="box basic"><div class="box-title"><span class="em">💡</span>สรุป AVL</div>
+<p>สูงไม่เกิน 1.44 log₂n → search/insert/delete = O(log n) การันตี · แลกมาด้วยต้นทุนจัดการ: เช็ค BF ทุกชั้นบนเส้นทาง (สูงสุด ~1.44 log₂n ครั้ง) และ delete อาจหมุนไล่ขึ้นหลายชั้น (insert หมุนมากสุด 1 ชุด) — เหมาะกับงานที่ <strong>ค้นหาถี่</strong></p></div>
+
+<h2 id="rb">🎨 Red-Black Tree — สมดุลด้วย "การเปลี่ยนสี"</h2>
+<p>อีกตระกูล self-balancing BST ที่ <strong>Java TreeSet/TreeMap ใช้จริง</strong> — ไม่เก็บ height แต่เก็บ <strong>สี (red/black)</strong> ในแต่ละ node แล้วบังคับกฎ 5 ข้อ:</p>
+<div class="box basic"><div class="box-title"><span class="em">📗</span>กฎ 5 ข้อของ Red-Black (ท่องให้ได้!)</div>
+<ol>
+<li>เป็น BST (ซ้ายน้อย ขวามาก) อยู่แล้ว</li>
+<li>ทุก node มีสี <strong>แดง หรือ ดำ</strong> เพียงสีเดียว</li>
+<li><strong>root ต้องดำเสมอ</strong></li>
+<li>แดงต้องไม่มีลูกแดง (ห้าม "แดงติดกัน" บนเส้นทางเดียว)</li>
+<li>ทุกเส้นทางจาก node ใด ๆ ลงไปถึงใบ NIL ต้องมี<strong>จำนวน node ดำเท่ากันหมด</strong> (เรียกว่า black-height เท่ากัน) · ใบ NIL นับเป็นดำ</li>
+</ol></div>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ: ทำไมกฎแดง-ดำ = สมดุล?</div>
+<p>กฎ "black-height เท่ากัน" ทำให้ทุกเส้นทางมีจำนวน "ชั้นดำ" เท่ากัน และกฎ "แดงไม่ติดกัน" ทำให้แทรกแดงระหว่างดำได้แค่ตัวเดียว →
+<strong>เส้นทางยาวสุด ≤ 2 เท่าของเส้นสั้นสุด</strong> → สูงไม่เกิน 2 log₂(n+1) → ยัง O(log n)!
+เหมือนอาคารที่ชั้น "ดำ" ทุกตึกเท่ากัน แต่อนุญาตให้แทรก "ชั้นแดง" (mezzanine) ได้ไม่เกินชั้นละ 1 — ตึกจึงบิดเบี้ยวได้ไม่เกิน 2 เท่า</p></div>
+
+<h2 id="rbcheck">🔍 ตรวจว่า tree เป็น Red-Black ที่ valid ไหม (สไลด์มี 8 เคส!)</h2>
+<p>วิธีตรวจเป็นระบบ — ไล่เช็คทีละข้อ: (1) root ดำ? (2) BST ordering ถูก? (3) มีแดงมีลูกแดงไหม? (4) นับ black ทุกเส้นทาง root→NIL เท่ากันไหม? — ตัวอย่างเคสจากสไลด์:</p>
+
+<div class="cols2">
+<div class="box basic"><div class="box-title"><span class="em">✅</span>เคส 1: valid ไหม? — <b>ใช่!</b></div>
+<p>20B(10R(5B, 15B(12R)), 30R(25B(27R), 40B(−, 50R)))<br>
+root ดำ ✓ · ไม่มีแดงติดแดง ✓ · นับ black ทุกเส้น (รวม NIL):<br>
+20→10→5→NIL: 20B,5B,NIL = <strong>3 ดำ</strong> · 20→10→15→12R→NIL: 20B,15B,NIL = <strong>3 ดำ</strong> · 20→30→25→27R→NIL = <strong>3 ดำ</strong> · 20→30→40→50R→NIL = <strong>3 ดำ</strong> ✓<br>
+<span class="small">สังเกต: node แดง (10R, 12R, 27R, 50R) ไม่ถูกนับ — เส้นทาง "ยาวกว่า" ได้เพราะแทรกแดงได้</span></p></div>
+<div class="box warn"><div class="box-title"><span class="em">❌</span>เคส 2: 20R เป็น root</div>
+<p>โครงสร้างสวยหมดทุกข้อ แต่ <strong>root เป็นแดง = ผิดกฎข้อ 3</strong> ทันที<br>
+<span class="small">หมายเหตุจากสไลด์: อัลกอริทึม insert เสร็จจะ recolor root เป็นดำเสมอ — แบบนี้จึงเป็น "แบบฝึกตรวจ" ไม่ใช่ผลจาก insert จริง</span></p></div>
+</div>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>แบบฝึกจากสไลด์: แก้ด้วยการเปลี่ยนสี 1 จุด</div>
+<p>40B(20R(10R, 30B), 60B(50R, 70R)) — ผิดตรงไหน? แก้ยังไง? <em>มี 2 ทางเลือก แต่ทางหนึ่งดีกว่า</em></p>
+<details class="sol"><summary>เฉลย</summary><div class="sol-body">
+<p>ผิดที่ 40B→20R→10R (แดงติดกัน) และถ้านับ black จะเห็นฝั่งขวาดำมากกว่า</p>
+<ul>
+<li><strong>Solution A: เปลี่ยน 20R → 20B</strong> ✓ แดงติดแดงหาย และ black-height ทั้งต้นสม่ำเสมอ (ทุกเส้นผ่าน 20B)</li>
+<li>Solution B: เปลี่ยน 10R → 10B — หายแดงติดแดง แต่ทำให้เส้นทางผ่าน 10B มีดำมากขึ้น = ผิด black-height ต่อ!</li>
+</ul>
+<p>คำตอบที่ถูกคือ A — <strong>เลือกจุดที่ "ครอบคลุมทุกเส้นทาง" พอดี</strong> ไม่ใช่จุดที่แก้เฉพาะกิ่งเดียว</p>
+</div></details>
+</div>
+
+<div class="mcq" data-q="rb1">
+  <div class="q">จากสไลด์เคส 7: ต้นไหนเป็น valid Red-Black? 40B(20B(10R,30R), 60B(50R,70R)) กับ 40B(20B(10R,30R), 60B(50R,70B))</div>
+  <div class="opts">
+    <button class="opt" data-correct="1">ต้น A (ลูกทั้งสี่เป็นแดง)</button>
+    <button class="opt">ต้น B (70 เป็นดำ)</button>
+    <button class="opt">ทั้งสองต้น</button>
+    <button class="opt">ไม่มีต้นไหน</button>
+  </div>
+  <div class="explain">✅ ต้น A: ทุกเส้นทาง root→NIL มีดำ 3 ตัว (40B + 20B/60B + NIL) → valid · ต้น B: เส้นทางผ่าน 70B มีดำ 4 ตัว ≠ เส้นอื่น → invalid — การ "ทำให้ดำเพิ่ม" ทำลาย black-height ทันที</div>
+</div>
+
+<h2 id="rbinsert">➕ RB Insert — แดงใหม่เข้ามา แล้วแก้ตาม "สีของลุง"</h2>
+<p>insert แบบ BST ปกติ แต่ <strong>node ใหม่เป็นสีแดงเสมอ</strong> (แดงใหม่ไม่เปลี่ยน black-height เลย — อัลกอริทึมจึงไม่ต้องไล่วัดเส้นทาง) แล้วเช็คแค่ "แดงติดแดง" ไหม:</p>
+<div class="tbl-wrap"><table>
+<thead><tr><th>สถานการณ์หลัง insert</th><th>เป็นปัญหาไหม</th><th>วิธีแก้</th></tr></thead>
+<tbody>
+<tr><td>พ่อเป็น <strong>ดำ</strong></td><td>ไม่มีปัญหา</td><td>จบทันที ✅</td></tr>
+<tr><td>พ่อแดง + <strong>ลุงแดง</strong></td><td>แดงติดแดง (ปัญหา "สี")</td><td><b>Recolor:</b> พ่อ+ลุง → ดำ, ปู่ → แดง แล้วขยับไปตรวจที่ปู่ต่อ (อาจลามขึ้นไปถึง root · ถ้าปู่เป็น root กลับเป็นดำ)</td></tr>
+<tr><td>พ่อแดง + <strong>ลุงดำ/NIL</strong></td><td>แดงติดแดง (ปัญหา "รูปทรง")</td><td><b>หมุน</b>ที่ปู่ (LL/RR เดี่ยว, LR/RL คู่) + recolor: ตัวขึ้นใหม่ → ดำ, ปู่ → แดง แล้ว <b>จบ</b></td></tr>
+</tbody></table></div>
+<div class="box basic"><div class="box-title"><span class="em">💡</span>จำเคล็ด</div>
+<p>"ลุงแดง = ปัญหาสี → เปลี่ยนสี ขยับขึ้น" · "ลุงดำ = ปัญหารูป → หมุน แล้วจบ" — การ recolor ไม่เปลี่ยน black-height (ดำคู่แลกปู่แดง) ส่วนการหมุนแทน "ดำปู่" ด้วย "ดำตัวขึ้นใหม่" black-height จึงคงเดิมเช่นกัน จบด้วย <code>root.color = BLACK</code> เสมอ</p></div>
+
+<h3>Trace จากสไลด์: insert {10, 20, 30, 15, 25, 27, 5, 1, 7} ทีละค่า</h3>
+<div class="steps">
+  <div class="step"><span class="step-t">1. insert 10 (แดง)</span>เป็น root → ผิดกฎ root ดำ → recolor เป็นดำ → <b>10B</b></div>
+  <div class="step"><span class="step-t">2. insert 20 (แดง)</span>พ่อ (10B) ดำ → จบ → 20R อยู่ขวาของ 10B</div>
+  <div class="step"><span class="step-t">3. insert 30 (แดง) → แดงติดแดง 20R-30R, ลุง NIL (ดำ) → เคส RR</span>หมุนซ้ายที่ปู่ 10 · recolor: 20→<b>B</b>, 10→R · ผล: <b>20B</b>(10R, 30R)</div>
+  <div class="step"><span class="step-t">4. insert 15 (แดง) → แดงติดแดง 10R-15R, ลุง 30R แดง → recolor</span>10→B, 30→B, ปู่ 20→R → แต่ 20 เป็น root → บังคับกลับดำ · ผล: 20B(10B(−,15R), 30B)</div>
+  <div class="step"><span class="step-t">5. insert 25 (แดง)</span>พ่อ (30B) ดำ → จบ · 25R อยู่ซ้ายของ 30B</div>
+  <div class="step"><span class="step-t">6. insert 27 (แดง) → แดงติดแดง 25R-27R, ลุง NIL (ดำ) → เคส LR</span>หมุนซ้ายที่ 25 (27 ขึ้น) → หมุนขวาที่ 30 (27 ขึ้น) · recolor: 27→<b>B</b>, 30→R · ผล: 20B(10B(−,15R), 27B(25R,30R))</div>
+  <div class="step"><span class="step-t">7. insert 5 (แดง)</span>พ่อ (10B) ดำ → จบ · 5R ซ้ายของ 10B</div>
+  <div class="step"><span class="step-t">8. insert 1 (แดง) → แดงติดแดง 5R-1R, ลุง 15R แดง → recolor + ลามขึ้น</span>5→B, 15→B, ปู่ 10→R · ไปตรวจที่ 10: พ่อของ 10 คือ 20B ดำ → หยุด · ผล: 20B(10R(5B(1R,−),15B), 27B(25R,30R))</div>
+  <div class="step"><span class="step-t">9. insert 7 (แดง)</span>พ่อ (5B) ดำ → จบ · 7R ขวาของ 5B — <b>ครบ 9 ค่า ✅</b></div>
+</div>
+
+<figure class="diagram">
+<svg viewBox="0 0 560 330" width="560" role="img" aria-label="Final Red-Black tree">
+  <text x="280" y="16" text-anchor="middle" class="slab-b">ผลลัพธ์สุดท้าย (แดง/ดำ เขียนต่อท้ายตัวเลข)</text>
+  <line x1="280" y1="70" x2="150" y2="150" class="te"/><line x1="280" y1="70" x2="410" y2="150" class="te"/>
+  <line x1="150" y1="170" x2="85" y2="240" class="te"/><line x1="150" y1="170" x2="215" y2="240" class="te"/>
+  <line x1="410" y1="170" x2="345" y2="240" class="te"/><line x1="410" y1="170" x2="475" y2="240" class="te"/>
+  <line x1="85" y1="260" x2="50" y2="300" class="te"/><line x1="85" y1="260" x2="120" y2="300" class="te"/>
+  <g><circle cx="280" cy="60" r="24" class="nd black-n"/><text x="280" y="65" text-anchor="middle" class="nlab-w">20B</text></g>
+  <g><circle cx="150" cy="160" r="24" class="nd red-n"/><text x="150" y="165" text-anchor="middle" class="nlab">10R</text></g>
+  <g><circle cx="410" cy="160" r="24" class="nd black-n"/><text x="410" y="165" text-anchor="middle" class="nlab-w">27B</text></g>
+  <g><circle cx="85" cy="250" r="22" class="nd black-n"/><text x="85" y="255" text-anchor="middle" class="nlab-w">5B</text></g>
+  <g><circle cx="215" cy="250" r="22" class="nd black-n"/><text x="215" y="255" text-anchor="middle" class="nlab-w">15B</text></g>
+  <g><circle cx="345" cy="250" r="22" class="nd red-n"/><text x="345" y="255" text-anchor="middle" class="nlab">25R</text></g>
+  <g><circle cx="475" cy="250" r="22" class="nd red-n"/><text x="475" y="255" text-anchor="middle" class="nlab">30R</text></g>
+  <g><circle cx="50" cy="310" r="21" class="nd red-n"/><text x="50" y="315" text-anchor="middle" class="nlab">1R</text></g>
+  <g><circle cx="120" cy="310" r="21" class="nd red-n"/><text x="120" y="315" text-anchor="middle" class="nlab">7R</text></g>
+  <text x="280" y="360" text-anchor="middle" class="tag">ตรวจ: root ดำ ✓ · ไม่มีแดงติดแดง ✓ · ทุกเส้น root→NIL มีดำ 3 ตัว (20B + {5B/15B/27B} + NIL) ✓</text>
+</svg>
+<figcaption><b>ต้น RB สุดท้าย</b> — สังเกตว่ามัน "ไม่สมมาตร" ก็ได้ ขอแค่ผ่านกฎ 5 ข้อ (ต่างจาก AVL ที่บังคับ BF ทุก node)</figcaption>
+</figure>
+
+<p>เวลาการทำงาน: search/insert/delete ของ RB ล้วน <strong>O(log n)</strong> — insert ใช้การหมุนมากสุด 2 ครั้ง (ข้อดีเด่นกว่า AVL ตอน delete ที่อาจหมุนไล่ขึ้นหลายชั้น) จึงเป็นที่นิยมใน library:
+Java <code>TreeSet</code>/<code>TreeMap</code> (sorted set/map: ไม่เก็บของซ้ำ, ไล่ตามลำดับ ascending, มี first()/last()/contains()/remove()) ก็สร้างบน Red-Black tree นี่เอง</p>
+<h2 id="splay">🧲 Splay Tree — ไม่แคร์สมดุล แต่ "ดึงของที่เพิ่งใช้ขึ้นหัว"</h2>
+<p>Splay tree คือ BST ที่พอ access (search/insert/delete) node ไหน จะ <strong>splay</strong> = หมุนดึง node นั้นขึ้นมาเป็น root เสมอ
+(โดยไม่ทำลายกฎ BST) — ไอเดียจริง ๆ มาจากข้อมูลโลกจริง: "ของไม่กี่ชิ้นถูกเรียกใช้บ่อยมาก" (80/20 rule)
+พอ splay แล้วของยอดฮิตจะลอยอยู่บน ๆ ค้นครั้งหน้าไวมาก ของที่ไม่ค่อยใช้ค่อย ๆ จมลงล่าง</p>
+<div class="box analogy"><div class="box-title"><span class="em">💡</span>เปรียบเทียบ</div>
+<p>เหมือนตู้เสื้อที่ไม่มีใครจัดชั้น: เสื้อที่เพิ่งใส่เมื่อวานถูก "ยกไปแขวนข้างประตู" ทุกครั้ง
+เสื้อจามรุ่นลาวค่อย ๆ ถูกดันไปมุมลึก — ไม่มีความสวยงามเรขาคณิต แต่เร็วต่อ "การใช้งานจริง"</p></div>
+
+<h3>3 รูปแบบการ splay (ใช้ rotation เดิมจาก AVL!)</h3>
+<div class="tbl-wrap"><table>
+<thead><tr><th>รูปแบบ</th><th>เมื่อ node กับพ่ออยู่ตำแหน่งไหน</th><th>หมุนยังไง</th></tr></thead>
+<tbody>
+<tr><td><b>Zig / Zag</b></td><td>พ่อคือ root (เหลือชั้นเดียว)</td><td>หมุนที่ <b>พ่อ</b> รอบเดียวจบ</td></tr>
+<tr><td><b>Zig-Zig / Zag-Zag</b></td><td>node กับพ่อเลี้ยว "ทางเดียวกัน" (ซ้าย-ซ้าย หรือ ขวา-ขวา)</td><td>หมุนที่ <b>ปู่ก่อน</b> แล้วค่อยหมุนที่พ่อ (สำคัญ: ปู่ก่อนเสมอ!)</td></tr>
+<tr><td><b>Zig-Zag / Zag-Zig</b></td><td>เลี้ยว "คนละทาง"</td><td>หมุนที่ <b>พ่อก่อน</b> แล้วค่อยหมุนที่ปู่</td></tr>
+</tbody></table></div>
+
+<div class="box warn"><div class="box-title"><span class="em">⚠️</span>จุดชวนตรวจข้อสอบ</div>
+<p>Zig-Zig ต้อง "ปู่ก่อน-พ่อทีหลัง" แต่ Zig-Zag ต้อง "พ่อก่อน-ปู่ทีหลัง" — สลับกันง่ายมาก ท่องว่า
+<strong>"ตรงกัน → ปู่ก่อน, คนละทาง → พ่อก่อน"</strong> (สไลด์: Splay 40 ให้ขึ้นหัว — ไล่หาแพทเทิร์นทีละชั้นจาก node ขึ้นไป)</p></div>
+
+<h3>การทำงานของ Splay แต่ละ operation</h3>
+<div class="steps">
+  <div class="step"><span class="step-t">Search</span>ค้นแบบ BST ปกติ → เจอแล้ว splay ตัวที่เจอขึ้น root · ถ้าไม่เจอ ให้ splay "node สุดท้ายที่ผ่าน" ขึ้นแทน (ตัวนั้นใกล้ค่าที่หามากสุด)</div>
+  <div class="step"><span class="step-t">Insert</span>แทรกแบบ BST → splay ตัวใหม่ขึ้น root ทันที (insert ล่าสุดอยู่บนสุดเสมอ)</div>
+  <div class="step"><span class="step-t">Delete — แนวออกสอบ (Final 67!)</span>(1) search ตัวที่จะลบ แล้ว splay มันขึ้น root (2) หา <strong>max ของ subtree ซ้าย</strong> แล้ว splay ขึ้นเป็น root ของ subtree ซ้าย (3) ต่อ subtree ซ้ายนั้นเป็น root ใหม่ โดยให้ลูกขวาของ root ใหม่ = ลูกขวาเดิมของ root เก่า (subtree ขวาทั้งก้อนแขวนต่อขวา) — จบ ไม่ต้อง recolor, ไม่ต้องนับ height</div>
+</div>
+
+<div class="box basic"><div class="box-title"><span class="em">📗</span>Amortized analysis — เวลาของ splay นับยังไง</div>
+<p>แต่ละ operation เดี่ยว ๆ อาจแย่ (worst O(n) — ต้นเอียงได้ ไม่มีใครห้าม) แต่<strong>เฉลี่ยต่อ operation ในลำดับยาว ๆ</strong> ดีเสมอ:
+ทำ M operations บนต้น N node ใช้รวม O(M log N) → <strong>amortized O(log N)</strong> ต่อ operation ·
+การรับประกันนี้มาจากการ splay เอง (ไม่ต้อง bookkeeping height/BF/สีเลย!) — คำสำคัญ "amortized" ออกเติมคำบ่อย</p></div>
+
+<h2 id="summary">📌 สรุปใหญ่: เทียบ 3 ตระกูล + แนวข้อสอบ</h2>
+<div class="tbl-wrap"><table>
+<thead><tr><th></th><th>AVL Tree</th><th>Red-Black Tree</th><th>Splay Tree</th></tr></thead>
+<tbody>
+<tr><td>วิธีรักษาสมดุล</td><td>BF = −1/0/+1 ทุก node</td><td>สี + black-height</td><td>ไม่รักษาเลย (ดึงตัวล่าสุดขึ้นหัว)</td></tr>
+<tr><td>ความสูง</td><td>แน่นสุด (&lt; 1.44 log₂n)</td><td>หลวมกว่า (≤ 2 log₂(n+1))</td><td>ไม่การันตี (เอียงได้)</td></tr>
+<tr><td>เวลาการันตี</td><td class="good">O(log n) เสมอ</td><td class="good">O(log n) เสมอ</td><td>O(log n) แบบ amortized</td></tr>
+<tr><td>การหมุน</td><td>insert ≤ 1 ชุด / delete ไล่ขึ้นได้</td><td>insert ≤ 2 ครั้ง / recolor เยอะ</td><td>หมุนเยอะแต่ไม่เก็บ metadata</td></tr>
+<tr><td>เก็บอะไรใน node</td><td>height</td><td>isRed</td><td>ไม่เก็บอะไรเพิ่ม</td></tr>
+<tr><td>เหมาะกับ</td><td>ค้นหาถี่ (database)</td><td>insert/delete ถี่ (language libraries)</td><td>access กระจุกตัวบางตัว (cache-like)</td></tr>
+</tbody></table></div>
+
+<div class="box exam"><div class="box-title"><span class="em">📝</span>แนวข้อสอบบทนี้ (รวมจากรีวิว + สไลด์)</div>
+<ul>
+<li><strong>"มี unbalanced tree มาให้ แสดงขั้นตอนทำให้ balance พร้อมผลลัพธ์สุดท้าย"</strong> → เขียน BF ทุก node หา node ที่ |BF|=2 → ระบุเคส (ดู 2 ก้าวสุดท้าย) → วาดก่อน/หลังหมุน → เช็ค BF ใหม่</li>
+<li><strong>"เขียน AVL Tree" จากชุดตัวเลข</strong> → trace ทีละค่าเหมือนหน้านี้ (แบบฝึก: 21,26,30,9,4,14,28,18,15,10,2,3,7)</li>
+<li><strong>ตรวจ/ตกแต่ง Red-Black tree</strong> → เช็ค 5 กฎ ทีละข้อ (root ดำ → BST order → แดงไม่ติดแดง → black-height เท่ากัน)</li>
+<li><strong>trace RB insert</strong> → จำ 3 เคส: พ่อดำจบ, ลุงแดง recolor ขยับขึ้น, ลุงดำหมุน+recolor แล้วจบ</li>
+<li><strong>Delete Splay Tree</strong> → splay ตัวที่ลบขึ้น root → splay max ฝั่งซ้าย → ต่อขวาเดิมใต้ root ใหม่</li>
+</ul></div>
+
+<div class="mcq" data-q="1">
+  <div class="q">1) insert ให้เกิด node ที่ BF = +2 โดยเส้นทาง 2 ก้าวสุดท้าย "ขวาแล้วซ้าย" — เคสอะไร แก้ยังไง?</div>
+  <div class="opts">
+    <button class="opt">RR — หมุนซ้ายครั้งเดียว</button>
+    <button class="opt" data-correct="1">RL — หมุนขวาที่ลูกขวา แล้วหมุนซ้ายที่ node</button>
+    <button class="opt">LL — หมุนขวาครั้งเดียว</button>
+    <button class="opt">LR — หมุนซ้ายที่ลูกซ้าย แล้วหมุนขวาที่ node</button>
+  </div>
+  <div class="explain">✅ ขวา→ซ้าย = RL (เคสใน) — หมุนสองรอบ: รอบแรกทำเส้นทางให้ตรง (ขวาที่ลูก) แล้วจบแบบเคสนอก (ซ้ายที่ node)</div>
+</div>
+<div class="mcq" data-q="2">
+  <div class="q">2) RB tree: แทรก node แดงใหม่ พ่อเป็นแดง ลุงเป็นดำ — ทำอะไร?</div>
+  <div class="opts">
+    <button class="opt">recolor พ่อกับลุงเป็นดำ ปู่เป็นแดง แล้วขยับขึ้นตรวจต่อ</button>
+    <button class="opt" data-correct="1">หมุนที่ปู่ + recolor (ตัวขึ้นใหม่ดำ ปู่แดง) แล้วจบ</button>
+    <button class="opt">ลบ node ใหม่ทิ้งแล้วแทรกใหม่</button>
+    <button class="opt">เปลี่ยน node ใหม่เป็นดำ จบ</button>
+  </div>
+  <div class="explain">✅ ลุงดำ = ปัญหารูปทรง → หมุน (LL/RR เดี่ยว, LR/RL คู่) + recolor แล้วจบทันที ส่วน "ลุงแดง" ต่างหากถึงใช้ recolor ขยับขึ้น</div>
+</div>
+<div class="mcq" data-q="3">
+  <div class="q">3) ข้อใดกล่าวถูกต้องเกี่ยวกับ Splay tree?</div>
+  <div class="opts">
+    <button class="opt">สูงการันตีไม่เกิน 2 log n เสมอ</button>
+    <button class="opt">ทุก operation การันตี O(log n) เดี่ยว ๆ</button>
+    <button class="opt" data-correct="1">M operations บนต้น N node รวม O(M log N) = amortized O(log N)</button>
+    <button class="opt">ต้องเก็บ height ในทุก node</button>
+  </div>
+  <div class="explain">✅ Splay ไม่การันตีสูง/เวลารายครั้ง (แย่สุด O(n) ได้) แต่เฉลี่ยระยะยาว amortized O(log N) — และไม่เก็บ metadata ใด ๆ</div>
+</div>
+
+<div class="pager">
+  <a href="bst.html"><span class="dir">← บทก่อน</span><span class="pt">L10 BST</span></a>
+  <a href="graph.html" class="next"><span class="dir">บทถัดไป →</span><span class="pt">L12 Graph</span></a>
+</div>
+</main>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · L11 Advanced Tree · <a href="graph.html">หน้าถัดไป: Graph →</a></div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>

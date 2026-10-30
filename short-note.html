@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Short Note 1 แผ่น — DSA Final</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ---------- cheat sheet specific ---------- */
+.sheet-note { background: var(--warn-bg); border: 1px solid var(--warn-line); color: var(--warn-ink); border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: .9rem; }
+.sheet {
+  max-width: 1000px; margin: 0 auto; background: #fffdf8; color: #1c232b;
+  border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px;
+  font-size: 12.2px; line-height: 1.5; column-count: 3; column-gap: 16px;
+  /* cheat sheet is always light (it is meant for printing) — neutralize dark-theme vars inside */
+  --bg-soft: #f3efe6; --line: #e3dccd; --ink: #1c232b; --ink-soft: #5b6673;
+  --code-bg: #f5f1e6; --code-ink: #33302a; --accent-soft: #e4f4f1; --accent-ink: #0b5a54;
+}
+.sheet pre, .sheet code { color: #33302a; }
+.sheet h2 { font-size: 13.5px; margin: 0 0 4px; padding: 3px 7px; border-radius: 6px; break-after: avoid; border-top: none; }
+.sheet h2.s1 { background: #0f766e; color: #fff; }
+.sheet h2.s2 { background: #b45309; color: #fff; }
+.sheet h2.s3 { background: #1d4ed8; color: #fff; }
+.sheet h2.s4 { background: #a21caf; color: #fff; }
+.sheet h2.s5 { background: #b91c1c; color: #fff; }
+.sheet h2.s6 { background: #4d7c0f; color: #fff; }
+.sheet .blk { break-inside: avoid; margin: 0 0 10px; }
+.sheet ul, .sheet ol { margin: 2px 0; padding-left: 15px; }
+.sheet li { margin: 1px 0; }
+.sheet p { margin: 2px 0; }
+.sheet table { width: 100%; min-width: 0; font-size: 11.2px; border-collapse: collapse; margin: 2px 0; }
+.sheet th, .sheet td { padding: 2px 5px; border: 1px solid #d8d2c4; text-align: left; }
+.sheet th { background: #f0ebdf; }
+.sheet code { font-size: 10.8px; padding: 0 3px; background: #f0ecdf; }
+.sheet pre { font-size: 10.2px; line-height: 1.42; padding: 6px 8px; margin: 3px 0; background: #f5f1e6; border-radius: 6px; }
+.sheet b.k { color: #0b5a54; }
+.sheet .mm { font-weight: 800; }
+.sheet .red { color: #b91c1c; font-weight: 700; }
+.sheet .grn { color: #15803d; font-weight: 700; }
+.pagebreak { break-after: page; }
+@media (max-width: 860px) { .sheet { column-count: 2; font-size: 13px; } }
+@media (max-width: 620px) { .sheet { column-count: 1; font-size: 14px; } }
+@media print {
+  header.site, .sheet-note, .no-print, footer.site, #progress { display: none !important; }
+  body { background: #fff; }
+  .wrap { display: block; padding: 0; max-width: none; }
+  .sheet { max-width: none; border: none; border-radius: 0; padding: 6px 10px; column-count: 3; font-size: 10.6px; color: #000; background: #fff; }
+  .sheet table, .sheet th, .sheet td { border-color: #bbb; }
+  a { color: inherit; text-decoration: none; }
+}
+</style>
+</head>
+<body class="topic-exam">
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn no-print" onclick="window.print()" title="พิมพ์" style="font-size:.72rem;font-weight:800;width:auto;padding:0 12px">🖨️ พิมพ์</button>
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" style="display:block">
+<div class="sheet-note no-print">📄 <b>Short Note 1 แผ่น (A4 สองหน้า)</b> — กดปุ่ม "🖨️ พิมพ์" แล้วเลือกกระดาษ A4 แนวตั้ง · หน้า 1: Sorting + Heap + BST · หน้า 2: AVL/RB/Splay + Graph + Big-O · จัดให้ตัวอักษรพอดี ไม่ล้นแผ่น</div>
+
+<div class="sheet">
+<div class="blk">
+<h2 class="s1">SORTING (L08)</h2>
+<table>
+<tr><th>Algo</th><th>Best</th><th>Worst</th><th>Mem</th><th>Stable</th></tr>
+<tr><td>Bubble</td><td>O(n)</td><td>O(n²)</td><td>O(1)</td><td class="grn">Y</td></tr>
+<tr><td>Selection</td><td>O(n²)</td><td>O(n²)</td><td>O(1)</td><td class="red">N</td></tr>
+<tr><td>Insertion</td><td>O(n)</td><td>O(n²)</td><td>O(1)</td><td class="grn">Y</td></tr>
+<tr><td>Quick</td><td>O(nlogn)</td><td class="red">O(n²)</td><td>O(logn)</td><td class="red">N</td></tr>
+<tr><td>Merge</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(n)</td><td class="grn">Y</td></tr>
+<tr><td>Heap</td><td>O(nlogn)</td><td>O(nlogn)</td><td>O(n)</td><td class="red">N</td></tr>
+<tr><td>Radix</td><td>O(nd)</td><td>O(nd)</td><td>O(n+d)</td><td class="grn">Y</td></tr>
+<tr><td>Counting</td><td>O(n)</td><td>O(m+n)</td><td>O(m)</td><td class="grn">Y*</td></tr>
+<tr><td>Bucket</td><td>O(n)</td><td>O(m+n)</td><td>O(m)</td><td class="grn">Y</td></tr>
+<tr><td>Shell</td><td>—</td><td>&gt;nlogn</td><td>O(1)</td><td class="red">N</td></tr>
+</table>
+<p>*Counting <b class="k">stable เมื่อวางจากขวา→ซ้าย</b> ด้วย prefix sum · comparison sort ต่ำสุด O(n log n) · non-comparison (Count/Radix/Bucket) ทะลุขอบได้</p>
+<ul>
+<li><b>Bubble:</b> เทียบคู่ข้าง ๆ สลับ → ใหญ่สุดลอยท้าย/รอบ · improved: ไม่สลับเลย = จบ (best O(n))</li>
+<li><b>Selection:</b> หา min มาสลับหน้า · swap น้อยสุด (≤n−1) · เทียบตายตัว O(n²) เสมอ</li>
+<li><b>Insertion:</b> หยิบใหม่สอดเข้าโซนซ้ายที่เรียงแล้ว · เก่งข้อมูลเกือบเรียง · เวลา ∝ inversions</li>
+<li><b>Quick (Lomuto):</b> pivot ตัวท้าย · เจอ ≤pivot: i++ แล้ว swap · จบ swap pivot↔a[i+1] · pivot = median ดีสุด · stable ไม่ได้</li>
+<li><b>Merge:</b> หักครึ่ง → merge ตักหัวน้อยกว่า · <b>ใช้ &lt;= จึง stable</b> · T(n)=2T(n/2)+cn = Θ(nlogn)</li>
+<li>D&amp;C moral: 2 ครึ่งดีกว่าทั้งก้อน · แบ่งไม่สมดุล (0.1n/0.9n) แย่</li>
+<li>Ascending = น้อย→มาก, Descending = มาก→น้อย</li>
+</ul>
+</div>
+
+<div class="blk">
+<h2 class="s2">HEAP / PRIORITY QUEUE (L09)</h2>
+<p>PQ = ADT "สิทธิ์สูงออกก่อน" · ใช้ <b class="k">binary heap</b>: min heap แม่≤ลูก (root น้อยสุด) · max heap แม่≥ลูก · <span class="red">heap ไม่เรียงซ้าย→ขวา!</span></p>
+<p><b>สูตร array (node i):</b> ลูกซ้าย <code>2i+1</code> · ลูกขวา <code>2i+2</code> · แม่ <code>(i−1)/2</code> · root = index 0</p>
+<ul>
+<li><b>insert d:</b> วางท้าย (size++) → ขึ้น: while p&gt;0 &amp;&amp; heap[p]&lt;heap[(p−1)/2] → swap</li>
+<li><b>removeMin:</b> จำ root → heap[0]=heap[−−size] → ลง: เทียบลูก <b>เล็กกว่า</b> (min heap) สลับจนแม่≤ลูก · 3 เคส: ไม่มีลูก break / ลูกเดียว (ซ้าย) เทียบแล้ว break / 2 ลูก เลือก min(ซ้าย,ขวา)</li>
+<li><b>peek O(1)</b> · insert/remove <b>O(log n)</b></li>
+<li><b>heapify (build heap จาก array) = O(n)</b> · insert ทีละตัว n ครั้ง = O(nlogn) — ไม่เหมือนกัน!</li>
+<li><b>Heap sort:</b> heapify + remove วน n ครั้ง → เรียง (code: heap[size]=d ทิ้งไว้ท้าย = เรียงมาก→น้อย) O(nlogn), ไม่ stable</li>
+<li>ลบ node ใด ๆ: แทนด้วยใบสุดท้าย แล้ว percolate ขึ้น/ลงตามความเหมาะ</li>
+<li>PQ สิทธิ์เท่ากันไม่การันตี FIFO → แก้: เก็บ counter เข้าก่อน-ออกก่อน</li>
+<li>kth ใหญ่สุด (stream) → <b>min heap ขนาด k</b> (root = อันดับ k) · O(log k)/ตัว</li>
+</ul>
+</div>
+
+<div class="blk">
+<h2 class="s3">BST (L10)</h2>
+<p>ศัพท์: root / leaf (ไม่มีลูก) / siblings (แม่เดียวกัน) / depth (edge จาก root) / height (depth มากสุด) / subtree<br>
+balanced: สูง O(log n) · deformed: โน้ม O(n) = linked list</p>
+<p><b>กฎ BST:</b> ทุก node — ลูกซ้ายทั้งฝั่ง &lt; node &lt; ลูกขวาทั้งฝั่ง</p>
+<p><b>Traversal (O(n)):</b> Pre = Root L R · In = L Root R · Post = L R Root<br>
+<b class="k">In-order ของ BST = เรียงน้อย→มาก</b> (ใช้ตรวจคำตอบ!)</p>
+<p><b>insert:</b> search หาช่องว่างแล้ววาง · ลำดับ insert เรียงมาแล้ว → ต้นเอียง</p>
+<p><b>searchIter (ออกสอบ!):</b></p>
+<pre>TreeNode searchIter(int key){
+  TreeNode cur = root;
+  while (cur != null) {
+    if (key == cur.data) return cur;
+    else if (key &lt; cur.data) cur = cur.left;
+    else cur = cur.right;
+  }
+  return null;
+}</pre>
+<p><b>delete 3 เคส:</b> ① ใบ → ตัด, แม่ชี้ null ② ลูกเดียว → ยกลูกแทน ③ <b>2 ลูก</b> → แทนด้วย <b>max ของ subtree ซ้าย</b> (หรือ min ขวา) → ลบตัวนั้นออกจากที่เดิม → ต่อ parent เดิม + รับลูกทั้งคู่ (q.left=node.left, q.right=node.right)</p>
+<p>findMax: วิ่งขวาสุด · findMin: ซ้ายสุด · rangeSumBST: ตัดทาง — val&lt;low → ขวาอย่างเดียว, val&gt;high → ซ้ายอย่างเดียว</p>
+</div>
+
+<div class="blk pagebreak">
+<h2 class="s4">AVL (L11)</h2>
+<p><b>height:</b> ใบ=0, null=−1 · <b>BF = hL − hR</b> อนุญาต −1/0/+1 · |BF|≥2 → หมุน · สูง &lt; 1.44 log₂n · insert/delete/search O(log n)</p>
+<p><b>4 เคส (ดู 2 ก้าวท้ายของเส้นทาง):</b></p>
+<table>
+<tr><th>เคส</th><th>แก้</th></tr>
+<tr><td>LL (ซ้าย-ซ้าย, BF+2, ลูกซ้าย BF≥0)</td><td>หมุนขวา ที่ node</td></tr>
+<tr><td>RR (ขวา-ขวา, BF−2, ลูกขวา BF≤0)</td><td>หมุนซ้าย ที่ node</td></tr>
+<tr><td>LR (ซ้ายแล้วขวา, ลูกซ้าย BF&lt;0)</td><td>หมุนซ้ายที่ลูกซ้าย → หมุนขวาที่ node</td></tr>
+<tr><td>RL (ขวาแล้วซ้าย, ลูกขวา BF&gt;0)</td><td>หมุนขวาที่ลูกขวา → หมุนซ้ายที่ node</td></tr>
+</table>
+<p>ทำ: insert แบบ BST → เดินขึ้นคิด BF ทุกชั้น → เจอ |BF|=2 หมุนที่ node นั้น <b class="k">(insert หมุน ≤1 ชุด; delete ไล่ขึ้นได้ทุกชั้น)</b> → update height</p>
+<p>หมุนซ้ายที่ n = ลูกขวาขึ้นแทน (subtree กลางย้ายไปลูกขวาของ n) · หมุนขวา = กลับกัน · ต่อ parent + update h เสมอ</p>
+</div>
+
+<div class="blk">
+<h2 class="s4">RED-BLACK (L11)</h2>
+<p><b class="k">กฎ 5 ข้อ:</b> ① เป็น BST ② สีแดง/ดำ ③ <b>root ดำ</b> ④ แดงไม่มีลูกแดง ⑤ ทุกเส้นทาง→NIL มี <b>จำนวนดำเท่ากัน</b> (NIL นับดำ)</p>
+<p>เส้นยาวสุด ≤ 2×สั้นสุด → h ≤ 2log₂(n+1) → search/insert/delete O(log n)</p>
+<p><b>insert node ใหม่ = แดงเสมอ</b> แล้ว:</p>
+<ul>
+<li>พ่อดำ → จบ</li>
+<li>พ่อแดง + <b>ลุงแดง</b> → recolor: พ่อ+ลุง=ดำ, ปู่=แดง → ขยับไปตรวจที่ปู่ (root แดง → ดำ)</li>
+<li>พ่อแดง + <b>ลุงดำ/NIL</b> → หมุนที่ปู่ (LL/RR เดี่ยว, LR/RL คู่) + recolor: ตัวขึ้น=ดำ ปู่=แดง → <b>จบ</b></li>
+</ul>
+<p>ตรวจ tree: root ดำ? BST order? แดงติดแดง? นับดำทุกเส้นเท่า? (node แดงไม่นับ)</p>
+<p>Java TreeSet/TreeMap = RB tree (เรียง ascending, ไม่เก็บซ้ำ, first()/last())</p>
+</div>
+
+<div class="blk">
+<h2 class="s4">SPLAY (L11)</h2>
+<p>ทุก access → <b>splay ขึ้น root</b> (หมุนโดย BST ยังถูก) · ของที่ใช้บ่อยลอยบน · ไม่เก็บ height/สี</p>
+<ul>
+<li><b>Zig/Zag:</b> พ่อ = root → หมุนที่พ่อ 1 ครั้ง</li>
+<li><b>Zig-Zig/Zag-Zag:</b> เลี้ยวทางเดียวกัน → หมุน <b>ปู่ก่อน</b> แล้วพ่อ</li>
+<li><b>Zig-Zag/Zag-Zig:</b> คนละทาง → หมุน <b>พ่อก่อน</b> แล้วปู่</li>
+</ul>
+<p><b>delete x:</b> ① search+ splay x ขึ้น root ② splay <b>max ฝั่งซ้าย</b> ขึ้นหัว subtree ซ้าย ③ root ใหม่ = ตัว max นั้น, ลูกขวา = subtree ขวาเดิม</p>
+<p>amortized: M ops บน N node = O(M log N) → <b>O(log N) เฉลี่ย</b> (เดี่ยว ๆ อาจ O(n))</p>
+</div>
+
+<div class="blk">
+<h2 class="s5">GRAPH: BASICS (L12)</h2>
+<p>G=(V,E) · undirected (x,y)=(y,x) / directed (arc) · weighted · loop (x,x) · multi-edge · simple = ไม่มีทั้งสอง · degree = เส้นที่แตะ (directed: in/out-degree) · sparse |E|=O(V), dense |E|=O(V²) · complete = ทุกคู่มีเส้น · bipartite = 2 กลุ่ม เส้นข้ามกลุ่มเท่านั้น</p>
+<p>path = จุดต่อเส้น · length = #เส้น · simple path ไม่ซ้ำจุด · cycle จบที่ตัวเอง ไม่ย้อนเส้น · DAG = มีทิศ ไม่มีวง · connected component = ก้อนไปถึงกันหมด · tree = connected ไม่มีวง · forest = ก้อนเป็น tree</p>
+<p><b class="k">Subgraph</b> H=(V′,E′): V′⊆V และ E′⊆E (เส้นต้องมีจุดปลายใน V′)</p>
+<p><b>Spanning tree:</b> ครบ V จุด + connected + ไม่มีวง = <b>V−1 เส้น</b> · MST = ผลรวม w น้อยสุด (w ไม่ซ้ำ → ตัวเดียว)</p>
+</div>
+
+<div class="blk">
+<h2 class="s5">GRAPH: REPRESENTATION</h2>
+<table>
+<tr><th></th><th>List</th><th>Matrix</th></tr>
+<tr><td>Mem</td><td class="grn">Θ(V+E)</td><td>Θ(V²)</td></tr>
+<tr><td>(u,v) มีไหม?</td><td>O(deg u)</td><td class="grn">O(1)</td></tr>
+<tr><td>หา degree</td><td class="grn">O(1)</td><td>O(V)</td></tr>
+<tr><td>Traverse</td><td class="grn">O(V+E)</td><td>O(V²)</td></tr>
+</table>
+<p>sparse → list · ถามเส้นบ่อย/dense → matrix · มี w เก็บคู่ [w, v]</p>
+</div>
+
+<div class="blk">
+<h2 class="s5">BFS / DFS</h2>
+<p>สถานะ: unvisited → discovered → explored · <b>BFS = Queue</b> (กว้างก่อน, mark ตอน <b>enqueue</b>) · <b>DFS = Stack/recursive</b> (ลึกก่อน, mark ตอนเหยียบ) · ทั้งคู่ <b class="k">O(V+E)</b></p>
+<pre>dfs(v){ if visited return; visited=true;
+  for w adj v: if !visited dfs(w); }</pre>
+<p>BFS ในกราฟไม่มีน้ำหนัก → d[w]=d[u]+1 = เส้นน้อยสุด + path[] ย้อนทาง</p>
+</div>
+
+<div class="blk">
+<h2 class="s5">PRIM (MST)</h2>
+<p>เริ่มจุดใดก็ได้ → วน: หยิบจุดนอกต้นไม้ที่ <b>key น้อยสุด</b> (key = เส้นถูกสุดพาเข้า tree) → relax: w(u,v)&lt;key[v] → อัปเดต + parent · จบเมื่อครบ V · <b>O(E log V)</b> (lazy PQ)</p>
+</div>
+
+<div class="blk">
+<h2 class="s5">DIJKSTRA (SSSP)</h2>
+<p>จาก s ไปทุกจุด, <b class="k">น้ำหนัก ≥ 0 เท่านั้น</b> · dist[s]=0 ที่เหลือ ∞ · วน: pop (dist น้อยสุด) → relax ทุกเส้น: <b>alt = dist[u]+w &lt; dist[v]</b> → dist[v]=alt, prev[v]=u, push เพิ่ม · ผล: dist[], prev[] (ย้อนทาง) · <b>O(E log V)</b></p>
+<pre>push(pq,0,s)
+while(!pq.empty()){
+  (du,u)=extractMin(pq)
+  if (du &gt; dist[u]) continue; // stale
+  for (u,v,w):
+    if(du+w &lt; dist[v]){ dist[v]=du+w;
+      prev[v]=u; push(pq,dist[v],v); } }</pre>
+<p><b>Prim vs Dijkstra:</b> ต่างกันที่ priority: key=เส้นถูกสุดเข้า tree ↔ dist=ระยะรวมจาก s · <span class="red">MST ไม่ใช่เส้นทางสั้นสุด!</span></p>
+</div>
+
+<div class="blk">
+<h2 class="s5">UNION-FIND</h2>
+<p>find(x) = หัวกลุ่ม · union รวมกลุ่ม · ใช้กันวงใน Kruskal</p>
+<pre>find(x){ if(parent[x]!=x)
+  parent[x]=find(parent[x]); // path compression
+  return parent[x]; }
+union(a,b){ ra=find(a); rb=find(b);
+  if(ra==rb) return;      // กลุ่มเดียว = วง!
+  if(rank[ra]&lt;rank[rb]) parent[ra]=rb;
+  else if(rank[ra]&gt;rank[rb]) parent[rb]=ra;
+  else { parent[rb]=ra; rank[ra]++; } }</pre>
+<p>union by rank: ต้นสั้นใต้ต้นสูง (เท่ากัน → เลือก + rank++) · path compression: รีดชี้ตรง root → find/union ≈ O(1) (α(n))</p>
+</div>
+
+<div class="blk">
+<h2 class="s5">KRUSKAL (MST)</h2>
+<p>เรียงเส้น w น้อย→มาก → วน: ถ้า find(u)≠find(v) → รับ + union · ถ้าเท่ากัน → <b class="k">ทิ้ง (วง!)</b> · จบเมื่อได้ V−1 เส้น · ต้นทุน = sort = <b>O(E log E)</b></p>
+<p>เขียนตาราง: เส้น | find | ตัดสิน | กลุ่มหลังรวม</p>
+</div>
+
+<div class="blk">
+<h2 class="s6">โค้ดเด็า: BINARY STRING 1 ห้ามติดกัน</h2>
+<pre>static void gen(String s,int k,char last){
+  if (s.length()==k){ println(s); return; }
+  gen(s+"0", k, '0');
+  if (last!='1') gen(s+"1", k, '1');
+}
+// เรียก: gen("", k, '0');</pre>
+<p>จำนวน = Fibonacci: K=1→2, 2→3, 3→5, 4→8</p>
+<p><b>Heap swap 4 แบบ:</b> temp ✓ · +/− (overflow) · ×/÷ (เจอ 0 พัง) · XOR ✓</p>
+<p><b>Search ทั่วไป:</b> linear O(n) · binary O(log n) ต้องเรียงแล้ว (ตัดครึ่งต่อรอบ)</p>
+</div>
+</div>
+
+<div class="pager" style="max-width:1000px;margin:26px auto 0">
+  <a href="exam.html"><span class="dir">← กลับ</span><span class="pt">แนวข้อสอบรวม</span></a>
+  <a href="index.html" class="next"><span class="dir">→</span><span class="pt">หน้าแรก</span></a>
+</div>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · Short Note 1 แผ่น · พิมพ์ A4 2 หน้า</div></footer>
+<script src="assets/main.js"></script>
+</body>
+</html>
