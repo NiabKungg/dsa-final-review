@@ -1,10 +1,10 @@
 {
   "schemaVersion": "mimosa-hook-status/v1",
-  "recordedAt": "2026-10-29T13:29:51.613Z",
+  "recordedAt": "2026-10-30T07:53:54.615Z",
   "sessionId": "session_0d252ffd95a3841baf1f6b689d63c620",
   "event": "PostToolUse",
   "toolName": "Edit",
-  "file": "index.html",
+  "file": "short-note.html",
   "outcome": "clear",
   "coverage": "complete",
   "findingCount": 0,
