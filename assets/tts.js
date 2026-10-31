@@ -438,10 +438,10 @@
       box.__anchor = h3;
       h3.appendChild(makeBtn(box, stripEmoji(h3.textContent).slice(0, 60), 'tts-sub'));
     });
-    /* กล่องพื้นฐาน/เปรียบเทียบ/แนวข้อสอบ — อ่านเฉพาะกล่องนั้น */
+    /* กล่องพื้นฐาน/เปรียบเทียบ/แนวข้อสอบ — อ่านเฉพาะกล่องนั้น (ปุ่มขึ้นหน้าสุดเพื่อ float ชิดขวาบน) */
     document.querySelectorAll('main .box > .box-title').forEach((t) => {
       const box = t.parentElement;
-      t.appendChild(makeBtn(box, stripEmoji(t.textContent).slice(0, 50)));
+      t.prepend(makeBtn(box, stripEmoji(t.textContent).slice(0, 50)));
     });
     /* เฉลย — กดอ่านเฉลยได้ทันที (ไม่พับ/กางกล่อง) */
     document.querySelectorAll('main details.sol > summary').forEach((s) => {

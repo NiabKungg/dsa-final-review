@@ -169,8 +169,10 @@ hr.sep { border: none; border-top: 1px dashed var(--line); margin: 2em 0; }
   background: var(--card); border: 1px solid var(--line); border-left: 5px solid var(--accent);
   border-radius: var(--radius); padding: 14px 18px; margin: 18px 0; box-shadow: var(--shadow);
 }
-.box .box-title { font-weight: 800; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.box .box-title .em { font-size: 1.15rem; }
+.box .box-title { font-weight: 800; display: flow-root; line-height: 1.55; margin-bottom: 6px; }
+.box .box-title .em { font-size: 1.15rem; margin-right: 6px; }
+/* ปุ่มอ่านออกเสียงในหัวข้อกล่อง: ลอยชิดขวาบน ไม่ดันข้อความให้หักบรรทัดผิดรูป */
+.box-title .tts-btn { float: right; margin-top: 3px; margin-left: 10px; }
 .box p:first-child { margin-top: 0; }
 .box p:last-child { margin-bottom: 0; }
 .box.analogy { border-left-color: #d97706; background: var(--warn-bg); }
