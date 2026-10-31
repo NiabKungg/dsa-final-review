@@ -121,7 +121,7 @@
 
 <h3>Trace ทีละคู่ — ข้อมูล [5, 3, 8, 1] (Ascending)</h3>
 <figure class="diagram">
-<svg viewBox="0 0 740 300" width="740" role="img" aria-label="Bubble sort pass 1">
+<svg viewBox="0 0 740 312" width="740" role="img" aria-label="Bubble sort pass 1">
   <text x="20" y="24" class="slab-b">Pass 1 — สุดท้ายแล้ว 8 จบการทำงาน</text>
   <!-- step 1: compare 5,3 swap -->
   <g transform="translate(20,40)">
@@ -212,9 +212,9 @@
 เหมือนเลือกกัปตันทีม: จับฉ่ายทั้งห้อง หยิบเก่งสุดคนแรก แล้วไล่เลือกลำดับถัดไปจากคนที่เหลือ</p>
 
 <figure class="diagram">
-<svg viewBox="0 0 740 170" width="740" role="img" aria-label="Selection sort trace">
+<svg viewBox="0 0 800 170" width="800" role="img" aria-label="Selection sort trace">
   <g transform="translate(20,20)">
-    <text x="0" y="0" class="slab-b">รอบที่ 1: สแกนหา min ของทั้งแถว → เจอ 1 ที่ช่องสุดท้าย</text>
+    <text x="0" y="0" class="slab-b">รอบที่ 1: หา min ทั้งแถว → เจอ 1</text>
     <rect x="0" y="10" width="38" height="32" rx="5" class="cell"/><text x="19" y="32" text-anchor="middle" class="box-lab">5</text>
     <rect x="38" y="10" width="38" height="32" rx="5" class="cell"/><text x="57" y="32" text-anchor="middle" class="box-lab">3</text>
     <rect x="76" y="10" width="38" height="32" rx="5" class="cell"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
@@ -261,7 +261,7 @@
 เริ่มจากฝั่งซ้ายมี 1 ใบ (ไพ่ 1 ใบถือว่าเรียงแล้วเสมอ) จนหมดกอง</p>
 
 <figure class="diagram">
-<svg viewBox="0 0 740 190" width="740" role="img" aria-label="Insertion sort trace">
+<svg viewBox="0 0 815 190" width="815" role="img" aria-label="Insertion sort trace">
   <g transform="translate(20,14)">
     <text x="0" y="0" class="slab-b">หยิบ 3 → 5 ใหญ่กว่า เลื่อน 5 ไปขวา แล้วสอด 3 หน้า</text>
     <rect x="0" y="10" width="38" height="32" rx="5" class="cell good"/><text x="19" y="32" text-anchor="middle" class="box-lab">5</text>
@@ -282,7 +282,7 @@
     <rect x="38" y="10" width="38" height="32" rx="5" class="cell good"/><text x="57" y="32" text-anchor="middle" class="box-lab">5</text>
     <rect x="76" y="10" width="38" height="32" rx="5" class="cell good"/><text x="95" y="32" text-anchor="middle" class="box-lab">8</text>
     <rect x="114" y="10" width="38" height="32" rx="5" class="cell"/><text x="133" y="32" text-anchor="middle" class="box-lab">| 1</text>
-    <text x="0" y="62" class="tag">หยิบ 1 → เลื่อน 8, 5, 3 ไปขวาทีละตัว</text>
+    <text x="0" y="62" class="tag">หยิบ 1 → เลื่อน 8,5,3 ไปขวา</text>
   </g>
   <text x="465" y="46" class="slab-b">→</text>
   <g transform="translate(655,14)">
@@ -342,7 +342,7 @@ pivot จะลงตำแหน่ง "สุดท้ายของมัน
 <svg viewBox="0 0 760 320" width="760" role="img" aria-label="Quick sort partition trace">
   <defs><marker id="arwq" markerWidth="9" markerHeight="9" refX="7" refY="4.5" orient="auto"><path d="M0,0 L8,4.5 L0,9 z" fill="#8a94a0"/></marker></defs>
   <!-- row 1: initial -->
-  <g transform="translate(20,10)">
+  <g transform="translate(20,16)">
     <text x="0" y="0" class="slab-b">เริ่ม: i = -1 (กำแพงไม่มี) · pivot = 6</text>
     <rect x="0" y="8" width="38" height="32" rx="5" class="cell"/><text x="19" y="30" text-anchor="middle" class="box-lab">7</text>
     <rect x="38" y="8" width="38" height="32" rx="5" class="cell"/><text x="57" y="30" text-anchor="middle" class="box-lab">2</text>
@@ -556,8 +556,9 @@ Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรีย�
     <text x="0" y="50" class="tag">ค่านี้ = "ตำแหน่งท้ายของแต่ละค่าใน output"</text>
   </g>
   <!-- placement -->
-  <text x="20" y="180" class="slab">ขั้น 3 วางจากขวาไปซ้าย: เจอ 3 → ไปช่อง prefix[3]=6 คือ output[5], แล้วลด prefix[3] ลง 1 … ทำไมจากขวา? เพื่อให้ตัว "ที่อยู่หลัง" ใน input ไปวางหลัง → stable!</text>
-  <g transform="translate(20,196)">
+  <text x="20" y="174" class="slab">ขั้น 3 วางจากขวาไปซ้าย: เจอ 3 → ไปช่อง prefix[3]=6 คือ output[5] แล้วลด prefix[3] ลง 1</text>
+  <text x="20" y="192" class="slab">ทำไมจากขวา? เพื่อให้ตัว "ที่อยู่หลัง" ใน input ไปวางหลัง → stable!</text>
+  <g transform="translate(20,200)">
     <rect x="0" width="46" height="34" rx="5" class="cell good"/><text x="23" y="22" text-anchor="middle" class="box-lab">0</text>
     <rect x="46" width="46" height="34" rx="5" class="cell good"/><text x="69" y="22" text-anchor="middle" class="box-lab">1</text>
     <rect x="92" width="46" height="34" rx="5" class="cell good"/><text x="115" y="22" text-anchor="middle" class="box-lab">1</text>

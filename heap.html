@@ -154,7 +154,7 @@
 </tbody></table></div>
 
 <figure class="diagram">
-<svg viewBox="0 0 700 250" width="700" role="img" aria-label="Heap array mapping">
+<svg viewBox="0 0 720 280" width="720" role="img" aria-label="Heap array mapping">
   <!-- tree -->
   <g>
     <text x="170" y="18" text-anchor="middle" class="slab-b">Tree (ตามชั้น)</text>
@@ -170,7 +170,8 @@
     <g><circle cx="275" cy="176" r="20" class="nd"/><text x="275" y="181" text-anchor="middle" class="nlab">3</text><text x="292" y="204" class="tag">i=6</text></g>
   </g>
   <!-- arrow -->
-  <text x="345" y="120" class="slab-b">→ เรียงตามชั้น →</text>
+  <text x="350" y="118" text-anchor="middle" class="slab-b">→</text>
+  <text x="350" y="138" text-anchor="middle" class="tag">เรียงตามชั้น</text>
   <!-- array -->
   <g transform="translate(390,60)">
     <text x="0" y="0" class="slab-b">Array เดียวกัน</text>
@@ -187,9 +188,10 @@
       <text x="207" y="68" text-anchor="middle" class="tag">4</text><text x="253" y="68" text-anchor="middle" class="tag">5</text>
       <text x="299" y="68" text-anchor="middle" class="tag">6</text>
     </g>
-    <text x="0" y="110" class="tag">ตรวจสูตร: ค่า 5 (i=1) มีลูกซ้าย 2(1)+1=3 → ค่า 9 ✅ ลูกขวา 2(1)+2=4 → ค่า 7 ✅ แม่ (1−1)/2=0 → ค่า 2 ✅</text>
-    <text x="0" y="132" class="tag">ไม่ว่า tree จะยักไหน array นี้คือ "ความจริง" ข้อสอบมักให้ trace บน array!</text>
+    <text x="0" y="110" class="tag">ตรวจสูตร (ค่า 5 ที่ i=1): ลูกซ้าย 2(1)+1=3 → ค่า 9 ✅</text>
+    <text x="0" y="132" class="tag">ลูกขวา 2(1)+2=4 → ค่า 7 ✅ · แม่ (1−1)/2=0 → ค่า 2 ✅</text>
   </g>
+  <text x="20" y="248" class="tag">ไม่ว่า tree จะยักไหน array นี้คือ "ความจริง" — ข้อสอบมักให้ trace บน array! (ตรวจสูตร: ค่า 5 ที่ i=1 → ลูกซ้าย 9, ลูกขวา 7, แม่ 2 ✅)</text>
 </svg>
 <figcaption><b>Array representation</b> — ไม่ต้องใช้ pointer เลย เก็บแถว ๆ ลงมือ หาญาติด้วยสูตรคูณสอง</figcaption>
 </figure>
@@ -213,12 +215,12 @@
   <g>
     <text x="120" y="14" text-anchor="middle" class="slab-b">เริ่ม: วาง 3 ท้าย</text>
     <line x1="120" y1="56" x2="55" y2="96" class="te"/><line x1="120" y1="56" x2="185" y2="96" class="te"/>
-    <line x1="55" y1="126" x2="15" y2="156" class="te"/><line x1="55" y1="126" x2="95" y2="156" class="te"/>
+    <line x1="55" y1="126" x2="21" y2="156" class="te"/><line x1="55" y1="126" x2="95" y2="156" class="te"/>
     <line x1="185" y1="116" x2="148" y2="156" class="te"/><line x1="185" y1="116" x2="222" y2="156" class="te"/>
     <g><circle cx="120" cy="46" r="19" class="nd"/><text x="120" y="51" text-anchor="middle" class="nlab">2</text></g>
     <g><circle cx="55" cy="106" r="19" class="nd"/><text x="55" y="111" text-anchor="middle" class="nlab">5</text></g>
     <g><circle cx="185" cy="106" r="19" class="nd"/><text x="185" y="111" text-anchor="middle" class="nlab">8</text></g>
-    <g><circle cx="15" cy="166" r="18" class="nd"/><text x="15" y="171" text-anchor="middle" class="nlab">9</text></g>
+    <g><circle cx="21" cy="166" r="18" class="nd"/><text x="21" y="171" text-anchor="middle" class="nlab">9</text></g>
     <g><circle cx="95" cy="166" r="18" class="nd"/><text x="95" y="171" text-anchor="middle" class="nlab">7</text></g>
     <g><circle cx="148" cy="166" r="18" class="nd"/><text x="148" y="171" text-anchor="middle" class="nlab">10</text></g>
     <g><circle cx="222" cy="166" r="18" class="nd hot"/><text x="222" y="171" text-anchor="middle" class="nlab">3</text></g>
@@ -285,7 +287,7 @@
 
 <h3>3 เคสที่ลูป "เคาะลง" ต้องโดน (โครงสร้างเดียวกันทุกข้อสอบ)</h3>
 <figure class="diagram">
-<svg viewBox="0 0 760 190" width="760" role="img" aria-label="Percolate down three cases">
+<svg viewBox="0 0 830 215" width="830" role="img" aria-label="Percolate down three cases">
   <!-- case 1: no child -->
   <g>
     <text x="120" y="16" text-anchor="middle" class="slab-b">เคส 1: ไม่มีลูก → หยุดเลย</text>
