@@ -388,37 +388,210 @@
 <h2 id="drill-heap">✏️ Drill 2: Min Heap insert + delete min (Final 66/67)</h2>
 <div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ (ก): min heap เป็น array <b>[1, 3, 6, 5, 9, 8]</b> — ถ้า insert(2) heap ใหม่เป็นอย่างไร? (ข): จาก heap หลัง insert แล้ว delete min → เป็นอย่างไร?</div>
 <details class="sol"><summary>เฉลย (ก) insert(2) — เคาะขึ้น</summary><div class="sol-body">
-<div class="steps">
-<div class="step"><span class="step-t">วาง 2 ที่ index 6 (ลูกขวาของ 8)</span>[1, 3, 6, 5, 9, 8, <strong>2</strong>] · แม่ของ 2 = index (6−1)/2 = 2 → ค่า 6</div>
-<div class="step"><span class="step-t">2 &lt; 6 → สลับ</span>[1, 3, <strong>2</strong>, 5, 9, 8, <strong>6</strong>] · ตอนนี้ 2 อยู่ index 2 แม่ = index 0 → ค่า 1</div>
-<div class="step"><span class="step-t">2 &gt; 1 → หยุด ✅</span><strong>ผลลัพธ์: [1, 3, 2, 5, 9, 8, 6]</strong> — แม่≤ลูกทุกคู่: (1≤3,2), (3≤5,9), (2≤8,6) ✓</div>
-</div>
+<figure class="diagram">
+<svg viewBox="0 0 780 235" width="780" role="img" aria-label="Heap insert 2 visualization">
+  <defs><marker id="dArwH" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#64748b"/></marker></defs>
+  <text x="10" y="15" class="dtag-b">1) วาง 2 ที่ index 6 (ลูกขวาของ 6 — แม่ = (6−1)/2 = 2)</text>
+  <line x1="190" y1="51" x2="112" y2="74" stroke="#94a3b8" stroke-width="1.6"/><line x1="190" y1="51" x2="268" y2="74" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="110" y1="103" x2="72" y2="126" stroke="#94a3b8" stroke-width="1.6"/><line x1="110" y1="103" x2="148" y2="126" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="270" y1="103" x2="232" y2="126" stroke="#94a3b8" stroke-width="1.6"/><line x1="270" y1="103" x2="308" y2="126" stroke="#d97706" stroke-width="2"/>
+  <circle cx="190" cy="34" r="17" class="dcell"/><text x="190" y="39" text-anchor="middle" class="dtxt">1</text>
+  <circle cx="110" cy="86" r="17" class="dcell"/><text x="110" y="91" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="270" cy="86" r="17" fill="#fffdf5" stroke="#d97706" stroke-width="2.4"/><text x="270" y="91" text-anchor="middle" class="dtxt">6</text>
+  <circle cx="70" cy="138" r="17" class="dcell"/><text x="70" y="143" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="150" cy="138" r="17" class="dcell"/><text x="150" y="143" text-anchor="middle" class="dtxt">9</text>
+  <circle cx="230" cy="138" r="17" class="dcell"/><text x="230" y="143" text-anchor="middle" class="dtxt">8</text>
+  <circle cx="310" cy="138" r="17" class="dcell hot"/><text x="310" y="143" text-anchor="middle" class="dtxt">2</text>
+  <text x="310" y="172" text-anchor="middle" class="dtag">ใหม่</text>
+  <text x="190" y="200" text-anchor="middle" class="dswap">แม่ของ 2 คือ 6 → 2 &lt; 6 ผิดกฎ → สลับ!</text>
+  <line x1="352" y1="110" x2="380" y2="110" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwH)"/>
+
+  <text x="400" y="15" class="dtag-b">2) สลับ 2 ↔ 6 แล้วเทียบแม่ใหม่</text>
+  <line x1="580" y1="51" x2="502" y2="74" stroke="#94a3b8" stroke-width="1.6"/><line x1="580" y1="51" x2="658" y2="74" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="500" y1="103" x2="462" y2="126" stroke="#94a3b8" stroke-width="1.6"/><line x1="500" y1="103" x2="538" y2="126" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="660" y1="103" x2="622" y2="126" stroke="#94a3b8" stroke-width="1.6"/><line x1="660" y1="103" x2="698" y2="126" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="580" cy="34" r="17" fill="#fffdf5" stroke="#d97706" stroke-width="2.4"/><text x="580" y="39" text-anchor="middle" class="dtxt">1</text>
+  <circle cx="500" cy="86" r="17" class="dcell"/><text x="500" y="91" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="660" cy="86" r="17" class="dcell hot"/><text x="660" y="91" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="460" cy="138" r="17" class="dcell"/><text x="460" y="143" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="540" cy="138" r="17" class="dcell"/><text x="540" y="143" text-anchor="middle" class="dtxt">9</text>
+  <circle cx="620" cy="138" r="17" class="dcell"/><text x="620" y="143" text-anchor="middle" class="dtxt">8</text>
+  <circle cx="700" cy="138" r="17" class="dcell"/><text x="700" y="143" text-anchor="middle" class="dtxt">6</text>
+  <text x="580" y="200" text-anchor="middle" class="dswap">แม่ใหม่คือ 1 → 2 &gt; 1 ถูกกฎแล้ว → หยุด ✅</text>
+
+  <text x="20" y="228" class="dtag-b">ผลลัพธ์</text>
+  <rect x="110" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="127" y="228" text-anchor="middle" class="dtxt">1</text>
+  <rect x="144" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="161" y="228" text-anchor="middle" class="dtxt">3</text>
+  <rect x="178" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="195" y="228" text-anchor="middle" class="dtxt">2</text>
+  <rect x="212" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="229" y="228" text-anchor="middle" class="dtxt">5</text>
+  <rect x="246" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="263" y="228" text-anchor="middle" class="dtxt">9</text>
+  <rect x="280" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="297" y="228" text-anchor="middle" class="dtxt">8</text>
+  <rect x="314" y="210" width="34" height="26" rx="4" class="dcell good"/><text x="331" y="228" text-anchor="middle" class="dtxt">6</text>
+  <text x="370" y="228" class="dtag">array [1, 3, 2, 5, 9, 8, 6] — แม่ ≤ ลูกทุกคู่ ✅ (สลับ 1 ครั้ง)</text>
+</svg>
+<figcaption><b>insert(2) ลง min heap</b> — วางท้ายสุด (index 6) แล้วเคาะขึ้น: 2 &lt; 6 สลับหนึ่งครั้ง ขึ้นไปเจอแม่ = 1 ซึ่งเล็กกว่าจึงหยุด</figcaption>
+</figure>
+<p><strong>ผลลัพธ์: [1, 3, 2, 5, 9, 8, 6]</strong> — สลับ 1 ครั้ง (กับ 6) แล้วหยุดเพราะแม่ถัดไปคือ 1 &lt; 2 · สูตรแม่: (6−1)/2 = 2 และ (2−1)/2 = 0</p>
 </div></details>
 <details class="sol"><summary>เฉลย (ข) delete min — เคาะลง</summary><div class="sol-body">
-<div class="steps">
-<div class="step"><span class="step-t">ดึง root (1) ออก = คำตอบที่ return</span>ค่าน้อยสุดคือ 1</div>
-<div class="step"><span class="step-t">ยกใบสุดท้าย (6) ขึ้น root</span>[<strong>6</strong>, 3, 2, 5, 9, 8] (size 6)</div>
-<div class="step"><span class="step-t">ลูกของ 6 = 3 (index1), 2 (index2) → ตัวเล็กกว่าคือ 2 → สลับ</span>[<strong>2</strong>, 3, <strong>6</strong>, 5, 9, 8]</div>
-<div class="step"><span class="step-t">ลูกของ 6 (ตอนนี้ index 2) = index 5 (8) ลูกเดียว (index 6 เกิน size) → 6 &lt; 8 → หยุด ✅</span><strong>ผลลัพธ์: [2, 3, 6, 5, 9, 8]</strong> · return 1</div>
-</div>
+<figure class="diagram">
+<svg viewBox="0 0 780 435" width="780" role="img" aria-label="Heap delete min visualization">
+  <text x="10" y="15" class="dtag-b">1) ดึง root (1) ออก = ค่าที่ return</text>
+  <line x1="181" y1="62" x2="117" y2="89" stroke="#94a3b8" stroke-width="1.6"/><line x1="199" y1="62" x2="263" y2="89" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="103" y1="113" x2="73" y2="140" stroke="#94a3b8" stroke-width="1.6"/><line x1="117" y1="113" x2="147" y2="140" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="263" y1="113" x2="233" y2="140" stroke="#94a3b8" stroke-width="1.6"/><line x1="277" y1="113" x2="307" y2="140" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="190" cy="48" r="17" class="dbad"/><text x="190" y="53" text-anchor="middle" class="dtxt">1</text>
+  <circle cx="110" cy="100" r="17" class="dcell"/><text x="110" y="105" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="270" cy="100" r="17" class="dcell"/><text x="270" y="105" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="70" cy="152" r="17" class="dcell"/><text x="70" y="157" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="150" cy="152" r="17" class="dcell"/><text x="150" y="157" text-anchor="middle" class="dtxt">9</text>
+  <circle cx="230" cy="152" r="17" class="dcell"/><text x="230" y="157" text-anchor="middle" class="dtxt">8</text>
+  <circle cx="310" cy="152" r="17" class="dcell"/><text x="310" y="157" text-anchor="middle" class="dtxt">6</text>
+
+  <text x="400" y="15" class="dtag-b">2) ยกใบสุดท้าย (6) ขึ้น root</text>
+  <line x1="571" y1="62" x2="507" y2="89" stroke="#94a3b8" stroke-width="1.6"/><line x1="589" y1="62" x2="653" y2="89" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="493" y1="113" x2="463" y2="140" stroke="#94a3b8" stroke-width="1.6"/><line x1="507" y1="113" x2="537" y2="140" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="653" y1="113" x2="623" y2="140" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="580" cy="48" r="17" class="dcell hot"/><text x="580" y="53" text-anchor="middle" class="dtxt">6</text>
+  <circle cx="500" cy="100" r="17" class="dcell"/><text x="500" y="105" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="660" cy="100" r="17" class="dcell"/><text x="660" y="105" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="460" cy="152" r="17" class="dcell"/><text x="460" y="157" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="540" cy="152" r="17" class="dcell"/><text x="540" y="157" text-anchor="middle" class="dtxt">9</text>
+  <circle cx="620" cy="152" r="17" class="dcell"/><text x="620" y="157" text-anchor="middle" class="dtxt">8</text>
+
+  <text x="190" y="206" text-anchor="middle" class="dtag-b">3) ลูกของ 6 = (3, 2) → เล็กกว่าคือ 2 → สลับ</text>
+  <line x1="181" y1="256" x2="117" y2="283" stroke="#94a3b8" stroke-width="1.6"/><line x1="199" y1="256" x2="263" y2="283" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="103" y1="307" x2="73" y2="334" stroke="#94a3b8" stroke-width="1.6"/><line x1="117" y1="307" x2="147" y2="334" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="263" y1="307" x2="233" y2="334" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="190" cy="240" r="17" class="dcell hot"/><text x="190" y="245" text-anchor="middle" class="dtxt">6</text>
+  <circle cx="110" cy="292" r="17" class="dcell"/><text x="110" y="297" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="270" cy="292" r="17" class="dcell hot"/><text x="270" y="297" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="270" cy="292" r="21" fill="none" stroke="#d97706" stroke-width="1.6"/>
+  <circle cx="70" cy="344" r="17" class="dcell"/><text x="70" y="349" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="150" cy="344" r="17" class="dcell"/><text x="150" y="349" text-anchor="middle" class="dtxt">9</text>
+  <circle cx="230" cy="344" r="17" class="dcell"/><text x="230" y="349" text-anchor="middle" class="dtxt">8</text>
+
+  <text x="580" y="206" text-anchor="middle" class="dtag-b">4) 6 (index 2) มีลูกเดียว = 8 → 6 &lt; 8 หยุด ✅</text>
+  <line x1="571" y1="256" x2="507" y2="283" stroke="#94a3b8" stroke-width="1.6"/><line x1="589" y1="256" x2="653" y2="283" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="493" y1="307" x2="463" y2="334" stroke="#94a3b8" stroke-width="1.6"/><line x1="507" y1="307" x2="537" y2="334" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="653" y1="307" x2="623" y2="334" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="580" cy="240" r="17" class="dcell good"/><text x="580" y="245" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="500" cy="292" r="17" class="dcell"/><text x="500" y="297" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="660" cy="292" r="17" class="dcell hot"/><text x="660" y="297" text-anchor="middle" class="dtxt">6</text>
+  <circle cx="460" cy="344" r="17" class="dcell"/><text x="460" y="349" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="540" cy="344" r="17" class="dcell"/><text x="540" y="349" text-anchor="middle" class="dtxt">9</text>
+  <circle cx="620" cy="344" r="17" class="dcell"/><text x="620" y="349" text-anchor="middle" class="dtxt">8</text>
+
+  <text x="20" y="410" class="dtag-b">return 1 ✅</text>
+  <rect x="110" y="392" width="34" height="26" rx="4" class="dcell good"/><text x="127" y="410" text-anchor="middle" class="dtxt">2</text>
+  <rect x="144" y="392" width="34" height="26" rx="4" class="dcell good"/><text x="161" y="410" text-anchor="middle" class="dtxt">3</text>
+  <rect x="178" y="392" width="34" height="26" rx="4" class="dcell good"/><text x="195" y="410" text-anchor="middle" class="dtxt">6</text>
+  <rect x="212" y="392" width="34" height="26" rx="4" class="dcell good"/><text x="229" y="410" text-anchor="middle" class="dtxt">5</text>
+  <rect x="246" y="392" width="34" height="26" rx="4" class="dcell good"/><text x="263" y="410" text-anchor="middle" class="dtxt">9</text>
+  <rect x="280" y="392" width="34" height="26" rx="4" class="dcell good"/><text x="297" y="410" text-anchor="middle" class="dtxt">8</text>
+  <text x="340" y="410" class="dtag">ผลลัพธ์ [2, 3, 6, 5, 9, 8] — แม่ ≤ ลูกทุกคู่ ✅ (เคาะลง 1 ครั้ง)</text>
+</svg>
+<figcaption><b>delete min จาก min heap</b> — ดึง root ออก, ยกใบสุดท้ายขึ้น root แล้วเคาะลงโดยเลือกลูกที่เล็กกว่าเสมอ (2) จนถึงที่ที่ถูกกฎ</figcaption>
+</figure>
+<p><strong>return 1 · ผลลัพธ์: [2, 3, 6, 5, 9, 8]</strong> — เคาะลงครั้งเดียวจบ เพราะ 6 มีลูกเดียวคือ 8 และ 6 &lt; 8 ถูกกฎแล้ว</p>
 </div></details>
 </div>
 
 <h2 id="drill-bst">✏️ Drill 3: สร้าง BST + เติม searchIter (Final 66/67)</h2>
 <div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์ (ก): แสดงขั้นตอนสร้าง BST จาก <b>50, 30, 70, 20, 40, 60, 80</b> (ข): เติมโค้ดบรรทัดที่หายของ searchIter</div>
 <details class="sol"><summary>เฉลย (ก)</summary><div class="sol-body">
-<ol>
-<li>50 → root</li>
-<li>30 &lt; 50 → ซ้ายของ 50</li>
-<li>70 &gt; 50 → ขวาของ 50</li>
-<li>20 &lt; 50, &lt; 30 → ซ้ายของ 30</li>
-<li>40 &lt; 50, &gt; 30 → ขวาของ 30</li>
-<li>60 &gt; 50, &lt; 70 → ซ้ายของ 70</li>
-<li>80 &gt; 50, &gt; 70 → ขวาของ 70</li>
-</ol>
-<p>ผลลัพธ์: 50(30(20, 40), 70(60, 80)) — ต้นสมมาตรพอดี · ตรวจ in-order: 20,30,40,50,60,70,80 เรียง ✅</p>
+<figure class="diagram">
+<svg viewBox="0 0 620 300" width="620" role="img" aria-label="BST build visualization">
+  <text x="80" y="12" text-anchor="middle" class="dtag-b">insert 50</text>
+  <line x1="80" y1="47" x2="80" y2="47" stroke="#94a3b8"/>
+  <circle cx="80" cy="58" r="13" class="dcell hot"/><text x="80" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+
+  <text x="230" y="12" text-anchor="middle" class="dtag-b">insert 30</text>
+  <line x1="230" y1="45" x2="195" y2="65" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="230" cy="58" r="13" class="dcell good"/><text x="230" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+  <circle cx="195" cy="76" r="13" class="dcell hot"/><text x="195" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">30</text>
+
+  <text x="380" y="12" text-anchor="middle" class="dtag-b">insert 70</text>
+  <line x1="380" y1="45" x2="345" y2="65" stroke="#94a3b8" stroke-width="1.5"/><line x1="380" y1="45" x2="415" y2="65" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="380" cy="58" r="13" class="dcell good"/><text x="380" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+  <circle cx="345" cy="76" r="13" class="dcell good"/><text x="345" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">30</text>
+  <circle cx="415" cy="76" r="13" class="dcell hot"/><text x="415" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">70</text>
+
+  <text x="530" y="12" text-anchor="middle" class="dtag-b">insert 20</text>
+  <line x1="530" y1="45" x2="495" y2="65" stroke="#94a3b8" stroke-width="1.5"/><line x1="530" y1="45" x2="565" y2="65" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="495" y1="87" x2="482" y2="107" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="530" cy="58" r="13" class="dcell good"/><text x="530" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+  <circle cx="495" cy="76" r="13" class="dcell good"/><text x="495" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">30</text>
+  <circle cx="565" cy="76" r="13" class="dcell good"/><text x="565" y="80" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">70</text>
+  <circle cx="482" cy="118" r="13" class="dcell hot"/><text x="482" y="122" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">20</text>
+
+  <text x="80" y="152" text-anchor="middle" class="dtag-b">insert 40</text>
+  <line x1="80" y1="185" x2="45" y2="205" stroke="#94a3b8" stroke-width="1.5"/><line x1="80" y1="185" x2="115" y2="205" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="45" y1="227" x2="32" y2="247" stroke="#94a3b8" stroke-width="1.5"/><line x1="45" y1="227" x2="58" y2="247" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="80" cy="198" r="13" class="dcell good"/><text x="80" y="202" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+  <circle cx="45" cy="216" r="13" class="dcell good"/><text x="45" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">30</text>
+  <circle cx="115" cy="216" r="13" class="dcell good"/><text x="115" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">70</text>
+  <circle cx="32" cy="258" r="13" class="dcell good"/><text x="32" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">20</text>
+  <circle cx="58" cy="258" r="13" class="dcell hot"/><text x="58" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">40</text>
+
+  <text x="230" y="152" text-anchor="middle" class="dtag-b">insert 60</text>
+  <line x1="230" y1="185" x2="195" y2="205" stroke="#94a3b8" stroke-width="1.5"/><line x1="230" y1="185" x2="265" y2="205" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="265" y1="227" x2="252" y2="247" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="230" cy="198" r="13" class="dcell good"/><text x="230" y="202" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+  <circle cx="195" cy="216" r="13" class="dcell good"/><text x="195" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">30</text>
+  <circle cx="265" cy="216" r="13" class="dcell good"/><text x="265" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">70</text>
+  <circle cx="182" cy="258" r="13" class="dcell good"/><text x="182" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">20</text>
+  <circle cx="208" cy="258" r="13" class="dcell good"/><text x="208" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">40</text>
+  <circle cx="252" cy="258" r="13" class="dcell hot"/><text x="252" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">60</text>
+
+  <text x="380" y="152" text-anchor="middle" class="dtag-b">insert 80</text>
+  <line x1="380" y1="185" x2="345" y2="205" stroke="#94a3b8" stroke-width="1.5"/><line x1="380" y1="185" x2="415" y2="205" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="415" y1="227" x2="428" y2="247" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="380" cy="198" r="13" class="dcell good"/><text x="380" y="202" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">50</text>
+  <circle cx="345" cy="216" r="13" class="dcell good"/><text x="345" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">30</text>
+  <circle cx="415" cy="216" r="13" class="dcell good"/><text x="415" y="220" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">70</text>
+  <circle cx="332" cy="258" r="13" class="dcell good"/><text x="332" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">20</text>
+  <circle cx="358" cy="258" r="13" class="dcell good"/><text x="358" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">40</text>
+  <circle cx="402" cy="258" r="13" class="dcell good"/><text x="402" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">60</text>
+  <circle cx="428" cy="258" r="13" class="dcell hot"/><text x="428" y="262" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">80</text>
+
+  <text x="480" y="170" class="dtag-b">ครบ 7 ตัว ✅</text>
+  <text x="480" y="190" class="dtag">ตรวจด้วย in-order:</text>
+  <text x="480" y="208" class="dtag">20, 30, 40, 50,</text>
+  <text x="480" y="226" class="dtag">60, 70, 80 → เรียง ✅</text>
+  <text x="480" y="252" class="dtag">ต้นสมมาตรพอดี</text>
+  <text x="480" y="270" class="dtag">สูง = 2 (log พอดี)</text>
+</svg>
+<figcaption><b>สร้าง BST ทีละ insert</b> — เหลือง = node ใหม่ที่เพิ่งวาง (เดินซ้าย/ขวาตามกฎจนเจอช่องว่าง) · ต้นสุดท้ายสมมาตร สูง 2 ชั้น · in-order เรียงถูกต้อง</figcaption>
+</figure>
+<p><strong>ผลลัพธ์: 50(30(20, 40), 70(60, 80))</strong> — ลำดับนี้ได้ต้นสมมาตรพอดี (balanced โดยดวง) · ตรวจ in-order: 20,30,40,50,60,70,80 เรียง ✅</p>
 </div></details>
 <details class="sol"><summary>เฉลย (ข) searchIter — โครงคือ "เดินตามกฎจน null"</summary><div class="sol-body">
+<figure class="diagram">
+<svg viewBox="0 0 560 215" width="560" role="img" aria-label="searchIter trace visualization">
+  <defs><marker id="dArwP" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#d97706"/></marker></defs>
+  <text x="20" y="20" class="dtag-b">trace searchIter(60) — เดินทีละเปรียบเทียบ</text>
+  <line x1="171" y1="50" x2="251" y2="98" stroke="#d97706" stroke-width="2.4" marker-end="url(#dArwP)"/>
+  <line x1="251" y1="112" x2="222" y2="140" stroke="#d97706" stroke-width="2.4" marker-end="url(#dArwP)"/>
+  <circle cx="180" cy="42" r="17" class="dcell hot"/><text x="180" y="47" text-anchor="middle" class="dtxt">50</text>
+  <circle cx="100" cy="97" r="17" class="dcell"/><text x="100" y="102" text-anchor="middle" class="dtxt">30</text>
+  <circle cx="260" cy="97" r="17" class="dcell hot"/><text x="260" y="102" text-anchor="middle" class="dtxt">70</text>
+  <circle cx="60" cy="152" r="17" class="dcell"/><text x="60" y="157" text-anchor="middle" class="dtxt">20</text>
+  <circle cx="140" cy="152" r="17" class="dcell"/><text x="140" y="157" text-anchor="middle" class="dtxt">40</text>
+  <circle cx="220" cy="152" r="17" class="dcell good"/><text x="220" y="157" text-anchor="middle" class="dtxt">60</text>
+  <circle cx="300" cy="152" r="17" class="dcell"/><text x="300" y="157" text-anchor="middle" class="dtxt">80</text>
+  <line x1="91" y1="110" x2="66" y2="138" stroke="#94a3b8" stroke-width="1.5"/><line x1="109" y1="110" x2="134" y2="138" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="269" y1="110" x2="294" y2="138" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="370" y="55" class="dswap">60 &gt; 50 → cur = cur.right</text>
+  <text x="370" y="85" class="dswap">60 &lt; 70 → cur = cur.left</text>
+  <text x="370" y="115" class="dswap">60 == 60 → return cur ✅</text>
+  <text x="370" y="150" class="dtag">เจอใน 3 ครั้ง = O(h)</text>
+  <text x="370" y="168" class="dtag">h = ความสูงต้น (balanced → log n)</text>
+  <text x="370" y="196" class="dtag">ถ้าหา 25: 50→ซ้าย→30→ซ้าย→20,</text>
+  <text x="370" y="214" class="dtag">25 &gt; 20 → ขวา = null → return null</text>
+</svg>
+<figcaption><b>trace searchIter(60)</b> — เทียบที่ root แล้วเลี้ยวตามกฎ BST จนเจอ · เส้นส้มคือเส้นทางเดินของตัวแปร cur</figcaption>
+</figure>
 <pre><code>TreeNode <span class="fn">searchIter</span>(<span class="kw">int</span> key) {
   TreeNode cur = root;
   <span class="kw">while</span> (cur != <span class="kw">null</span>) {
@@ -448,34 +621,209 @@
 <figcaption>ลูกศรตามชั้น: 15 → 20 (ลูกขวา) → 25 (ลูกขวาต่อ) — เพิ่ง insert 25 แล้ว unbalanced</figcaption>
 </figure>
 <details class="sol"><summary>เฉลยทีละขั้น</summary><div class="sol-body">
+<figure class="diagram">
+<svg viewBox="0 0 720 240" width="720" role="img" aria-label="AVL rebalance visualization">
+  <text x="10" y="14" class="dtag-b">ก่อน: insert 25 แล้ว</text>
+  <line x1="91" y1="60" x2="55" y2="88" stroke="#94a3b8" stroke-width="1.6"/><line x1="109" y1="60" x2="146" y2="88" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="163" y1="110" x2="177" y2="132" stroke="#94a3b8" stroke-width="1.6"/><line x1="193" y1="155" x2="207" y2="177" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="100" cy="50" r="17" class="dcell"/><text x="100" y="55" text-anchor="middle" class="dtxt">10</text>
+  <circle cx="45" cy="100" r="17" class="dcell"/><text x="45" y="105" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="155" cy="100" r="17" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/><text x="155" y="105" text-anchor="middle" class="dtxt">15</text>
+  <circle cx="185" cy="145" r="17" class="dcell"/><text x="185" y="150" text-anchor="middle" class="dtxt">20</text>
+  <circle cx="215" cy="190" r="17" class="dcell hot"/><text x="215" y="195" text-anchor="middle" class="dtxt">25</text>
+  <text x="230" y="92" font-size="11.5" font-weight="700" fill="#dc2626">BF = −2 ❌</text>
+  <text x="245" y="140" class="dtag">BF = −1</text>
+  <text x="215" y="222" text-anchor="middle" class="dtag">ใบใหม่ h=0</text>
+  <text x="240" y="20" class="dtag">10: BF = −2 (หายหลังหมุน)</text>
+  <line x1="262" y1="120" x2="342" y2="120" stroke="#64748b" stroke-width="2" marker-end="url(#dArwH)"/>
+  <text x="302" y="100" text-anchor="middle" class="dswap">หมุนซ้ายที่ 15</text>
+  <text x="302" y="158" text-anchor="middle" class="dtag">(เคส RR — เดี่ยว)</text>
+  <text x="302" y="184" text-anchor="middle" class="dtag">20 ขึ้นแทน · 15 ลงซ้าย</text>
+
+  <text x="380" y="14" class="dtag-b">หลังหมุน ✅</text>
+  <line x1="471" y1="60" x2="435" y2="88" stroke="#94a3b8" stroke-width="1.6"/><line x1="489" y1="60" x2="526" y2="88" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="526" y1="110" x2="513" y2="132" stroke="#94a3b8" stroke-width="1.6"/><line x1="544" y1="110" x2="557" y2="132" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="480" cy="50" r="17" class="dcell good"/><text x="480" y="55" text-anchor="middle" class="dtxt">10</text>
+  <circle cx="425" cy="100" r="17" class="dcell good"/><text x="425" y="105" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="535" cy="100" r="17" class="dcell good"/><text x="535" y="105" text-anchor="middle" class="dtxt">20</text>
+  <circle cx="505" cy="145" r="17" class="dcell good"/><text x="505" y="150" text-anchor="middle" class="dtxt">15</text>
+  <circle cx="565" cy="145" r="17" class="dcell good"/><text x="565" y="150" text-anchor="middle" class="dtxt">25</text>
+  <text x="480" y="22" text-anchor="middle" class="dtag">BF −1 ✓</text>
+  <text x="600" y="95" class="dtag">BF 0 ✓</text>
+  <text x="452" y="140" class="dtag">BF 0 ✓</text>
+</svg>
+<figcaption><b>AVL rebalance</b> — insert 25 ทำให้ node 15 มี BF = −2 (เคส RR: เส้นทางขวา-ขวา) → หมุนซ้ายที่ 15 ครั้งเดียว 20 ขึ้นแทน แล้วทั้งต้นสมดุล</figcaption>
+</figure>
 <div class="steps">
-<div class="step"><span class="step-t">1. คำนวณ BF ทุก node บนเส้นทางของ 25</span>25: ใบ · 20: ใบ · 15: h(ซ้าย)=−1, h(ขวา)=1 → BF = −2 ❌ พังที่ <strong>15</strong>! · 10: h(5)=1 − h(15 subtree)=3 → BF = −2 — แต่หยุดแก้ที่ node ต่ำสุดที่พังก่อน (15)</div>
-<div class="step"><span class="step-t">2. หาเคส: เส้นทาง 15→20→25 ขวา-ขวา = เคส RR (นอก)</span>ลูกขวา (20) BF = −1 ≤ 0 ยืนยันเคสนอก</div>
-<div class="step"><span class="step-t">3. หมุนซ้ายที่ 15</span>20 ขึ้นเป็นหัว subtree: 20(15, 25) · 15 กลายเป็นลูกซ้ายของ 20</div>
-<div class="step"><span class="step-t">4. ต่อกลับกับแม่เดิม</span>10 ชี้ขวามาที่ 20 (แทนที่ 15 เดิม)</div>
+<div class="step"><span class="step-t">1. เดินขึ้นจากใบใหม่ (25) คำนวณ BF ทีละชั้น</span>15: h(ซ้าย)=−1, h(ขวา)=1 → BF = −2 ❌ พังที่ node ต่ำสุด = <strong>15</strong> (10 ตอนนี้ BF = −2 เหมือนกัน แต่จะหายเองหลังหมุนที่ 15)</div>
+<div class="step"><span class="step-t">2. หาเคสจาก 2 ก้าวสุดท้าย: 15→20→25 ขวา-ขวา = เคส RR (นอก)</span>ลูกขวา (20) BF = −1 ≤ 0 ยืนยันเคสนอก → หมุน<strong>ซ้าย</strong>ที่ 15 รอบเดียว</div>
+<div class="step"><span class="step-t">3. หมุน: 20 ขึ้นเป็นหัว subtree, 15 ลงเป็นลูกซ้ายของ 20</span>แล้วต่อกลับกับแม่เดิม: 10 ชี้ขวามาที่ 20 (แทนที่ 15 เดิม)</div>
+<div class="step"><span class="step-t">4. ตรวจซ้ำ</span>BF(10) = h(ซ้าย)−h(ขวา) = 0−1 = −1 ✓ · in-order: 5,10,15,20,25 เรียง ✅ · ทุก node |BF| ≤ 1</div>
 </div>
-<p><strong>ผลลัพธ์สุดท้าย:</strong> 10(5, 20(15, 25)) — เช็ค: BF(10)= 1−2 = −1 ✓, BF(20)=0 ✓, ทุก node |BF| ≤ 1 ✅ in-order: 5,10,15,20,25 เรียง ✅</p>
-<p class="small">ระวัง: ถ้าเส้นทางเป็น ขวา-ซ้าย ให้หมุนขวาที่ลูกก่อน (คู่) — ตาราง 4 เคสอยู่ใน <a href="avltree.html#rotations">บท AVL</a></p>
+<p><strong>ผลลัพธ์สุดท้าย: 10(5, 20(15, 25))</strong> — หมุนรอบเดียวจบ (insert ต้องหมุน ≤ 1 ชุดเสมอ)</p>
 </div></details>
 </div>
 
 <h2 id="drill-splay">✏️ Drill 5: Splay delete (Final 67)</h2>
 <div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: BST จาก insert 10, 5, 15, 3, 7, 12, 20 (10 เป็น root) — <b>delete 10</b> ด้วยวิธี Splay</div>
 <details class="sol"><summary>เฉลยทีละขั้น</summary><div class="sol-body">
-<p>โครง tree เริ่มต้น: 10(5(3, 7), 15(12, 20))</p>
-<div class="steps">
-<div class="step"><span class="step-t">1. search 10 + splay ขึ้น root</span>10 เป็น root อยู่แล้ว ข้ามได้</div>
-<div class="step"><span class="step-t">2. หา max ของ subtree ซ้าย (5(3,7)) = 7 แล้ว splay 7 ขึ้นหัว subtree ซ้าย</span>7 เป็นลูกขวาของ 5 (พ่อคือ root ของ subtree) → เคส Zig → หมุนซ้ายที่ 5 → subtree ซ้ายใหม่: <strong>7(5(3,−), −)</strong></div>
-<div class="step"><span class="step-t">3. root ใหม่ = 7 · ต่อ subtree ขวาเดิมไว้ลูกขวา</span>7(5(3,−), <strong>15(12, 20)</strong>) — ตัด 10 ทิ้ง จบ ✅</div>
-</div>
-<p><strong>ผลลัพธ์:</strong> 7(5(3, −), 15(12, 20)) — BST ยังถูกกฎ (5,7 &lt; 15 ฝั่งขวา ยัง &gt; 7 ทั้งก้อน ✓)</p>
+<figure class="diagram">
+<svg viewBox="0 0 780 245" width="780" role="img" aria-label="Splay delete visualization">
+  <defs><marker id="dArwZ" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#64748b"/></marker></defs>
+  <text x="10" y="14" class="dtag-b">1) splay 10 ขึ้น root — อยู่แล้ว ข้าม</text>
+  <line x1="112" y1="60" x2="68" y2="88" stroke="#94a3b8" stroke-width="1.6"/><line x1="128" y1="60" x2="172" y2="88" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="53" y1="110" x2="37" y2="138" stroke="#94a3b8" stroke-width="1.6"/><line x1="67" y1="110" x2="83" y2="138" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="173" y1="110" x2="157" y2="138" stroke="#94a3b8" stroke-width="1.6"/><line x1="187" y1="110" x2="203" y2="138" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="120" cy="50" r="16" class="dbad"/><text x="120" y="55" text-anchor="middle" class="dtxt">10</text>
+  <circle cx="60" cy="100" r="16" class="dcell"/><text x="60" y="105" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="180" cy="100" r="16" class="dcell"/><text x="180" y="105" text-anchor="middle" class="dtxt">15</text>
+  <circle cx="30" cy="150" r="16" class="dcell"/><text x="30" y="155" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="90" cy="150" r="16" fill="#fffdf5" stroke="#d97706" stroke-width="2.4"/><text x="90" y="155" text-anchor="middle" class="dtxt">7</text>
+  <circle cx="150" cy="150" r="16" class="dcell"/><text x="150" y="155" text-anchor="middle" class="dtxt">12</text>
+  <circle cx="210" cy="150" r="16" class="dcell"/><text x="210" y="155" text-anchor="middle" class="dtxt">20</text>
+  <text x="120" y="195" text-anchor="middle" class="dtag">max ฝั่งซ้าย = 7 (วงส้ม) → splay ขึ้น</text>
+  <line x1="248" y1="120" x2="272" y2="120" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwZ)"/>
+
+  <text x="280" y="14" class="dtag-b">2) Zig: หมุนซ้ายที่ 5 → 7 ขึ้นหัว</text>
+  <line x1="347" y1="90" x2="326" y2="113" stroke="#94a3b8" stroke-width="1.6"/><line x1="367" y1="90" x2="382" y2="113" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="340" cy="80" r="16" class="dcell"/><text x="340" y="85" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="310" cy="125" r="16" class="dcell"/><text x="310" y="130" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="375" cy="125" r="16" fill="#fffdf5" stroke="#d97706" stroke-width="2.4"/><text x="375" y="130" text-anchor="middle" class="dtxt">7</text>
+  <line x1="405" y1="100" x2="433" y2="100" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwZ)"/>
+  <circle cx="490" cy="80" r="16" class="dcell hot"/><text x="490" y="85" text-anchor="middle" class="dtxt">7</text>
+  <circle cx="455" cy="125" r="16" class="dcell"/><text x="455" y="130" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="420" cy="170" r="16" class="dcell"/><text x="420" y="175" text-anchor="middle" class="dtxt">3</text>
+  <line x1="483" y1="93" x2="462" y2="113" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="448" y1="138" x2="427" y2="158" stroke="#94a3b8" stroke-width="1.6"/>
+  <text x="430" y="215" text-anchor="middle" class="dtag">subtree ซ้ายใหม่: 7(5(3,−), −)</text>
+
+  <text x="550" y="14" class="dtag-b">3) root ใหม่ = 7 + ต่อขวาเดิม (15) ใต้ 7</text>
+  <line x1="652" y1="65" x2="608" y2="93" stroke="#94a3b8" stroke-width="1.6"/><line x1="668" y1="65" x2="712" y2="93" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="593" y1="115" x2="577" y2="143" stroke="#94a3b8" stroke-width="1.6"/>
+  <line x1="713" y1="115" x2="697" y2="143" stroke="#94a3b8" stroke-width="1.6"/><line x1="727" y1="115" x2="743" y2="143" stroke="#94a3b8" stroke-width="1.6"/>
+  <circle cx="660" cy="55" r="16" class="dcell good"/><text x="660" y="60" text-anchor="middle" class="dtxt">7</text>
+  <circle cx="600" cy="105" r="16" class="dcell"/><text x="600" y="110" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="720" cy="105" r="16" class="dcell"/><text x="720" y="110" text-anchor="middle" class="dtxt">15</text>
+  <circle cx="570" cy="155" r="16" class="dcell"/><text x="570" y="160" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="690" cy="155" r="16" class="dcell"/><text x="690" y="160" text-anchor="middle" class="dtxt">12</text>
+  <circle cx="750" cy="155" r="16" class="dcell"/><text x="750" y="160" text-anchor="middle" class="dtxt">20</text>
+  <text x="660" y="200" text-anchor="middle" class="dtag">ตัด 10 ทิ้ง · BST ยังถูกกฎ ✅</text>
+</svg>
+<figcaption><b>Splay delete 10</b> — splay ตัวที่ลบขึ้น root → splay max ฝั่งซ้าย (7) ขึ้นหัว subtree ซ้าย → root ใหม่คือ 7 โดย subtree ขวาเดิม (15) แขวนลูกขวาต่อ</figcaption>
+</figure>
+<p><strong>ผลลัพธ์: 7(5(3, −), 15(12, 20))</strong> — BST ยังถูกกฎ (ทุกตัวซ้าย ≤ 7 ≤ ทุกตัวขวา ✓)</p>
 <p class="small">ทำไม max ของซ้าย? เพราะมันคือ "ค่าใหญ่สุดฝั่งซ้าย" = ใกล้ค่าที่ลบที่สุด ต่อเข้าเป็น root ใหม่แล้ว ทุกตัวซ้าย ≤ มัน ≤ ทุกตัวขวา กฎ BST ไม่พัง</p>
 </div></details>
 </div>
 <h2 id="drill-kruskal">✏️ Drill 6: Kruskal MST (Final 66)</h2>
 <div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: จุด {1,2,3,4,5} เส้น: 1–2 (2), 1–3 (3), 2–3 (4), 3–4 (5), 3–5 (6), 4–5 (7), 2–5 (8) — แสดงขั้นตอน Kruskal</div>
 <details class="sol"><summary>เฉลย: ตารางเรียงเส้น + Union-Find</summary><div class="sol-body">
-<p>เรียงเส้นตามน้ำหนัก: 1–2(2), 1–3(3), 2–3(4), 3–4(5), 3–5(6), 4–5(7), 2–5(8)</p>
+<figure class="diagram">
+<svg viewBox="0 0 830 510" width="830" role="img" aria-label="Kruskal step visualization">
+  <text x="20" y="16" class="dtag-b">Kruskal ทีละเส้น (เรียงตามน้ำหนัก) — เขียว = รับแล้ว · แดงประ = ทิ้งเพราะสร้างวง</text>
+  <g transform="translate(0,35)">
+    <text x="130" y="-6" text-anchor="middle" class="dtag-b">เริ่ม: ทุกจุดเป็นกลุ่มตัวเอง</text>
+    <line x1="50" y1="75" x2="150" y2="30" stroke="#cbd5e1" stroke-width="1.5"/><text x="95" y="45" text-anchor="middle" class="dtag">2</text>
+    <line x1="50" y1="75" x2="230" y2="80" stroke="#cbd5e1" stroke-width="1.5"/><text x="135" y="70" text-anchor="middle" class="dtag">3</text>
+    <line x1="150" y1="30" x2="230" y2="80" stroke="#cbd5e1" stroke-width="1.5"/><text x="196" y="48" text-anchor="middle" class="dtag">4</text>
+    <line x1="230" y1="80" x2="190" y2="160" stroke="#cbd5e1" stroke-width="1.5"/><text x="224" y="122" text-anchor="middle" class="dtag">5</text>
+    <line x1="230" y1="80" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="162" y="118" text-anchor="middle" class="dtag">6</text>
+    <line x1="190" y1="160" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="138" y="174" text-anchor="middle" class="dtag">7</text>
+    <line x1="150" y1="30" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="98" y="100" text-anchor="middle" class="dtag">8</text>
+    <circle cx="50" cy="75" r="15" class="dcell"/><text x="50" y="80" text-anchor="middle" class="dtxt">1</text>
+    <circle cx="150" cy="30" r="15" class="dcell"/><text x="150" y="35" text-anchor="middle" class="dtxt">2</text>
+    <circle cx="230" cy="80" r="15" class="dcell"/><text x="230" y="85" text-anchor="middle" class="dtxt">3</text>
+    <circle cx="190" cy="160" r="15" class="dcell"/><text x="190" y="165" text-anchor="middle" class="dtxt">4</text>
+    <circle cx="80" cy="170" r="15" class="dcell"/><text x="80" y="175" text-anchor="middle" class="dtxt">5</text>
+    <text x="130" y="210" text-anchor="middle" class="dtag">กลุ่ม: {1} {2} {3} {4} {5}</text>
+  </g>
+  <g transform="translate(280,35)">
+    <text x="130" y="-6" text-anchor="middle" class="dtag-b">เส้นที่ 1: รับ 1–2 (2) ✓</text>
+    <line x1="50" y1="75" x2="150" y2="30" stroke="#16a34a" stroke-width="3"/><text x="95" y="45" text-anchor="middle" class="dtag">2</text>
+    <line x1="50" y1="75" x2="230" y2="80" stroke="#cbd5e1" stroke-width="1.5"/><text x="135" y="70" text-anchor="middle" class="dtag">3</text>
+    <line x1="150" y1="30" x2="230" y2="80" stroke="#cbd5e1" stroke-width="1.5"/><text x="196" y="48" text-anchor="middle" class="dtag">4</text>
+    <line x1="230" y1="80" x2="190" y2="160" stroke="#cbd5e1" stroke-width="1.5"/><text x="224" y="122" text-anchor="middle" class="dtag">5</text>
+    <line x1="230" y1="80" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="162" y="118" text-anchor="middle" class="dtag">6</text>
+    <line x1="190" y1="160" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="138" y="174" text-anchor="middle" class="dtag">7</text>
+    <line x1="150" y1="30" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="98" y="100" text-anchor="middle" class="dtag">8</text>
+    <circle cx="50" cy="75" r="15" class="dcell"/><text x="50" y="80" text-anchor="middle" class="dtxt">1</text>
+    <circle cx="150" cy="30" r="15" class="dcell"/><text x="150" y="35" text-anchor="middle" class="dtxt">2</text>
+    <circle cx="230" cy="80" r="15" class="dcell"/><text x="230" y="85" text-anchor="middle" class="dtxt">3</text>
+    <circle cx="190" cy="160" r="15" class="dcell"/><text x="190" y="165" text-anchor="middle" class="dtxt">4</text>
+    <circle cx="80" cy="170" r="15" class="dcell"/><text x="80" y="175" text-anchor="middle" class="dtxt">5</text>
+    <text x="130" y="210" text-anchor="middle" class="dtag">กลุ่ม: {1,2} · {3} · {4} · {5}</text>
+  </g>
+  <g transform="translate(560,35)">
+    <text x="130" y="-6" text-anchor="middle" class="dtag-b">เส้นที่ 2: รับ 1–3 (3) ✓</text>
+    <line x1="50" y1="75" x2="150" y2="30" stroke="#16a34a" stroke-width="3"/><text x="95" y="45" text-anchor="middle" class="dtag">2</text>
+    <line x1="50" y1="75" x2="230" y2="80" stroke="#16a34a" stroke-width="3"/><text x="135" y="70" text-anchor="middle" class="dtag">3</text>
+    <line x1="150" y1="30" x2="230" y2="80" stroke="#cbd5e1" stroke-width="1.5"/><text x="196" y="48" text-anchor="middle" class="dtag">4</text>
+    <line x1="230" y1="80" x2="190" y2="160" stroke="#cbd5e1" stroke-width="1.5"/><text x="224" y="122" text-anchor="middle" class="dtag">5</text>
+    <line x1="230" y1="80" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="162" y="118" text-anchor="middle" class="dtag">6</text>
+    <line x1="190" y1="160" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="138" y="174" text-anchor="middle" class="dtag">7</text>
+    <line x1="150" y1="30" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="98" y="100" text-anchor="middle" class="dtag">8</text>
+    <circle cx="50" cy="75" r="15" class="dcell"/><text x="50" y="80" text-anchor="middle" class="dtxt">1</text>
+    <circle cx="150" cy="30" r="15" class="dcell"/><text x="150" y="35" text-anchor="middle" class="dtxt">2</text>
+    <circle cx="230" cy="80" r="15" class="dcell"/><text x="230" y="85" text-anchor="middle" class="dtxt">3</text>
+    <circle cx="190" cy="160" r="15" class="dcell"/><text x="190" y="165" text-anchor="middle" class="dtxt">4</text>
+    <circle cx="80" cy="170" r="15" class="dcell"/><text x="80" y="175" text-anchor="middle" class="dtxt">5</text>
+    <text x="130" y="210" text-anchor="middle" class="dtag">กลุ่ม: {1,2,3} · {4} · {5}</text>
+  </g>
+  <g transform="translate(0,275)">
+    <text x="130" y="-6" text-anchor="middle" class="dtag-b">เส้นที่ 3: ทิ้ง 2–3 (4) ✗</text>
+    <line x1="50" y1="75" x2="150" y2="30" stroke="#16a34a" stroke-width="3"/><text x="95" y="45" text-anchor="middle" class="dtag">2</text>
+    <line x1="50" y1="75" x2="230" y2="80" stroke="#16a34a" stroke-width="3"/><text x="135" y="70" text-anchor="middle" class="dtag">3</text>
+    <line x1="150" y1="30" x2="230" y2="80" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="5 4"/><text x="196" y="48" text-anchor="middle" class="dtag">4</text>
+    <text x="196" y="62" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">✗ วง!</text>
+    <line x1="230" y1="80" x2="190" y2="160" stroke="#cbd5e1" stroke-width="1.5"/><text x="224" y="122" text-anchor="middle" class="dtag">5</text>
+    <line x1="230" y1="80" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="162" y="118" text-anchor="middle" class="dtag">6</text>
+    <line x1="190" y1="160" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="138" y="174" text-anchor="middle" class="dtag">7</text>
+    <line x1="150" y1="30" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="98" y="100" text-anchor="middle" class="dtag">8</text>
+    <circle cx="50" cy="75" r="15" class="dcell"/><text x="50" y="80" text-anchor="middle" class="dtxt">1</text>
+    <circle cx="150" cy="30" r="15" class="dcell"/><text x="150" y="35" text-anchor="middle" class="dtxt">2</text>
+    <circle cx="230" cy="80" r="15" class="dcell"/><text x="230" y="85" text-anchor="middle" class="dtxt">3</text>
+    <circle cx="190" cy="160" r="15" class="dcell"/><text x="190" y="165" text-anchor="middle" class="dtxt">4</text>
+    <circle cx="80" cy="170" r="15" class="dcell"/><text x="80" y="175" text-anchor="middle" class="dtxt">5</text>
+    <text x="130" y="210" text-anchor="middle" class="dtag">2–3 จบสองข้างกลุ่มเดียวกัน (find เท่ากัน)</text>
+    <text x="130" y="226" text-anchor="middle" class="dtag">→ รับจะสร้างวง → ทิ้ง · กลุ่มยัง {1,2,3} · {4} · {5}</text>
+  </g>
+  <g transform="translate(280,275)">
+    <text x="130" y="-6" text-anchor="middle" class="dtag-b">เส้นที่ 4: รับ 3–4 (5) ✓</text>
+    <line x1="50" y1="75" x2="150" y2="30" stroke="#16a34a" stroke-width="3"/><text x="95" y="45" text-anchor="middle" class="dtag">2</text>
+    <line x1="50" y1="75" x2="230" y2="80" stroke="#16a34a" stroke-width="3"/><text x="135" y="70" text-anchor="middle" class="dtag">3</text>
+    <line x1="150" y1="30" x2="230" y2="80" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="5 4"/><text x="196" y="48" text-anchor="middle" class="dtag">4</text>
+    <line x1="230" y1="80" x2="190" y2="160" stroke="#16a34a" stroke-width="3"/><text x="224" y="122" text-anchor="middle" class="dtag">5</text>
+    <line x1="230" y1="80" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="162" y="118" text-anchor="middle" class="dtag">6</text>
+    <line x1="190" y1="160" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="138" y="174" text-anchor="middle" class="dtag">7</text>
+    <line x1="150" y1="30" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="98" y="100" text-anchor="middle" class="dtag">8</text>
+    <circle cx="50" cy="75" r="15" class="dcell"/><text x="50" y="80" text-anchor="middle" class="dtxt">1</text>
+    <circle cx="150" cy="30" r="15" class="dcell"/><text x="150" y="35" text-anchor="middle" class="dtxt">2</text>
+    <circle cx="230" cy="80" r="15" class="dcell"/><text x="230" y="85" text-anchor="middle" class="dtxt">3</text>
+    <circle cx="190" cy="160" r="15" class="dcell"/><text x="190" y="165" text-anchor="middle" class="dtxt">4</text>
+    <circle cx="80" cy="170" r="15" class="dcell"/><text x="80" y="175" text-anchor="middle" class="dtxt">5</text>
+    <text x="130" y="210" text-anchor="middle" class="dtag">กลุ่ม: {1,2,3,4} · {5}</text>
+  </g>
+  <g transform="translate(560,275)">
+    <text x="130" y="-6" text-anchor="middle" class="dtag-b">เส้นที่ 5: รับ 3–5 (6) → จบ!</text>
+    <line x1="50" y1="75" x2="150" y2="30" stroke="#16a34a" stroke-width="3"/><text x="95" y="45" text-anchor="middle" class="dtag">2</text>
+    <line x1="50" y1="75" x2="230" y2="80" stroke="#16a34a" stroke-width="3"/><text x="135" y="70" text-anchor="middle" class="dtag">3</text>
+    <line x1="150" y1="30" x2="230" y2="80" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="5 4"/><text x="196" y="48" text-anchor="middle" class="dtag">4</text>
+    <line x1="230" y1="80" x2="190" y2="160" stroke="#16a34a" stroke-width="3"/><text x="224" y="122" text-anchor="middle" class="dtag">5</text>
+    <line x1="230" y1="80" x2="80" y2="170" stroke="#16a34a" stroke-width="3"/><text x="162" y="118" text-anchor="middle" class="dtag">6</text>
+    <line x1="190" y1="160" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="138" y="174" text-anchor="middle" class="dtag">7</text>
+    <line x1="150" y1="30" x2="80" y2="170" stroke="#cbd5e1" stroke-width="1.5"/><text x="98" y="100" text-anchor="middle" class="dtag">8</text>
+    <circle cx="50" cy="75" r="15" class="dcell"/><text x="50" y="80" text-anchor="middle" class="dtxt">1</text>
+    <circle cx="150" cy="30" r="15" class="dcell"/><text x="150" y="35" text-anchor="middle" class="dtxt">2</text>
+    <circle cx="230" cy="80" r="15" class="dcell"/><text x="230" y="85" text-anchor="middle" class="dtxt">3</text>
+    <circle cx="190" cy="160" r="15" class="dcell"/><text x="190" y="165" text-anchor="middle" class="dtxt">4</text>
+    <circle cx="80" cy="170" r="15" class="dcell"/><text x="80" y="175" text-anchor="middle" class="dtxt">5</text>
+    <text x="130" y="210" text-anchor="middle" class="dtag-b">ครบ 4 เส้น = 5−1 → MST รวม 16 ✅</text>
+    <text x="130" y="226" text-anchor="middle" class="dtag">กลุ่มเดียว: {1,2,3,4,5} — เส้นที่เหลือไม่ต้องดูต่อ</text>
+  </g>
+</svg>
+<figcaption><b>Kruskal ทีละเส้น</b> — เรียงเส้นตามน้ำหนักแล้วไล่ดู: จบสองข้างคนละกลุ่ม = รับ (เขียว, แล้ว union) · กลุ่มเดียวกัน = ทิ้ง (แดง, จะสร้างวง) จนครบ V−1 เส้น</figcaption>
+</figure>
+<p>เรียงเส้นตามน้ำหนัก: 1–2(2), 1–3(3), 2–3(4), 3–4(5), 3–5(6), 4–5(7), 2–5(8) — ตารางด้านล่างคือรูปแบบที่ควรเขียนในข้อสอบ:</p>
 <table>
 <thead><tr><th class="num">รอบ</th><th>เส้น</th><th>ตรวจกลุ่ม (find)</th><th>ตัดสิน</th><th>กลุ่มหลัง union</th></tr></thead>
 <tbody>
@@ -512,6 +860,51 @@
 <figcaption>กราฟมีทิศตามลูกศร (A→B ฯลฯ) เริ่มหาจาก A</figcaption>
 </figure>
 <details class="sol"><summary>เฉลย: ตาราง trace</summary><div class="sol-body">
+<figure class="diagram">
+<svg viewBox="0 0 780 250" width="780" role="img" aria-label="Dijkstra visualization">
+  <defs><marker id="dArwD" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#94a3b8"/></marker></defs>
+  <text x="10" y="14" class="dtag-b">รอบ 1: pop (0, A) → ผ่อนเพื่อนบ้าน (relax)</text>
+  <line x1="68" y1="68" x2="172" y2="47" stroke="#d97706" stroke-width="2.4" marker-end="url(#dArwD)"/><text x="115" y="44" text-anchor="middle" class="dtag">10</text>
+  <line x1="60" y1="93" x2="100" y2="148" stroke="#d97706" stroke-width="2.4" marker-end="url(#dArwD)"/><text x="66" y="126" text-anchor="middle" class="dtag">3</text>
+  <line x1="118" y1="150" x2="180" y2="58" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="140" y="105" text-anchor="middle" class="dtag">4</text>
+  <line x1="208" y1="38" x2="282" y2="46" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="245" y="30" text-anchor="middle" class="dtag">2</text>
+  <line x1="125" y1="152" x2="283" y2="62" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="215" y="118" text-anchor="middle" class="dtag">8</text>
+  <line x1="205" y1="55" x2="340" y2="148" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="280" y="95" text-anchor="middle" class="dtag">5</text>
+  <line x1="305" y1="68" x2="345" y2="142" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="338" y="105" text-anchor="middle" class="dtag">7</text>
+  <circle cx="50" cy="75" r="18" class="dcell good"/><text x="50" y="80" text-anchor="middle" class="dtxt">A</text>
+  <circle cx="190" cy="40" r="18" class="dcell"/><text x="190" y="45" text-anchor="middle" class="dtxt">B</text>
+  <circle cx="110" cy="165" r="18" class="dcell"/><text x="110" y="170" text-anchor="middle" class="dtxt">C</text>
+  <circle cx="300" cy="50" r="18" class="dcell"/><text x="300" y="55" text-anchor="middle" class="dtxt">D</text>
+  <circle cx="350" cy="160" r="18" class="dcell"/><text x="350" y="165" text-anchor="middle" class="dtxt">E</text>
+  <rect x="23" y="98" width="54" height="18" rx="6" fill="#f0fdf4" stroke="#16a34a"/><text x="50" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">dist 0</text>
+  <rect x="163" y="63" width="54" height="18" rx="6" class="dchip"/><text x="190" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">dist 10</text>
+  <rect x="83" y="188" width="54" height="18" rx="6" class="dchip"/><text x="110" y="201" text-anchor="middle" font-size="11" font-weight="700" fill="#92400e">dist 3</text>
+  <rect x="273" y="73" width="54" height="18" rx="6" class="dcell"/><text x="300" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">dist ∞</text>
+  <rect x="323" y="183" width="54" height="18" rx="6" class="dcell"/><text x="350" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="#1e293b">dist ∞</text>
+  <text x="10" y="235" class="dtag">เหลือง = เพิ่ง relax สำเร็จ · alt = dist[u] + w &lt; dist[v] → อัปเดต dist + prev + push คิว</text>
+
+  <text x="410" y="14" class="dtag-b">จบ: dist สุดท้าย + ต้นไม้เส้นทาง (เขียว = prev)</text>
+  <line x1="468" y1="68" x2="572" y2="47" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="515" y="44" text-anchor="middle" class="dtag">10</text>
+  <line x1="460" y1="93" x2="500" y2="148" stroke="#16a34a" stroke-width="2.6" marker-end="url(#dArwD)"/><text x="466" y="126" text-anchor="middle" class="dtag">3</text>
+  <line x1="518" y1="150" x2="580" y2="58" stroke="#16a34a" stroke-width="2.6" marker-end="url(#dArwD)"/><text x="540" y="105" text-anchor="middle" class="dtag">4</text>
+  <line x1="608" y1="38" x2="682" y2="46" stroke="#16a34a" stroke-width="2.6" marker-end="url(#dArwD)"/><text x="645" y="30" text-anchor="middle" class="dtag">2</text>
+  <line x1="525" y1="152" x2="683" y2="62" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="615" y="118" text-anchor="middle" class="dtag">8</text>
+  <line x1="605" y1="55" x2="740" y2="148" stroke="#16a34a" stroke-width="2.6" marker-end="url(#dArwD)"/><text x="680" y="95" text-anchor="middle" class="dtag">5</text>
+  <line x1="705" y1="68" x2="745" y2="142" stroke="#cbd5e1" stroke-width="1.5" marker-end="url(#dArwD)"/><text x="738" y="105" text-anchor="middle" class="dtag">7</text>
+  <circle cx="450" cy="75" r="18" class="dcell good"/><text x="450" y="80" text-anchor="middle" class="dtxt">A</text>
+  <circle cx="590" cy="40" r="18" class="dcell good"/><text x="590" y="45" text-anchor="middle" class="dtxt">B</text>
+  <circle cx="510" cy="165" r="18" class="dcell good"/><text x="510" y="170" text-anchor="middle" class="dtxt">C</text>
+  <circle cx="700" cy="50" r="18" class="dcell good"/><text x="700" y="55" text-anchor="middle" class="dtxt">D</text>
+  <circle cx="750" cy="160" r="18" class="dcell good"/><text x="750" y="165" text-anchor="middle" class="dtxt">E</text>
+  <rect x="423" y="98" width="54" height="18" rx="6" fill="#f0fdf4" stroke="#16a34a"/><text x="450" y="111" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">dist 0</text>
+  <rect x="563" y="63" width="54" height="18" rx="6" fill="#f0fdf4" stroke="#16a34a"/><text x="590" y="76" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">dist 7</text>
+  <rect x="483" y="188" width="54" height="18" rx="6" fill="#f0fdf4" stroke="#16a34a"/><text x="510" y="201" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">dist 3</text>
+  <rect x="673" y="73" width="54" height="18" rx="6" fill="#f0fdf4" stroke="#16a34a"/><text x="700" y="86" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">dist 9</text>
+  <rect x="723" y="183" width="54" height="18" rx="6" fill="#f0fdf4" stroke="#16a34a"/><text x="750" y="196" text-anchor="middle" font-size="11" font-weight="700" fill="#14532d">dist 12</text>
+  <text x="410" y="235" class="dtag">ไป E: A→C→B→E = 3+4+5 = 12 ✓ — A→B ตรง ๆ = 10 แพงกว่าเส้นอ้อม!</text>
+</svg>
+<figcaption><b>Dijkstra ทีละขั้น</b> — ซ้าย: pop A แล้ว relax เพื่อนบ้าน (เหลือง) · ขวา: ผลลัพธ์สุดท้าย dist ทุกจุด + เส้นเขียวคือ shortest-path tree จาก prev</figcaption>
+</figure>
 <table>
 <thead><tr><th class="num">รอบ</th><th>pop</th><th>ผ่อนเส้น (relax)</th><th class="num">A</th><th class="num">B</th><th class="num">C</th><th class="num">D</th><th class="num">E</th></tr></thead>
 <tbody>

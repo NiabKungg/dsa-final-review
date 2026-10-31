@@ -374,6 +374,27 @@ TreeNode <span class="fn">searchRecurse</span>(<span class="kw">int</span> d, Tr
 <p>กำหนด BST สร้างจาก <code>{5, 3, 8, 2, 4, 7, 9}</code> — เขียน <code>findMax(bst)</code> คืนค่ามากสุด (เฉลย 9)</p>
 <details class="sol"><summary>เฉลย</summary><div class="sol-body">
 <p>กฎของ BST บอกว่า "ค่ามากสุด = node ที่วิ่ง<strong>ขวา</strong>ไปสุด" (แค่ไหนก็ขวาจนหลุด) — ไม่ต้อง traverse ทั้งต้นเลย:</p>
+<figure class="diagram">
+<svg viewBox="0 0 560 205" width="560" role="img" aria-label="findMax walk visualization">
+  <defs><marker id="dArwF" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#d97706"/></marker></defs>
+  <line x1="131" y1="59" x2="168" y2="96" stroke="#d97706" stroke-width="2.4" marker-end="url(#dArwF)"/>
+  <line x1="190" y1="114" x2="202" y2="148" stroke="#d97706" stroke-width="2.4" marker-end="url(#dArwF)"/>
+  <circle cx="120" cy="50" r="17" class="dcell hot"/><text x="120" y="55" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="60" cy="105" r="17" class="dcell"/><text x="60" y="110" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="180" cy="105" r="17" class="dcell hot"/><text x="180" y="110" text-anchor="middle" class="dtxt">8</text>
+  <circle cx="30" cy="160" r="17" class="dcell"/><text x="30" y="165" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="90" cy="160" r="17" class="dcell"/><text x="90" y="165" text-anchor="middle" class="dtxt">4</text>
+  <circle cx="150" cy="160" r="17" class="dcell"/><text x="150" y="165" text-anchor="middle" class="dtxt">7</text>
+  <circle cx="210" cy="160" r="17" class="dcell good"/><text x="210" y="165" text-anchor="middle" class="dtxt">9</text>
+  <text x="300" y="48" class="dswap">เริ่มที่ root (5)</text>
+  <text x="300" y="76" class="dswap">5 มีลูกขวา → node = node.right</text>
+  <text x="300" y="104" class="dswap">8 มีลูกขวา → ขวาต่อ</text>
+  <text x="300" y="132" class="dswap">9 ไม่มีลูกขวา = max ✅</text>
+  <text x="300" y="162" class="dtag">ว่างลูปทันที → return 9</text>
+  <text x="300" y="186" class="dtag">เดิน 2 ครั้งจบ = O(h)</text>
+</svg>
+<figcaption><b>findMax = วิ่งขวาจนสุด</b> — ลูกศรส้มคือเส้นทางของ node ใน while loop · ตัวสุดท้ายที่ไปต่อขวาไม่ได้คือค่ามากสุด</figcaption>
+</figure>
 <pre><code><span class="kw">private static int</span> <span class="fn">findMax</span>(MyBST_Basic bst) {
   Node node = bst.root;
   <span class="kw">if</span> (node == <span class="kw">null</span>) <span class="kw">return</span> -1;          <span class="cm">// tree ว่าง</span>
@@ -394,6 +415,32 @@ TreeNode <span class="fn">searchRecurse</span>(<span class="kw">int</span> d, Tr
   <span class="kw">return</span> node.val + <span class="fn">rangeSumBST</span>(node.left, low, high)              <span class="cm">/*D*/ อยู่ในช่วง → นับ + สองฝั่งยังอาจมีของในช่วง</span>
                   + <span class="fn">rangeSumBST</span>(node.right, low, high);
 }</code></pre>
+<figure class="diagram">
+<svg viewBox="0 0 700 235" width="700" role="img" aria-label="rangeSumBST visualization">
+  <defs><marker id="dArwR" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#d97706"/></marker></defs>
+  <text x="20" y="20" class="dtag-b">trace rangeSumBST(root, 4, 8) — เขียว = นับ, เหลือง = ตัดทาง, จาง = ไม่ถูกเยือน</text>
+  <line x1="142" y1="60" x2="88" y2="98" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="158" y1="60" x2="212" y2="98" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="72" y1="120" x2="52" y2="156" stroke="#dc2626" stroke-width="1.8" stroke-dasharray="5 4"/>
+  <line x1="88" y1="120" x2="108" y2="156" stroke="#94a3b8" stroke-width="1.5"/>
+  <line x1="212" y1="120" x2="192" y2="156" stroke="#94a3b8" stroke-width="1.5"/><line x1="228" y1="120" x2="248" y2="156" stroke="#94a3b8" stroke-width="1.5"/>
+  <circle cx="150" cy="50" r="17" class="dcell good"/><text x="150" y="55" text-anchor="middle" class="dtxt">5</text>
+  <circle cx="80" cy="110" r="17" class="dcell hot"/><text x="80" y="115" text-anchor="middle" class="dtxt">3</text>
+  <circle cx="220" cy="110" r="17" class="dcell good"/><text x="220" y="115" text-anchor="middle" class="dtxt">8</text>
+  <circle cx="45" cy="170" r="17" class="dcell" opacity="0.4"/><text x="45" y="175" text-anchor="middle" class="dtxt">2</text>
+  <circle cx="115" cy="170" r="17" class="dcell good"/><text x="115" y="175" text-anchor="middle" class="dtxt">4</text>
+  <circle cx="185" cy="170" r="17" class="dcell good"/><text x="185" y="175" text-anchor="middle" class="dtxt">7</text>
+  <circle cx="255" cy="170" r="17" class="dcell hot"/><text x="255" y="175" text-anchor="middle" class="dtxt">9</text>
+  <text x="40" y="145" text-anchor="middle" font-size="11" font-weight="700" fill="#dc2626">✗ ตัด</text>
+  <text x="340" y="50" class="dswap">5 ∈ [4,8] → นับ 5 + สองฝั่ง (D)</text>
+  <text x="340" y="86" class="dswap">3 &lt; low=4 → ซ้ายหมดตัด! ไปขวา (B)</text>
+  <text x="340" y="122" class="dswap">4 ∈ → นับ 4 (D) · 8 ∈ → นับ 8 (D)</text>
+  <text x="340" y="152" class="dswap">7 ∈ → นับ 7 (D)</text>
+  <text x="340" y="184" class="dswap">9 &gt; high=8 → ขวาตัด! ซ้าย = null → 0 (C)</text>
+  <text x="340" y="214" class="dtag-b">รวม 5 + 4 + 7 + 8 = 24 ✅ (2 ไม่ถูกนับ)</text>
+</svg>
+<figcaption><b>rangeSumBST ใช้กฎ BST ตัดทาง</b> — node &lt; low ปัดซ้ายทิ้ง (B), node &gt; high ปัดขวาทิ้ง (C), อยู่ในช่วง = นับแล้วลงสองฝั่ง (D) · node จาง ๆ คือ subtree ที่ไม่ถูกเยือนเลย</figcaption>
+</figure>
 <p>trace กับ BST {5,3,8,2,4,7,9} เรียก rangeSumBST(root,4,8) — ตามขั้นที่สไลด์เฉลย:</p>
 <ol>
 <li>node 5 → อยู่ในช่วง (เคส D) → 5 + sum(ซ้าย=3) + sum(ขวา=8)</li>

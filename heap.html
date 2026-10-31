@@ -419,16 +419,53 @@
 <li>ถ้าขนาด heap &gt; k → ทิ้ง root (ตัวเล็กสุด) ออก</li>
 <li>ตอบ = root (ถ้า heap ยังไม่เต็ม k ตัว ตอบตัวเล็กสุดที่มีอยู่ก่อน)</li>
 </ol>
-<p>ตัวอย่าง k = 3 กับคะแนน 60, 85, 70, 90, 75:</p>
-<table>
-<thead><tr><th>คะแนนเข้า</th><th>heap หลังจัด</th><th>ตอบ (อันดับ 3)</th></tr></thead>
-<tbody>
-<tr><td>60</td><td>{60}</td><td>—</td></tr>
-<tr><td>85</td><td>{60, 85}</td><td>—</td></tr>
-<tr><td>70</td><td>{60, 70, 85}</td><td><b>60</b></td></tr>
-<tr><td>90</td><td>{70, 85, 90} (ทิ้ง 60)</td><td><b>70</b></td></tr>
-<tr><td>75</td><td>{75, 85, 90} (ทิ้ง 70)</td><td><b>75</b></td></tr>
-</tbody></table>
+<p>ตัวอย่าง k = 3 กับคะแนน 60, 85, 70, 90, 75 — เหลือง = root (คำตอบ "อันดับ 3" ปัจจุบัน):</p>
+<figure class="diagram">
+<svg viewBox="0 0 970 170" width="970" role="img" aria-label="Kth highest score min heap visualization">
+  <g transform="translate(0,10)">
+    <text x="80" y="8" text-anchor="middle" class="dtag-b">รับ 60</text>
+    <circle cx="80" cy="40" r="15" class="dcell hot"/><text x="80" y="45" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">60</text>
+    <text x="80" y="122" text-anchor="middle" class="dtag">ยังไม่ครบ 3 ตัว</text>
+    <text x="80" y="138" text-anchor="middle" class="dtag">→ ยังไม่ตอบ</text>
+  </g>
+  <g transform="translate(190,10)">
+    <text x="80" y="8" text-anchor="middle" class="dtag-b">รับ 85</text>
+    <line x1="73" y1="50" x2="52" y2="74" stroke="#94a3b8" stroke-width="1.5"/>
+    <circle cx="80" cy="40" r="15" class="dcell"/><text x="80" y="45" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">60</text>
+    <circle cx="45" cy="85" r="15" class="dcell"/><text x="45" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">85</text>
+    <text x="80" y="122" text-anchor="middle" class="dtag">ยังไม่ครบ 3 ตัว</text>
+    <text x="80" y="138" text-anchor="middle" class="dtag">→ ยังไม่ตอบ</text>
+  </g>
+  <g transform="translate(380,10)">
+    <text x="80" y="8" text-anchor="middle" class="dtag-b">รับ 70 → ครบ k</text>
+    <line x1="73" y1="50" x2="52" y2="74" stroke="#94a3b8" stroke-width="1.5"/><line x1="87" y1="50" x2="108" y2="74" stroke="#94a3b8" stroke-width="1.5"/>
+    <circle cx="80" cy="40" r="15" class="dcell hot"/><text x="80" y="45" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">60</text>
+    <circle cx="45" cy="85" r="15" class="dcell"/><text x="45" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">70</text>
+    <circle cx="115" cy="85" r="15" class="dcell"/><text x="115" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">85</text>
+    <text x="80" y="122" text-anchor="middle" class="dtag-b">ตอบ = root = 60 ✅</text>
+    <text x="80" y="138" text-anchor="middle" class="dtag">(อันดับ 3 ปัจจุบัน)</text>
+  </g>
+  <g transform="translate(570,10)">
+    <text x="80" y="8" text-anchor="middle" class="dtag-b">รับ 90 → เกิน k ทิ้ง 60</text>
+    <line x1="73" y1="50" x2="52" y2="74" stroke="#94a3b8" stroke-width="1.5"/><line x1="87" y1="50" x2="108" y2="74" stroke="#94a3b8" stroke-width="1.5"/>
+    <circle cx="80" cy="40" r="15" class="dcell hot"/><text x="80" y="45" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">70</text>
+    <circle cx="45" cy="85" r="15" class="dcell"/><text x="45" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">85</text>
+    <circle cx="115" cy="85" r="15" class="dcell"/><text x="115" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">90</text>
+    <text x="80" y="122" text-anchor="middle" class="dtag-b">ตอบ = root = 70 ✅</text>
+    <text x="80" y="138" text-anchor="middle" class="dtag">(pop 60 ทิ้ง แล้วใส่ 90)</text>
+  </g>
+  <g transform="translate(760,10)">
+    <text x="80" y="8" text-anchor="middle" class="dtag-b">รับ 75 → ทิ้ง 70</text>
+    <line x1="73" y1="50" x2="52" y2="74" stroke="#94a3b8" stroke-width="1.5"/><line x1="87" y1="50" x2="108" y2="74" stroke="#94a3b8" stroke-width="1.5"/>
+    <circle cx="80" cy="40" r="15" class="dcell hot"/><text x="80" y="45" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">75</text>
+    <circle cx="45" cy="85" r="15" class="dcell"/><text x="45" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">85</text>
+    <circle cx="115" cy="85" r="15" class="dcell"/><text x="115" y="90" text-anchor="middle" font-size="11.5" font-weight="700" fill="#1e293b">90</text>
+    <text x="80" y="122" text-anchor="middle" class="dtag-b">ตอบ = root = 75 ✅</text>
+    <text x="80" y="138" text-anchor="middle" class="dtag">({75, 85, 90} = 3 ตัวใหญ่สุด)</text>
+  </g>
+</svg>
+<figcaption><b>min heap ขนาด k=3</b> — root เหลืองคือ "อันดับ 3" ปัจจุบันเสมอ · คะแนนใหม่ใส่ลง heap แล้วถ้าเกิน k ตัวให้ pop ตัวเล็กสุดทิ้ง</figcaption>
+</figure>
 <p>เวลาต่อคะแนนหนึ่งตัว = O(log k) — ทำไมใช้ max heap เก็บทุกตัวไม่ดีกว่าไหม? ได้แต่เปลือง: ต้องเก็บทุกคะแนน O(n) และตอบก็ยัง O(log n) — min heap k ตัวเก็บแค่ที่จำเป็น</p>
 </div></details>
 
