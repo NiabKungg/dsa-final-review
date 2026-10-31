@@ -83,26 +83,304 @@
 <div class="box exam"><div class="box-title"><span class="em">📝</span>โจทย์: ข้อมูล <b>[5, 1, 4, 2, 8]</b> — แสดงขั้นตอนละเอียดพร้อมผลลัพธ์สุดท้าย ของ (ก) Bubble (ข) Selection (ค) Insertion (ง) Quick</div>
 <p class="small">เคล็ด: เขียน array ใหม่ทุกครั้งที่สลับ/วาง + ระบุรอบ — อย่าลืม "รอบสุดท้ายที่ไม่มีการสลับ" ของ improved bubble</p>
 <details class="sol"><summary>เฉลย (ก) Bubble Sort</summary><div class="sol-body">
-<p>Pass 1: (5,1)สลับ → [1,5,4,2,8] · (5,4)สลับ → [1,4,5,2,8] · (5,2)สลับ → [1,4,2,5,8] · (5,8)ไม่สลับ → จบ pass: <strong>[1,4,2,5,8]</strong> (8 ล็อกท้าย)</p>
-<p>Pass 2: (1,4)ไม่สลับ · (4,2)สลับ → [1,2,4,5,8] · (4,5)ไม่สลับ → <strong>[1,2,4,5,8]</strong></p>
-<p>Pass 3: (1,2)ไม่สลับ · (2,4)ไม่สลับ → ไม่มีการสลับเลย → เรียงเสร็จ หยุด (improved) ✅</p>
-<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — รวม 7 เทียบ 5 สลับ</p>
+<figure class="diagram">
+<svg viewBox="0 0 1060 330" width="1060" role="img" aria-label="Bubble sort visualization">
+  <defs><marker id="dArwB" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#64748b"/></marker></defs>
+  <rect x="20" y="9" width="18" height="14" rx="3" class="dcell good"/><text x="44" y="21" class="dlegend">ล็อก/เรียงแล้ว</text>
+  <rect x="170" y="9" width="18" height="14" rx="3" class="dcell hot"/><text x="194" y="21" class="dlegend">กำลังเทียบ/สลับ</text>
+  <rect x="330" y="9" width="18" height="14" rx="3" class="dcell"/><text x="354" y="21" class="dlegend">ยังไม่ผ่าน</text>
+  <text x="490" y="21" class="dtag-b">ข้อมูล [5, 1, 4, 2, 8] · Ascending (น้อย → มาก)</text>
+
+  <text x="20" y="66" class="dtag-b">Pass 1</text>
+  <text x="20" y="82" class="dtag">เทียบ 4 คู่</text>
+  <rect x="140" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="156" y="69" text-anchor="middle" class="dtxt">5</text>
+  <rect x="176" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="192" y="69" text-anchor="middle" class="dtxt">1</text>
+  <rect x="212" y="48" width="32" height="30" rx="4" class="dcell"/><text x="228" y="69" text-anchor="middle" class="dtxt">4</text>
+  <rect x="248" y="48" width="32" height="30" rx="4" class="dcell"/><text x="264" y="69" text-anchor="middle" class="dtxt">2</text>
+  <rect x="284" y="48" width="32" height="30" rx="4" class="dcell"/><text x="300" y="69" text-anchor="middle" class="dtxt">8</text>
+  <line x1="319" y1="63" x2="347" y2="63" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwB)"/>
+  <text x="333" y="93" text-anchor="middle" class="dswap">สลับ 5↔1</text>
+  <rect x="350" y="48" width="32" height="30" rx="4" class="dcell"/><text x="366" y="69" text-anchor="middle" class="dtxt">1</text>
+  <rect x="386" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="402" y="69" text-anchor="middle" class="dtxt">5</text>
+  <rect x="422" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="438" y="69" text-anchor="middle" class="dtxt">4</text>
+  <rect x="458" y="48" width="32" height="30" rx="4" class="dcell"/><text x="474" y="69" text-anchor="middle" class="dtxt">2</text>
+  <rect x="494" y="48" width="32" height="30" rx="4" class="dcell"/><text x="510" y="69" text-anchor="middle" class="dtxt">8</text>
+  <line x1="529" y1="63" x2="557" y2="63" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwB)"/>
+  <text x="543" y="93" text-anchor="middle" class="dswap">สลับ 5↔4</text>
+  <rect x="560" y="48" width="32" height="30" rx="4" class="dcell"/><text x="576" y="69" text-anchor="middle" class="dtxt">1</text>
+  <rect x="596" y="48" width="32" height="30" rx="4" class="dcell"/><text x="612" y="69" text-anchor="middle" class="dtxt">4</text>
+  <rect x="632" y="48" width="32" height="30" rx="4" class="dcell"/><text x="648" y="69" text-anchor="middle" class="dtxt">5</text>
+  <rect x="668" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="684" y="69" text-anchor="middle" class="dtxt">2</text>
+  <rect x="704" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="720" y="69" text-anchor="middle" class="dtxt">8</text>
+  <line x1="739" y1="63" x2="767" y2="63" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwB)"/>
+  <text x="753" y="93" text-anchor="middle" class="dswap">สลับ 5↔2</text>
+  <rect x="770" y="48" width="32" height="30" rx="4" class="dcell"/><text x="786" y="69" text-anchor="middle" class="dtxt">1</text>
+  <rect x="806" y="48" width="32" height="30" rx="4" class="dcell"/><text x="822" y="69" text-anchor="middle" class="dtxt">4</text>
+  <rect x="842" y="48" width="32" height="30" rx="4" class="dcell"/><text x="858" y="69" text-anchor="middle" class="dtxt">2</text>
+  <rect x="878" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="894" y="69" text-anchor="middle" class="dtxt">5</text>
+  <rect x="914" y="48" width="32" height="30" rx="4" class="dcell hot"/><text x="930" y="69" text-anchor="middle" class="dtxt">8</text>
+  <rect x="912.5" y="46.5" width="35" height="33" rx="5" fill="none" stroke="#16a34a" stroke-width="2"/>
+  <text x="880" y="93" text-anchor="middle" class="dtag">5 ≤ 8 ผ่าน → 8 ล็อก 🔒</text>
+
+  <text x="20" y="150" class="dtag-b">Pass 2</text>
+  <text x="20" y="166" class="dtag">เทียบ 3 คู่</text>
+  <rect x="140" y="132" width="32" height="30" rx="4" class="dcell hot"/><text x="156" y="153" text-anchor="middle" class="dtxt">1</text>
+  <rect x="176" y="132" width="32" height="30" rx="4" class="dcell hot"/><text x="192" y="153" text-anchor="middle" class="dtxt">4</text>
+  <rect x="212" y="132" width="32" height="30" rx="4" class="dcell"/><text x="228" y="153" text-anchor="middle" class="dtxt">2</text>
+  <rect x="248" y="132" width="32" height="30" rx="4" class="dcell"/><text x="264" y="153" text-anchor="middle" class="dtxt">5</text>
+  <rect x="284" y="132" width="32" height="30" rx="4" class="dcell good"/><text x="300" y="153" text-anchor="middle" class="dtxt">8</text>
+  <text x="228" y="177" text-anchor="middle" class="dtag">1 ≤ 4 ผ่าน</text>
+  <line x1="319" y1="147" x2="347" y2="147" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwB)"/>
+  <text x="333" y="177" text-anchor="middle" class="dswap">สลับ 4↔2</text>
+  <rect x="350" y="132" width="32" height="30" rx="4" class="dcell"/><text x="366" y="153" text-anchor="middle" class="dtxt">1</text>
+  <rect x="386" y="132" width="32" height="30" rx="4" class="dcell hot"/><text x="402" y="153" text-anchor="middle" class="dtxt">2</text>
+  <rect x="422" y="132" width="32" height="30" rx="4" class="dcell hot"/><text x="438" y="153" text-anchor="middle" class="dtxt">4</text>
+  <rect x="458" y="132" width="32" height="30" rx="4" class="dcell"/><text x="474" y="153" text-anchor="middle" class="dtxt">5</text>
+  <rect x="494" y="132" width="32" height="30" rx="4" class="dcell good"/><text x="510" y="153" text-anchor="middle" class="dtxt">8</text>
+  <line x1="529" y1="147" x2="557" y2="147" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwB)"/>
+  <text x="543" y="177" text-anchor="middle" class="dtag">4 ≤ 5 ผ่าน</text>
+  <rect x="560" y="132" width="32" height="30" rx="4" class="dcell"/><text x="576" y="153" text-anchor="middle" class="dtxt">1</text>
+  <rect x="596" y="132" width="32" height="30" rx="4" class="dcell"/><text x="612" y="153" text-anchor="middle" class="dtxt">2</text>
+  <rect x="632" y="132" width="32" height="30" rx="4" class="dcell"/><text x="648" y="153" text-anchor="middle" class="dtxt">4</text>
+  <rect x="668" y="132" width="32" height="30" rx="4" class="dcell good"/><text x="684" y="153" text-anchor="middle" class="dtxt">5</text>
+  <rect x="704" y="132" width="32" height="30" rx="4" class="dcell good"/><text x="720" y="153" text-anchor="middle" class="dtxt">8</text>
+  <text x="648" y="177" text-anchor="middle" class="dtag">5, 8 ล็อก</text>
+
+  <text x="20" y="228" class="dtag-b">Pass 3</text>
+  <text x="20" y="244" class="dtag">เทียบ 2 คู่</text>
+  <rect x="140" y="210" width="32" height="30" rx="4" class="dcell hot"/><text x="156" y="231" text-anchor="middle" class="dtxt">1</text>
+  <rect x="176" y="210" width="32" height="30" rx="4" class="dcell hot"/><text x="192" y="231" text-anchor="middle" class="dtxt">2</text>
+  <rect x="212" y="210" width="32" height="30" rx="4" class="dcell"/><text x="228" y="231" text-anchor="middle" class="dtxt">4</text>
+  <rect x="248" y="210" width="32" height="30" rx="4" class="dcell good"/><text x="264" y="231" text-anchor="middle" class="dtxt">5</text>
+  <rect x="284" y="210" width="32" height="30" rx="4" class="dcell good"/><text x="300" y="231" text-anchor="middle" class="dtxt">8</text>
+  <text x="228" y="255" text-anchor="middle" class="dtag">1 ≤ 2 ผ่าน</text>
+  <text x="350" y="227" class="dnote">เทียบ (2, 4) ผ่าน — ไม่มีการสลับเลยในรอบนี้</text>
+  <text x="350" y="245" class="dtag-b">→ หยุดทันที: ไม่สลับ = เรียงเสร็จ (improved bubble)</text>
+
+  <text x="20" y="300" class="dtag-b">จบ</text>
+  <rect x="140" y="282" width="32" height="30" rx="4" class="dcell good"/><text x="156" y="303" text-anchor="middle" class="dtxt">1</text>
+  <rect x="176" y="282" width="32" height="30" rx="4" class="dcell good"/><text x="192" y="303" text-anchor="middle" class="dtxt">2</text>
+  <rect x="212" y="282" width="32" height="30" rx="4" class="dcell good"/><text x="228" y="303" text-anchor="middle" class="dtxt">4</text>
+  <rect x="248" y="282" width="32" height="30" rx="4" class="dcell good"/><text x="264" y="303" text-anchor="middle" class="dtxt">5</text>
+  <rect x="284" y="282" width="32" height="30" rx="4" class="dcell good"/><text x="300" y="303" text-anchor="middle" class="dtxt">8</text>
+  <text x="340" y="300" class="dtag-b">ผลลัพธ์สุดท้าย ✅ — เทียบ 9 ครั้ง · สลับ 4 ครั้ง</text>
+</svg>
+<figcaption><b>Bubble sort ทีละ pass</b> — เขียว = ตำแหน่งที่ล็อกแล้ว (ตัวใหญ่สุดถูกดันไปท้ายทุกรอบ), เหลือง = คู่ที่กำลังเทียบ/สลับ, ลูกศรพร้อมป้าย "สลับ x↔y" คือจังหวะ swap</figcaption>
+</figure>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — เทียบ 9 ครั้ง · สลับ 4 ครั้ง · Pass 3 ไม่มีการสลับเลยจึงหยุดก่อน (improved bubble)</p>
 </div></details>
 <details class="sol"><summary>เฉลย (ข) Selection Sort</summary><div class="sol-body">
-<p>รอบ 1: min ของทั้งแถว = 1 (index 1) → สลับกับ index 0 → <strong>[1, 5, 4, 2, 8]</strong></p>
-<p>รอบ 2: min ของ {5,4,2,8} = 2 → สลับกับ index 1 → <strong>[1, 2, 4, 5, 8]</strong></p>
-<p>รอบ 3: min ของ {4,5,8} = 4 → อยู่ที่ถูกแล้ว ไม่สลับ · รอบ 4: min {5,8} = 5 อยู่แล้ว</p>
-<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — เทียบ 10 ครั้ง (ตายตัว) สลับแค่ 2 ครั้ง</p>
+<figure class="diagram">
+<svg viewBox="0 0 700 400" width="700" role="img" aria-label="Selection sort visualization">
+  <defs><marker id="dArwS" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#64748b"/></marker></defs>
+  <rect x="20" y="9" width="18" height="14" rx="3" class="dcell good"/><text x="44" y="21" class="dlegend">ล็อกแล้ว</text>
+  <rect x="150" y="9" width="18" height="14" rx="3" class="dcell hot"/><text x="174" y="21" class="dlegend">min ที่เจอ / กำลังสลับ</text>
+  <rect x="350" y="9" width="18" height="14" rx="3" class="dcell"/><text x="374" y="21" class="dlegend">ยังไม่ผ่าน</text>
+  <text x="490" y="21" class="dtag-b">ข้อมูล [5, 1, 4, 2, 8]</text>
+
+  <text x="20" y="80" class="dtag-b">รอบ 1</text>
+  <text x="20" y="96" class="dtag">หา min ทั้งแถว</text>
+  <rect x="120" y="64" width="32" height="30" rx="4" class="dcell"/><text x="136" y="85" text-anchor="middle" class="dtxt">5</text>
+  <rect x="156" y="64" width="32" height="30" rx="4" class="dcell hot"/><text x="172" y="85" text-anchor="middle" class="dtxt">1</text>
+  <rect x="192" y="64" width="32" height="30" rx="4" class="dcell"/><text x="208" y="85" text-anchor="middle" class="dtxt">4</text>
+  <rect x="228" y="64" width="32" height="30" rx="4" class="dcell"/><text x="244" y="85" text-anchor="middle" class="dtxt">2</text>
+  <rect x="264" y="64" width="32" height="30" rx="4" class="dcell"/><text x="280" y="85" text-anchor="middle" class="dtxt">8</text>
+  <path d="M 172 60 Q 154 36 136 60" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#dArwS)"/>
+  <text x="190" y="40" class="dswap">สลับ a[0] ↔ a[1] (min = 1)</text>
+  <line x1="300" y1="79" x2="330" y2="79" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwS)"/>
+  <rect x="336" y="64" width="32" height="30" rx="4" class="dcell good"/><text x="352" y="85" text-anchor="middle" class="dtxt">1</text>
+  <rect x="372" y="64" width="32" height="30" rx="4" class="dcell"/><text x="388" y="85" text-anchor="middle" class="dtxt">5</text>
+  <rect x="408" y="64" width="32" height="30" rx="4" class="dcell"/><text x="424" y="85" text-anchor="middle" class="dtxt">4</text>
+  <rect x="444" y="64" width="32" height="30" rx="4" class="dcell"/><text x="460" y="85" text-anchor="middle" class="dtxt">2</text>
+  <rect x="480" y="64" width="32" height="30" rx="4" class="dcell"/><text x="496" y="85" text-anchor="middle" class="dtxt">8</text>
+  <text x="536" y="84" class="dtag">1 ล็อกตำแหน่ง 0</text>
+
+  <text x="20" y="156" class="dtag-b">รอบ 2</text>
+  <text x="20" y="172" class="dtag">min ของ {5,4,2,8}</text>
+  <rect x="120" y="140" width="32" height="30" rx="4" class="dcell good"/><text x="136" y="161" text-anchor="middle" class="dtxt">1</text>
+  <rect x="156" y="140" width="32" height="30" rx="4" class="dcell"/><text x="172" y="161" text-anchor="middle" class="dtxt">5</text>
+  <rect x="192" y="140" width="32" height="30" rx="4" class="dcell"/><text x="208" y="161" text-anchor="middle" class="dtxt">4</text>
+  <rect x="228" y="140" width="32" height="30" rx="4" class="dcell hot"/><text x="244" y="161" text-anchor="middle" class="dtxt">2</text>
+  <rect x="264" y="140" width="32" height="30" rx="4" class="dcell"/><text x="280" y="161" text-anchor="middle" class="dtxt">8</text>
+  <path d="M 244 136 Q 208 112 172 136" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#dArwS)"/>
+  <text x="208" y="112" class="dswap">สลับ a[1] ↔ a[3] (min = 2)</text>
+  <line x1="300" y1="155" x2="330" y2="155" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwS)"/>
+  <rect x="336" y="140" width="32" height="30" rx="4" class="dcell good"/><text x="352" y="161" text-anchor="middle" class="dtxt">1</text>
+  <rect x="372" y="140" width="32" height="30" rx="4" class="dcell good"/><text x="388" y="161" text-anchor="middle" class="dtxt">2</text>
+  <rect x="408" y="140" width="32" height="30" rx="4" class="dcell"/><text x="424" y="161" text-anchor="middle" class="dtxt">4</text>
+  <rect x="444" y="140" width="32" height="30" rx="4" class="dcell"/><text x="460" y="161" text-anchor="middle" class="dtxt">5</text>
+  <rect x="480" y="140" width="32" height="30" rx="4" class="dcell"/><text x="496" y="161" text-anchor="middle" class="dtxt">8</text>
+  <text x="536" y="160" class="dtag">2 ล็อกตำแหน่ง 1</text>
+
+  <text x="20" y="232" class="dtag-b">รอบ 3</text>
+  <text x="20" y="248" class="dtag">min ของ {4,5,8}</text>
+  <rect x="120" y="216" width="32" height="30" rx="4" class="dcell good"/><text x="136" y="237" text-anchor="middle" class="dtxt">1</text>
+  <rect x="156" y="216" width="32" height="30" rx="4" class="dcell good"/><text x="172" y="237" text-anchor="middle" class="dtxt">2</text>
+  <rect x="192" y="216" width="32" height="30" rx="4" class="dcell hot"/><text x="208" y="237" text-anchor="middle" class="dtxt">4</text>
+  <rect x="228" y="216" width="32" height="30" rx="4" class="dcell"/><text x="244" y="237" text-anchor="middle" class="dtxt">5</text>
+  <rect x="264" y="216" width="32" height="30" rx="4" class="dcell"/><text x="280" y="237" text-anchor="middle" class="dtxt">8</text>
+  <text x="200" y="210" text-anchor="middle" class="dswap">4 อยู่ตำแหน่งถูกแล้ว</text>
+  <line x1="300" y1="231" x2="330" y2="231" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwS)"/>
+  <rect x="336" y="216" width="32" height="30" rx="4" class="dcell good"/><text x="352" y="237" text-anchor="middle" class="dtxt">1</text>
+  <rect x="372" y="216" width="32" height="30" rx="4" class="dcell good"/><text x="388" y="237" text-anchor="middle" class="dtxt">2</text>
+  <rect x="408" y="216" width="32" height="30" rx="4" class="dcell good"/><text x="424" y="237" text-anchor="middle" class="dtxt">4</text>
+  <rect x="444" y="216" width="32" height="30" rx="4" class="dcell"/><text x="460" y="237" text-anchor="middle" class="dtxt">5</text>
+  <rect x="480" y="216" width="32" height="30" rx="4" class="dcell"/><text x="496" y="237" text-anchor="middle" class="dtxt">8</text>
+  <text x="536" y="236" class="dtag">ไม่สลับ — 4 ล็อก idx 2</text>
+
+  <text x="20" y="308" class="dtag-b">รอบ 4</text>
+  <text x="20" y="324" class="dtag">min ของ {5,8}</text>
+  <rect x="120" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="136" y="313" text-anchor="middle" class="dtxt">1</text>
+  <rect x="156" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="172" y="313" text-anchor="middle" class="dtxt">2</text>
+  <rect x="192" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="208" y="313" text-anchor="middle" class="dtxt">4</text>
+  <rect x="228" y="292" width="32" height="30" rx="4" class="dcell hot"/><text x="244" y="313" text-anchor="middle" class="dtxt">5</text>
+  <rect x="264" y="292" width="32" height="30" rx="4" class="dcell"/><text x="280" y="313" text-anchor="middle" class="dtxt">8</text>
+  <text x="200" y="286" text-anchor="middle" class="dswap">5 อยู่ตำแหน่งถูกแล้ว</text>
+  <line x1="300" y1="307" x2="330" y2="307" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwS)"/>
+  <rect x="336" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="352" y="313" text-anchor="middle" class="dtxt">1</text>
+  <rect x="372" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="388" y="313" text-anchor="middle" class="dtxt">2</text>
+  <rect x="408" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="424" y="313" text-anchor="middle" class="dtxt">4</text>
+  <rect x="444" y="292" width="32" height="30" rx="4" class="dcell good"/><text x="460" y="313" text-anchor="middle" class="dtxt">5</text>
+  <rect x="480" y="292" width="32" height="30" rx="4" class="dcell"/><text x="496" y="313" text-anchor="middle" class="dtxt">8</text>
+  <text x="536" y="312" class="dtag">ไม่สลับ — เหลือ 8 ตำแหน่งสุดท้าย</text>
+
+  <text x="20" y="372" class="dtag-b">จบ</text>
+  <rect x="120" y="356" width="32" height="30" rx="4" class="dcell good"/><text x="136" y="377" text-anchor="middle" class="dtxt">1</text>
+  <rect x="156" y="356" width="32" height="30" rx="4" class="dcell good"/><text x="172" y="377" text-anchor="middle" class="dtxt">2</text>
+  <rect x="192" y="356" width="32" height="30" rx="4" class="dcell good"/><text x="208" y="377" text-anchor="middle" class="dtxt">4</text>
+  <rect x="228" y="356" width="32" height="30" rx="4" class="dcell good"/><text x="244" y="377" text-anchor="middle" class="dtxt">5</text>
+  <rect x="264" y="356" width="32" height="30" rx="4" class="dcell good"/><text x="280" y="377" text-anchor="middle" class="dtxt">8</text>
+  <text x="320" y="372" class="dtag-b">ผลลัพธ์สุดท้าย ✅ — เทียบ 10 ครั้ง (ตายตัว) · สลับแค่ 2 ครั้ง</text>
+</svg>
+<figcaption><b>Selection sort ทีละรอบ</b> — ลูกศรโค้งสีส้มชี้ min ที่ค้นพบของโซนที่ยังไม่เรียง แล้วสลับเข้าตำแหน่งหน้าสุดของโซน (เขียว = ล็อกแล้วทีละช่องจากซ้าย)</figcaption>
+</figure>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — เทียบ 10 ครั้ง (ตายตัว ไม่ว่าข้อมูลแบบไหน) · สลับแค่ 2 ครั้ง</p>
 </div></details>
 <details class="sol"><summary>เฉลย (ค) Insertion Sort</summary><div class="sol-body">
-<p>หยิบ 1: 5 &gt; 1 เลื่อน 5 → <strong>[1, 5, 4, 2, 8]</strong> · หยิบ 4: เลื่อน 5 → <strong>[1, 4, 5, 2, 8]</strong></p>
-<p>หยิบ 2: เลื่อน 5, 4 → <strong>[1, 2, 4, 5, 8]</strong> · หยิบ 8: ใหญ่สุดแล้ว ไม่เลื่อน</p>
-<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — จำนวน "เลื่อน" = จำนวน inversions = 4 (คู่ 5-1, 5-4, 5-2, 4-2)</p>
+<figure class="diagram">
+<svg viewBox="0 0 720 375" width="720" role="img" aria-label="Insertion sort visualization">
+  <defs><marker id="dArwI" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#d97706"/></marker></defs>
+  <rect x="20" y="9" width="18" height="14" rx="3" class="dcell good"/><text x="44" y="21" class="dlegend">โซนเรียงแล้ว (ไพ่ในมือ)</text>
+  <rect x="210" y="9" width="18" height="14" rx="3" class="dcell hot"/><text x="234" y="21" class="dlegend">ตัวที่หยิบมา</text>
+  <rect x="360" y="9" width="18" height="14" rx="3" class="dcell"/><text x="384" y="21" class="dlegend">กองรอเรียง</text>
+  <text x="500" y="21" class="dtag-b">เส้นประ = ขอบเขตสองโซน</text>
+
+  <text x="20" y="80" class="dtag-b">ขั้น 1</text>
+  <text x="20" y="96" class="dtag">หยิบ 1</text>
+  <rect x="110" y="64" width="32" height="30" rx="4" class="dcell good"/><text x="126" y="85" text-anchor="middle" class="dtxt">5</text>
+  <rect x="146" y="64" width="32" height="30" rx="4" class="dcell hot"/><text x="162" y="85" text-anchor="middle" class="dtxt">1</text>
+  <rect x="182" y="64" width="32" height="30" rx="4" class="dcell"/><text x="198" y="85" text-anchor="middle" class="dtxt">4</text>
+  <rect x="218" y="64" width="32" height="30" rx="4" class="dcell"/><text x="234" y="85" text-anchor="middle" class="dtxt">2</text>
+  <rect x="254" y="64" width="32" height="30" rx="4" class="dcell"/><text x="270" y="85" text-anchor="middle" class="dtxt">8</text>
+  <line x1="144" y1="60" x2="144" y2="98" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <path d="M 162 60 Q 130 36 112 60" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#dArwI)"/>
+  <text x="150" y="34" class="dswap">สอด 1 ก่อน 5</text>
+  <text x="350" y="84" class="dtag">เลื่อน 5 ไปขวา แล้วสอด 1 → [1, 5 | 4, 2, 8]</text>
+
+  <text x="20" y="146" class="dtag-b">ขั้น 2</text>
+  <text x="20" y="162" class="dtag">หยิบ 4</text>
+  <rect x="110" y="130" width="32" height="30" rx="4" class="dcell good"/><text x="126" y="151" text-anchor="middle" class="dtxt">1</text>
+  <rect x="146" y="130" width="32" height="30" rx="4" class="dcell good"/><text x="162" y="151" text-anchor="middle" class="dtxt">5</text>
+  <rect x="182" y="130" width="32" height="30" rx="4" class="dcell hot"/><text x="198" y="151" text-anchor="middle" class="dtxt">4</text>
+  <rect x="218" y="130" width="32" height="30" rx="4" class="dcell"/><text x="234" y="151" text-anchor="middle" class="dtxt">2</text>
+  <rect x="254" y="130" width="32" height="30" rx="4" class="dcell"/><text x="270" y="151" text-anchor="middle" class="dtxt">8</text>
+  <line x1="180" y1="126" x2="180" y2="164" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <path d="M 198 126 Q 172 102 146 126" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#dArwI)"/>
+  <text x="186" y="100" class="dswap">สอดก่อน 5</text>
+  <text x="350" y="150" class="dtag">เลื่อน 5 แล้วสอด 4 ตรงกลาง → [1, 4, 5 | 2, 8]</text>
+
+  <text x="20" y="212" class="dtag-b">ขั้น 3</text>
+  <text x="20" y="228" class="dtag">หยิบ 2</text>
+  <rect x="110" y="196" width="32" height="30" rx="4" class="dcell good"/><text x="126" y="217" text-anchor="middle" class="dtxt">1</text>
+  <rect x="146" y="196" width="32" height="30" rx="4" class="dcell good"/><text x="162" y="217" text-anchor="middle" class="dtxt">4</text>
+  <rect x="182" y="196" width="32" height="30" rx="4" class="dcell good"/><text x="198" y="217" text-anchor="middle" class="dtxt">5</text>
+  <rect x="218" y="196" width="32" height="30" rx="4" class="dcell hot"/><text x="234" y="217" text-anchor="middle" class="dtxt">2</text>
+  <rect x="254" y="196" width="32" height="30" rx="4" class="dcell"/><text x="270" y="217" text-anchor="middle" class="dtxt">8</text>
+  <line x1="216" y1="192" x2="216" y2="230" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <path d="M 234 192 Q 166 166 112 192" fill="none" stroke="#d97706" stroke-width="1.8" marker-end="url(#dArwI)"/>
+  <text x="178" y="166" class="dswap">สอดหน้าสุด (เลื่อน 5, 4)</text>
+  <text x="350" y="216" class="dtag">เลื่อน 5 กับ 4 แล้วสอด 2 หน้าสุด → [1, 2, 4, 5 | 8]</text>
+
+  <text x="20" y="278" class="dtag-b">ขั้น 4</text>
+  <text x="20" y="294" class="dtag">หยิบ 8</text>
+  <rect x="110" y="262" width="32" height="30" rx="4" class="dcell good"/><text x="126" y="283" text-anchor="middle" class="dtxt">1</text>
+  <rect x="146" y="262" width="32" height="30" rx="4" class="dcell good"/><text x="162" y="283" text-anchor="middle" class="dtxt">2</text>
+  <rect x="182" y="262" width="32" height="30" rx="4" class="dcell good"/><text x="198" y="283" text-anchor="middle" class="dtxt">4</text>
+  <rect x="218" y="262" width="32" height="30" rx="4" class="dcell good"/><text x="234" y="283" text-anchor="middle" class="dtxt">5</text>
+  <rect x="254" y="262" width="32" height="30" rx="4" class="dcell hot"/><text x="270" y="283" text-anchor="middle" class="dtxt">8</text>
+  <line x1="252" y1="258" x2="252" y2="296" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <text x="350" y="282" class="dtag">8 ใหญ่กว่าทุกตัวในมือ — วางทันที ไม่ต้องเลื่อน</text>
+
+  <text x="20" y="344" class="dtag-b">จบ</text>
+  <rect x="110" y="328" width="32" height="30" rx="4" class="dcell good"/><text x="126" y="349" text-anchor="middle" class="dtxt">1</text>
+  <rect x="146" y="328" width="32" height="30" rx="4" class="dcell good"/><text x="162" y="349" text-anchor="middle" class="dtxt">2</text>
+  <rect x="182" y="328" width="32" height="30" rx="4" class="dcell good"/><text x="198" y="349" text-anchor="middle" class="dtxt">4</text>
+  <rect x="218" y="328" width="32" height="30" rx="4" class="dcell good"/><text x="234" y="349" text-anchor="middle" class="dtxt">5</text>
+  <rect x="254" y="328" width="32" height="30" rx="4" class="dcell good"/><text x="270" y="349" text-anchor="middle" class="dtxt">8</text>
+  <text x="320" y="344" class="dtag-b">ผลลัพธ์สุดท้าย ✅ — เลื่อนรวม 4 ครั้ง (= จำนวน inversion)</text>
+</svg>
+<figcaption><b>Insertion sort</b> — โซนเขียวคือ "ไพ่ในมือ" (เรียงแล้วเสมอ โตทีละใบ), เหลือง = ตัวที่หยิบจากกองรอ, ลูกศรส้มชี้จุดสอดเข้าโซนเรียงแล้ว</figcaption>
+</figure>
+<p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — เลื่อนรวม 4 ครั้ง = จำนวน inversions (คู่ 5-1, 5-4, 5-2, 4-2)</p>
 </div></details>
 <details class="sol"><summary>เฉลย (ง) Quick Sort (pivot = ตัวท้ายเสมอ)</summary><div class="sol-body">
-<p><strong>รอบแรก:</strong> [5, 1, 4, 2, 8] pivot = 8 → ทุกตัว ≤ 8 → pivot อยู่ที่เดิม index 4 → ซ้าย {5,1,4,2}, ขวาว่าง</p>
-<p><strong>quicksort [5,1,4,2]:</strong> pivot = 2 → เจอ 1 ≤ 2 สลับมาหน้า → [1, 5, 4, 2] → จบ partition สลับ pivot เข้าที่ index 1 → <strong>[1, 2, 4, 5]</strong> → ซ้าย {1} ขวา {4,5}</p>
-<p><strong>quicksort [4,5]:</strong> pivot = 5 → 4 ≤ 5 → pivot คงที่ → เรียงแล้ว</p>
+<figure class="diagram">
+<svg viewBox="0 0 780 400" width="780" role="img" aria-label="Quick sort partition tree">
+  <defs><marker id="dArwQ" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L7,4 L0,8 z" fill="#64748b"/></marker></defs>
+  <text x="20" y="22" class="dtag-b">Partition Tree — เหลือง = pivot (ตัวแบ่ง) · แตกซ้าย (≤ pivot) ขวา (&gt; pivot) จนก้อนเหลือ 1 ตัว = จบ</text>
+
+  <rect x="140" y="36" width="290" height="50" rx="10" class="dnode"/>
+  <text x="285" y="57" text-anchor="middle" class="dtxt">[5, 1, 4, 2, 8]</text>
+  <rect x="200" y="64" width="170" height="20" rx="10" class="dchip"/>
+  <text x="285" y="78" text-anchor="middle" font-size="11.5" font-weight="700" fill="#92400e">pivot = 8 (ตัวท้าย)</text>
+  <text x="450" y="54" class="dnote">ทุกตัว ≤ 8 → 8 ล็อกขวาสุด</text>
+  <text x="450" y="72" class="dnote">ฝั่งขวาว่าง — แตกซ้ายอย่างเดียว</text>
+
+  <line x1="230" y1="86" x2="195" y2="118" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwQ)"/>
+  <text x="160" y="106" class="dtag">ซ้าย</text>
+  <line x1="340" y1="86" x2="420" y2="108" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <text x="428" y="112" class="dtag">ขวา: ว่าง</text>
+
+  <rect x="60" y="120" width="260" height="50" rx="10" class="dnode"/>
+  <text x="190" y="141" text-anchor="middle" class="dtxt">[5, 1, 4, 2]</text>
+  <rect x="115" y="148" width="150" height="20" rx="10" class="dchip"/>
+  <text x="190" y="162" text-anchor="middle" font-size="11.5" font-weight="700" fill="#92400e">pivot = 2</text>
+  <text x="340" y="136" class="dnote">เทียบครบ: เหลือ 1 ≤ 2 ตัวเดียวหน้าโซน</text>
+  <text x="340" y="154" class="dnote">สลับ pivot เข้ากลาง → [1, 2, 4, 5]</text>
+  <text x="340" y="172" class="dtag-b">→ ซ้าย [1] · ขวา [4, 5]</text>
+
+  <line x1="105" y1="170" x2="85" y2="218" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwQ)"/>
+  <text x="42" y="196" class="dtag">ซ้าย [1]</text>
+  <line x1="255" y1="170" x2="305" y2="218" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwQ)"/>
+  <text x="312" y="196" class="dtag">ขวา [4, 5]</text>
+
+  <rect x="20" y="222" width="150" height="34" rx="10" class="dnode"/>
+  <text x="95" y="244" text-anchor="middle" class="dtxt">[1] — จบ (1 ตัว)</text>
+
+  <rect x="230" y="222" width="180" height="50" rx="10" class="dnode"/>
+  <text x="320" y="243" text-anchor="middle" class="dtxt">[4, 5]</text>
+  <rect x="250" y="250" width="140" height="20" rx="10" class="dchip"/>
+  <text x="320" y="264" text-anchor="middle" font-size="11.5" font-weight="700" fill="#92400e">pivot = 5</text>
+  <text x="430" y="238" class="dnote">4 ≤ 5 → 5 ล็อกขวาสุด</text>
+  <text x="430" y="256" class="dnote">แตกซ้าย: [4]</text>
+
+  <line x1="300" y1="272" x2="300" y2="300" stroke="#64748b" stroke-width="1.6" marker-end="url(#dArwQ)"/>
+  <rect x="230" y="304" width="150" height="34" rx="10" class="dnode"/>
+  <text x="305" y="326" text-anchor="middle" class="dtxt">[4] — จบ</text>
+
+  <line x1="380" y1="321" x2="462" y2="330" stroke="#94a3b8" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#dArwQ)"/>
+  <rect x="470" y="300" width="290" height="66" rx="10" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+  <text x="615" y="318" text-anchor="middle" font-size="12" font-weight="700" fill="#14532d">ผลลัพธ์สุดท้าย</text>
+  <rect x="522" y="326" width="30" height="24" rx="4" class="dcell good"/><text x="537" y="343" text-anchor="middle" class="dtxt">1</text>
+  <rect x="560" y="326" width="30" height="24" rx="4" class="dcell good"/><text x="575" y="343" text-anchor="middle" class="dtxt">2</text>
+  <rect x="598" y="326" width="30" height="24" rx="4" class="dcell good"/><text x="613" y="343" text-anchor="middle" class="dtxt">4</text>
+  <rect x="636" y="326" width="30" height="24" rx="4" class="dcell good"/><text x="651" y="343" text-anchor="middle" class="dtxt">5</text>
+  <rect x="674" y="326" width="30" height="24" rx="4" class="dcell good"/><text x="689" y="343" text-anchor="middle" class="dtxt">8</text>
+
+  <text x="20" y="388" class="dtag">เทียบ 8 ครั้ง · สลับจริง 3 ครั้ง — pivot 8 เลือกได้แย่สุด (ข้อมูลเกือบเรียง) แต่อัลกอริทึมยังเรียงสำเร็จ</text>
+</svg>
+<figcaption><b>Quick sort เป็น Partition Tree</b> — แต่ละก้อนเลือก pivot (ชิปเหลือง) จากตัวท้าย แล้ว partition: pivot ลงตำแหน่งจริง ซ้าย = ตัวที่ ≤ pivot ขวา = ตัวที่ &gt; pivot ทำซ้ำจนก้อนเหลือ 0–1 ตัว</figcaption>
+</figure>
 <p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5, 8]</strong> — สังเกตว่า pivot 8 แย่สุด ๆ (ข้อมูลเกือบเรียง) = โจทย์จงใจให้เห็น worst-ish case แต่ก็ยังเรียงได้</p>
 </div></details>
 </div>
