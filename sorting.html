@@ -402,6 +402,23 @@ pivot จะลงตำแหน่ง "สุดท้ายของมัน
 <figcaption><b>Partition 1 รอบ</b> — เขียว = โซน "เล็กกว่า pivot", เหลือง = pivot; จากนั้น recursive ต่อทั้งสองฝั่ง</figcaption>
 </figure>
 
+<h3>โค้ดเต็ม (Java — Lomuto partition ตามรูปข้างบน)</h3>
+<pre><code><span class="kw">void</span> <span class="fn">quickSort</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+  <span class="kw">if</span> (low &gt;= high) <span class="kw">return</span>;                 <span class="cm">// เหลือ 0–1 ตัว = จบ</span>
+  <span class="kw">int</span> p = <span class="fn">partition</span>(a, low, high);          <span class="cm">// pivot ลง "ตำแหน่งจริง" = p</span>
+  <span class="fn">quickSort</span>(a, low, p - 1);                 <span class="cm">// โซนซ้าย (≤ pivot)</span>
+  <span class="fn">quickSort</span>(a, p + 1, high);                <span class="cm">// โซนขวา (≥ pivot)</span>
+}
+<span class="kw">int</span> <span class="fn">partition</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> low, <span class="kw">int</span> high) {
+  <span class="kw">int</span> pivot = a[high];                      <span class="cm">// เลือกตัวท้ายเป็น pivot</span>
+  <span class="kw">int</span> i = low - 1;                          <span class="cm">// "กำแพง" โซนตัวเล็ก</span>
+  <span class="kw">for</span> (<span class="kw">int</span> j = low; j &lt; high; j++) {
+    <span class="kw">if</span> (a[j] &lt;= pivot) <span class="fn">swap</span>(a, ++i, j);     <span class="cm">← หัวใจ: เจอตัวเล็ก ดันมาไว้หน้ากำแพง</span>
+  }
+  <span class="fn">swap</span>(a, i + 1, high);                     <span class="cm">// pivot เข้าตำแหน่งจริง</span>
+  <span class="kw">return</span> i + 1;
+}</code></pre>
+
 <h3>จุดชี้ขาดคือ pivot</h3>
 <div class="box warn"><div class="box-title"><span class="em">⚠️</span>Worst case ของ Quick sort = pivot แย่</div>
 <p>ถ้า pivot ที่เลือกได้เป็น "ตัวเล็กสุดหรือใหญ่สุดเสมอ" (เช่น ข้อมูลเรียงมาแล้วแล้วเลือกตัวท้ายเป็น pivot) การแบ่งจะเอียงสุด ๆ
@@ -531,6 +548,24 @@ Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรีย�
 </figure>
 <p class="small">สรรพคุณ: Best/Worst/Average = <strong>O(nd)</strong>, Memory <strong>O(n+d)</strong>, <strong>Stable: Yes</strong> — Counting sort (ข้างล่าง) มักถูกใช้เป็น "เครื่องจัดถัง" ของ radix sort</p>
 
+<h3>โค้ด (Java — LSD: counting sort ต่อ 1 หลัก)</h3>
+<pre><code><span class="kw">void</span> <span class="fn">radixSort</span>(<span class="kw">int</span>[] a) {
+  <span class="kw">int</span> max = <span class="fn">maxOf</span>(a);
+  <span class="kw">for</span> (<span class="kw">int</span> exp = 1; max / exp &gt; 0; exp *= 10)  <span class="cm">// หลักหน่วย → สิบ → ร้อย …</span>
+    <span class="fn">countingSortByDigit</span>(a, exp);                <span class="cm">// ← หัวใจ: sort ทีละหลักจากขวา</span>
+}
+<span class="kw">void</span> <span class="fn">countingSortByDigit</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> exp) {   <span class="cm">// โครงเดียวกับ counting sort</span>
+  <span class="kw">int</span>[] count = <span class="kw">new int</span>[10];                  <span class="cm">// ถังหลัก 0..9</span>
+  <span class="kw">for</span> (<span class="kw">int</span> v : a) count[(v / exp) % 10]++;
+  <span class="kw">for</span> (<span class="kw">int</span> k = 1; k &lt; 10; k++) count[k] += count[k - 1];
+  <span class="kw">int</span>[] out = <span class="kw">new int</span>[a.length];
+  <span class="kw">for</span> (<span class="kw">int</span> i = a.length - 1; i &gt;= 0; i--) {   <span class="cm">// ขวา → ซ้าย = stable</span>
+    <span class="kw">int</span> d = (a[i] / exp) % 10;
+    out[--count[d]] = a[i];
+  }
+  <span class="fn">copyBack</span>(out, a);
+}</code></pre>
+
 <h2 id="counting">🗳️ Counting Sort — นับความถี่ + prefix sum</h2>
 <p>ถ้า key เป็นเลขจำนวนเต็มในช่วงแคบ ๆ (เช่น 0–9, 0–100) เราไม่ต้องเทียบเลย: (1) <strong>นับ</strong>ว่าแต่ละค่ามีกี่ตัว
 (2) ทำ <strong>prefix sum</strong> (รวมสะสม) เพื่อบอก "ตำแหน่งสุดท้าย" ของแต่ละค่าใน output (3) เดิน input <strong>จากขวาไปซ้าย</strong> วางของลงตำแหน่ง</p>
@@ -570,6 +605,19 @@ Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรีย�
 </svg>
 <figcaption><b>Counting sort</b> — เร็วเป็นเส้นตรง O(n + m) เมื่อ m = ช่วงค่าของ key</figcaption>
 </figure>
+
+<h3>โค้ด (Java — เวอร์ชัน stable วางจากขวา)</h3>
+<pre><code><span class="kw">int</span>[] <span class="fn">countingSort</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> m) {      <span class="cm">// ค่า key อยู่ในช่วง 0..m</span>
+  <span class="kw">int</span>[] count = <span class="kw">new int</span>[m + 1];
+  <span class="kw">for</span> (<span class="kw">int</span> v : a) count[v]++;             <span class="cm">// 1) นับความถี่ทีละค่า</span>
+  <span class="kw">for</span> (<span class="kw">int</span> k = 1; k &lt;= m; k++)            <span class="cm">// 2) prefix sum:</span>
+    count[k] += count[k - 1];              <span class="cm">//    count[v] = "ตำแหน่งท้าย" ของ v</span>
+  <span class="kw">int</span>[] out = <span class="kw">new int</span>[a.length];
+  <span class="kw">for</span> (<span class="kw">int</span> i = a.length - 1; i &gt;= 0; i--) <span class="cm">// 3) วางจากขวา → ซ้าย ← บรรทัดนี้ทำให้ stable</span>
+    out[--count[a[i]]] = a[i];
+  <span class="kw">return</span> out;
+}</code></pre>
+
 <div class="box warn"><div class="box-title"><span class="em">⚠️</span>กับดักคลาสสิก</div>
 <p><strong>Counting sort จะ stable ต่อเมื่อวางของจากขวาไปซ้าย!</strong> (ใช้ prefix sum เป็น "ตำแหน่งท้าย") — ถ้าเดินจากซ้าย มันก็ยังเรียงถูก แต่เสีย stability
 และถ้าช่วงค่า (m) กว้างมาก ๆ เช่น 1 ล้าน เทียบกับข้อมูล 100 ตัว → เสียเปล่าโง่ ๆ นั่นแหละที่มัน "เหมาะกับ key ไม่ห่างกันมากกว่าจำนวนข้อมูล"</p></div>
@@ -583,6 +631,19 @@ Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรีย�
 <tr><td>Bucket sort</td><td class="num">O(n) เมื่อ m = n</td><td class="num">O(m+n)</td><td>O(m)</td><td class="good">Yes</td></tr>
 </tbody></table></div>
 
+<h3>โค้ด (Java — key เป็นจำนวนเต็ม 0..max)</h3>
+<pre><code><span class="kw">void</span> <span class="fn">bucketSort</span>(<span class="kw">int</span>[] a, <span class="kw">int</span> max) {
+  List&lt;Integer&gt;[] bucket = <span class="kw">new</span> ArrayList[max + 1];  <span class="cm">// ถัง = ช่วงค่า</span>
+  <span class="kw">for</span> (<span class="kw">int</span> v : a) {                           <span class="cm">// 1) โยนของลงถังตามค่า ← หัวใจ</span>
+    <span class="kw">if</span> (bucket[v] == <span class="kw">null</span>) bucket[v] = <span class="kw">new</span> ArrayList&lt;&gt;();
+    bucket[v].<span class="fn">add</span>(v);
+  }
+  <span class="kw">int</span> k = 0;
+  <span class="kw">for</span> (<span class="kw">int</span> b = 0; b &lt;= max; b++)              <span class="cm">// 2) อ่านออกทีละถัง = เรียงแล้ว</span>
+    <span class="kw">if</span> (bucket[b] != <span class="kw">null</span>)
+      <span class="kw">for</span> (<span class="kw">int</span> v : bucket[b]) a[k++] = v;
+}</code></pre>
+
 <h2 id="shell">🐚 Shell Sort — insertion sort ที่กระโดดข้ามไกลได้</h2>
 <p>insertion sort ช้าเพราะของ "ต้องเดินทีละช่อง" ถ้าตัวที่ควรอยู่ขวาสุดอยู่ซ้ายสุด มันต้องเลื่อน n−1 รอบ
 <strong>Shell sort แก้โดยใช้ gap (h)</strong>: จัดให้ทุกตัวที่ห่าง h ช่องกันเป็นกลุ่มเรียงก่อน (<strong>h-sorted</strong>) แล้วค่อย ๆ ลด h ลงจนถึง 1 (รอบสุดท้ายก็คือ insertion sort ธรรมดา แต่ตอนนั้นข้อมูล "เกือบเรียงแล้ว" เลยเร็วมาก)</p>
@@ -590,6 +651,21 @@ Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรีย�
 <p>เหมือนจัดหนังสือบนชั้นยาว ๆ: รอบแรกจัดหยาบ ๆ ทุก ๆ 4 เล่ม (ขยับข้ามไกล ๆ ให้ใกล้บ้านที่ถูกต้อง)
 รอบต่อมาจัดละเอียดทุก 2 เล่ม แล้วจบด้วยการจับคู่ข้าง ๆ — เพราะจัดหยาบไปแล้ว งานละเอียดจึงเหลือน้อยมาก</p></div>
 <p class="small">ใช้จริงใน embedded: uClibc, Linux kernel (โค้ดสั้น ไม่ใช้ call stack) และใน bzip2 สำหรับ array สั้น ๆ</p>
+
+<h3>โค้ด (Java — insertion sort แบบเว้น gap)</h3>
+<pre><code><span class="kw">void</span> <span class="fn">shellSort</span>(<span class="kw">int</span>[] a) {
+  <span class="kw">for</span> (<span class="kw">int</span> gap = a.length / 2; gap &gt; 0; gap /= 2) {  <span class="cm">// h: ลดครึ่ง … จบที่ 1</span>
+    <span class="kw">for</span> (<span class="kw">int</span> i = gap; i &lt; a.length; i++) {    <span class="cm">// insertion sort รายกลุ่ม</span>
+      <span class="kw">int</span> key = a[i];
+      <span class="kw">int</span> j = i;
+      <span class="kw">while</span> (j &gt;= gap &amp;&amp; a[j - gap] &gt; key) {  <span class="cm">← หัวใจ: เลื่อนทีละ gap (ไม่ใช่ทีละ 1)</span>
+        a[j] = a[j - gap];
+        j -= gap;
+      }
+      a[j] = key;                             <span class="cm">// วาง key ลงช่องว่าง</span>
+    }
+  }
+}</code></pre>
 
 <h2 id="heapbst">⛰️ Heap Sort &amp; BST Sort — เรียงโดยใช้โครงสร้างข้อมูล</h2>
 <ul>
@@ -613,6 +689,19 @@ Radix sort ใช้ "หลัก" (digit) เป็นถัง: เรีย�
 <tr><td>Bucket</td><td class="num">O(n)</td><td class="num">O(m+n)</td><td class="num">O(m+n)</td><td>O(m)</td><td class="good">Yes</td><td>ถังช่วงกว้าง</td></tr>
 <tr><td>Shell</td><td class="num">—</td><td class="num">ขึ้นกับ gap</td><td class="num">&gt; O(n log n)</td><td>O(1)</td><td class="bad">No</td><td>insertion + gap กระโดดไกล</td></tr>
 </tbody></table></div>
+
+<div class="box basic"><div class="box-title"><span class="em">💾</span>ต้องจำโค้ด Sort ไหม? — คำตอบจากรีวิว 2 ปีล่าสุด</div>
+<p><strong>ไม่ต้องท่องทั้งบรรทัด!</strong> จากรีวิว Final 66 และ 67 ข้อสอบ sort เป็นแนว <strong>"ให้ตัวเลข → trace ทีละขั้น"</strong> ทั้งหมด (Bubble / Insertion / Selection / Quick) — <strong>ไม่เคยมีให้เขียนโค้ด sort มาก่อน</strong> โค้ดที่ต้องเขียนจริงมีแค่ <strong>Binary String (1 ห้ามติดกัน)</strong> ปี 67 และ <strong>เติม 1 บรรทัด searchIter</strong> ปี 66 (รุ่นพี่สรุปว่า "ออกทฤษฎีเกือบหมด มีแลปแค่ข้อเดียว")</p>
+<p>แต่ให้จำ "<strong>หัวใจ 1–2 บรรทัด</strong>" ของแต่ละตัวไว้ (โค้ดเต็มอยู่ในแต่ละหัวข้อด้านบน) เผื่อปีนี้พลิกเป็นเติมโค้ด / เขียน pseudocode:</p>
+<ul>
+<li><strong>Quick</strong> → partition แบบกำแพง i: <code>if (a[j] &lt;= pivot) swap(a, ++i, j)</code> จบด้วย <code>swap(pivot เข้ากลาง)</code></li>
+<li><strong>Counting</strong> → นับ → prefix sum → <code>วางจากขวาไปซ้าย</code> (บรรทัดนี้ทำให้ stable)</li>
+<li><strong>Radix</strong> → counting sort ต่อ 1 หลัก วน <code>exp = 1, 10, 100, …</code></li>
+<li><strong>Bucket</strong> → <code>โยนลงถังตามค่า → อ่านออกทีละถัง</code></li>
+<li><strong>Shell</strong> → insertion sort ที่เดินทีละ <code>gap</code> แล้ว <code>gap /= 2</code> จนถึง 1</li>
+</ul>
+<p class="small">เกร็ด: trace Quick ในข้อสอบมักใช้ pivot ตัวท้าย + แบบ Lomuto (กำแพง i) เหมือนโค้ดข้างบน — ฝึก trace จริงในหน้า <a href="exam.html#drill-sort">แนวข้อสอบ Drill 1</a> · ข้อสอบไม่ได้ระบุภาษา โจทย์ trace ใช้แค่ตรรกะ ไม่ต้องจำ syntax</p>
+</div>
 
 <div class="box exam"><div class="box-title"><span class="em">📝</span>แนวข้อสอบ (จากรีวิวรุ่นพี่ Final 66/67)</div>
 <p><strong>ข้อ 1:</strong> ให้ชุดตัวเลขมา แสดงขั้นตอนการเรียงแบบ Bubble / Insertion / Selection / Quick <strong>ละเอียดทุกรอบ พร้อมผลลัพธ์สุดท้าย</strong></p>
