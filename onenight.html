@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>คืนเดียวจบ — แผนซ้อมก่อนสอบ DSA</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 32%27%3E%3Crect width=%2732%27 height=%2732%27 rx=%278%27 fill=%27%230e7490%27/%3E%3Ctext x=%2716%27 y=%2722%27 font-size=%2716%27 font-weight=%27bold%27 text-anchor=%27middle%27 fill=%27white%27 font-family=%27sans-serif%27%3EDS%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<style>
+/* ---------- one-night checklist ---------- */
+.on-progress-wrap { position: sticky; top: 66px; z-index: 40; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 22px; box-shadow: var(--shadow); }
+.on-progress-bar-bg { height: 10px; background: var(--bg-soft); border-radius: 999px; overflow: hidden; margin-top: 8px; }
+.on-progress-bar { height: 100%; width: 0%; background: var(--accent); border-radius: 999px; transition: width .3s; }
+.on-progress-text { font-weight: 700; font-size: .95rem; }
+.on-progress-text small { color: var(--ink-soft); font-weight: 400; }
+.on-item { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; margin: 16px 0; box-shadow: var(--shadow); scroll-margin-top: 130px; }
+.on-item.done { border-color: #16a34a; }
+.on-head { display: flex; align-items: flex-start; gap: 12px; }
+.on-head input[type=checkbox] { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--accent); cursor: pointer; flex: none; }
+.on-head .on-num { font-weight: 800; color: var(--accent-ink); font-size: 1.05rem; white-space: nowrap; }
+.on-head h2 { border: none; margin: 0; padding: 0; font-size: 1.2rem; flex: 1; }
+.on-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0 10px 34px; }
+.on-meta .chip { font-size: .8rem; padding: 2px 10px; }
+.on-body { margin-left: 34px; }
+.on-item.done .on-head h2 { text-decoration: line-through; opacity: .6; }
+@media (max-width: 700px) { .on-body, .on-meta { margin-left: 0; } }
+details.ex > summary { background: var(--accent-soft); color: var(--accent-ink); }
+details.ex[open] > summary::before { transform: rotate(90deg); }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<header class="site">
+  <div class="site-inner">
+    <a class="brand" href="index.html"><span class="logo">DS</span>DSA Final Prep</a>
+    <nav class="main">
+      <a href="index.html">หน้าแรก</a>
+      <a href="sorting.html">Sorting</a>
+      <a href="heap.html">Heap &amp; PQ</a>
+      <a href="bst.html">BST</a>
+      <a href="avltree.html">AVL·RB·Splay</a>
+      <a href="graph.html">Graph</a>
+      <a href="exam.html">แนวข้อสอบ</a>
+      <a href="onenight.html" class="active">คืนเดียวจบ</a>
+    </nav>
+    <div class="header-actions">
+      <a class="icon-btn" href="short-note.html" title="Short Note 1 แผ่น (พิมพ์ได้)" style="text-decoration:none;font-size:.72rem;font-weight:800">📄 A4</a>
+      <button class="icon-btn" data-action="toggle-theme" title="สลับธีมมืด/สว่าง" aria-label="สลับธีม">🌙</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" style="display:block; max-width: 960px;">
+<section class="hero">
+  <div class="kicker">แผนฉุกเฉิน · สอนเพื่อนพื้นฐานน้อย · จบในคืนเดียว</div>
+  <h1>คืนเดียวจบ DSA — เช็คลิสต์ 11 ช่อง</h1>
+  <p class="lead">ใช้เวลารวม <strong>~6 ชั่วโมง</strong> (เว้นพักระหว่างช่อง) · เรียงจาก "ออกสอบแน่นอน" ไป "ถ้ามีเวลาเหลือ" ·
+  วิธีใช้: อ่านสรุปคอนเซปต์ → ดู <strong>ตัวอย่างพร้อมเฉลย</strong> 1 ข้อจนเข้าใจ → ลองทำโจทย์ 2-3 ข้อ (ปิดเฉลยก่อน!) →
+  ทำถูก 2 ใน 3 ถือ<strong>ผ่าน</strong> ติ๊ก ✓ ไปช่องถัดไป</p>
+  <div class="meta">
+    <span class="chip">🟥 = ออกสอบแน่นอน (จากรีวิว 66/67)</span>
+    <span class="chip">🟨 = มีโอกาสออก ถ้ามีเวลาค่อยทำ</span>
+    <span class="chip">✓ ติ๊กแล้วจำไว้ในเครื่องนี้ ปิดเปิดใหม่ไม่หาย</span>
+  </div>
+</section>
+
+<div class="on-progress-wrap">
+  <div class="on-progress-text">ความคืบหน้า: <span id="onDone">0</span>/<span id="onTotal">11</span> ช่อง <small>— ติ๊กช่องด้านล่างเมื่อผ่านเกณฑ์ของช่องนั้น</small></div>
+  <div class="on-progress-bar-bg"><div class="on-progress-bar" id="onBar"></div></div>
+</div>
+
+<!-- ช่อง 1 -->
+<div class="on-item" id="it1">
+  <div class="on-head">
+    <input type="checkbox" data-key="it1">
+    <span class="on-num">ช่อง 1</span>
+    <h2>ศัพท์ + Big-O พื้นฐาน (เกณฑ์พื้นฐานก่อนทำอย่างอื่น)</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ — เติมคำ 15 ข้อ ปี 67</span><span class="chip">⏱ 30 นาที</span><span class="chip">เกณฑ์ผ่าน: ตอบถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ที่ต้องรู้ (จำ 5 คำ)</div>
+    <p><strong>O(1)</strong> คงที่ · <strong>O(log n)</strong> ตัดครึ่งทิ้งทีละรอบ (1000 ตัว ~10 ครั้ง) · <strong>O(n)</strong> ไล่ทุกตัว ·
+    <strong>O(n log n)</strong> เพดานของ comparison sort · <strong>O(n²)</strong> เทียบทุกคู่<br>
+    <strong>Stable</strong> = ค่าเท่ากันคงลำดับเดิม · <strong>In-place</strong> = ไม่ใช้ memory เพิ่ม (O(1)) ·
+    <strong>Ascending</strong> = น้อย→มาก · <strong>Worst/Average/Best</strong> = ดวงซวย/เฉลี่ย/ดวงดี</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู (อ่านจนเข้าใจก่อนทำโจทย์)</summary><div class="sol-body">
+    <p><strong>โจทย์:</strong> Selection sort กับข้อมูล [5, 1, 4, 2, 8] ต้อง "เปรียบเทียบ" กี่ครั้ง? ถ้าข้อมูลเรียงมาแล้วล่ะ?</p>
+    <p><strong>เฉลย:</strong> <strong>10 ครั้งเสมอ ไม่ว่าข้อมูลยังไง</strong> — เพราะ selection ต้อง "สแกนหา min ของโซนที่เหลือ" ทุกรอบ:
+    รอบ 1 สแกน 4 คู่, รอบ 2 สแกน 3, รอบ 3 สแกน 2, รอบ 4 สแกน 1 → 4+3+2+1 = <strong>10</strong> = n(n−1)/2
+    → Best = Worst = <strong>O(n²)</strong> ตายตัว (นี่คือจุดต่างจาก bubble ที่ข้อมูลดีแล้วเร็วขึ้นเป็น O(n))</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง (ปิดเฉลยก่อนทำ!):</strong></p>
+    <details class="sol"><summary>โจทย์ 1.1 — Bubble sort กับ [4, 2, 5, 1]: เทียบกี่ครั้ง สลับกี่ครั้ง?</summary><div class="sol-body">
+    <p><strong>เทียบ 6 ครั้ง</strong> (Pass 1 เทียบ 3 คู่, Pass 2 เทียบ 2, Pass 3 เทียบ 1 = 3+2+1)<br>
+    <strong>สลับ 3 ครั้ง:</strong> Pass1: (4,2)สลับ → [2,4,5,1], (5,1)สลับ → [2,4,1,5] · Pass2: (4,1)สลับ → [2,1,4,5] · Pass3: (2,1)ไม่สลับ? — <strong>สลับ!</strong> → [1,2,4,5] รวม <strong>4 ครั้ง</strong></p>
+    <p class="small">ตรวจ: ให้เขียนสถานะ array ใหม่ทุกครั้งที่สลับ จะไม่หลง</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 1.2 — ข้อมูล [1,2,3,4,5] (เรียงมาแล้ว) กับ improved bubble: เทียบกี่ครั้งจบ?</summary><div class="sol-body">
+    <p><strong>4 ครั้ง</strong> — Pass 1 เทียบ 4 คู่ ไม่มีสลับเลย → โค้ด improved จะ break ทันที จบที่ <strong>O(n)</strong>
+    (ต่างจากแบบ naïve ที่ยังวนต่อเป็น O(n²)) — นี่คือเหตุผล best case ของ bubble = O(n)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 1.3 — Binary search หาในข้อมูลเรียงแล้ว 2,000 ตัว ต้องเทียบกี่ครั้งมากสุด?</summary><div class="sol-body">
+    <p><strong>~11 ครั้ง</strong> — เพราะ 2¹⁰ = 1024 &lt; 2000 ≤ 2¹¹ = 2048 → log₂(2000) ≈ 10.97 → ตัดครึ่ง 11 ทีหมด
+    (เทียบกับ linear search ที่อาจต้อง 2,000 ครั้ง — นี่คือพลังของ O(log n))</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 2 -->
+<div class="on-item" id="it2">
+  <div class="on-head">
+    <input type="checkbox" data-key="it2">
+    <span class="on-num">ช่อง 2</span>
+    <h2>Trace Bubble + Selection + Insertion (เขียนสถานะ array ทุกครั้งที่สลับ)</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ทั้ง 66/67</span><span class="chip">⏱ 50 นาที</span><span class="chip">เกณฑ์ผ่าน: trace ถูก 2 ใน 3 (ครบทุก pass)</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p><strong>Bubble</strong> = เทียบคู่ข้าง ๆ สลับถ้าซ้ายมากกว่า → ใหญ่สุดลอยท้ายทุก pass ·
+    <strong>Selection</strong> = หา min ของโซนที่เหลือมาสลับหน้า ·
+    <strong>Insertion</strong> = หยิบตัวใหม่ "สอด" เข้าโซนซ้ายที่เรียงแล้ว (เขียวโตทีละตัว)</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — ข้อมูล [3, 1, 2] ทั้งสามแบบ</summary><div class="sol-body">
+    <p><strong>Bubble:</strong> Pass1: (3,1)สลับ → [1,3,2] · (3,2)สลับ → [1,2,3] จบ pass (2 ล็อก) · Pass2: (1,2)ไม่สลับ → เรียงแล้ว ✅<br>
+    <strong>Selection:</strong> รอบ1: min ทั้งแถว = 1 → สลับ a[0] ↔ a[1] → [1,3,2] · รอบ2: min ของ {3,2} = 2 → สลับ a[1]↔a[2] → [1,2,3] ✅<br>
+    <strong>Insertion:</strong> หยิบ 1 → เลื่อน 3 → [1,3,2] · หยิบ 2 → เลื่อน 3 → [1,2,3] ✅</p>
+    <p class="small">สังเกต: ผลลัพธ์เหมือนกันหมด แต่ <strong>ลำดับการสลับต่างกัน</strong> — ข้อสอบให้คะแนนจากความละเอียด ให้เขียนทุกสถานะ + ระบุรอบ</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 2.1 — Bubble sort: [4, 2, 5, 1] แสดงทุก pass พร้อมผลลัพธ์สุดท้าย</summary><div class="sol-body">
+    <p>Pass 1: (4,2)สลับ → [2,4,5,1] · (4,5)ผ่าน · (5,1)สลับ → [2,4,1,5] — จบ pass: <strong>[2,4,1,5]</strong> (5 ล็อก)<br>
+    Pass 2: (2,4)ผ่าน · (4,1)สลับ → [2,1,4,5] — จบ pass: <strong>[2,1,4,5]</strong> (4,5 ล็อก)<br>
+    Pass 3: (2,1)สลับ → [1,2,4,5] — จบ pass ✅ (improved จะตรวจอีก pass แล้วหยุด)</p>
+    <p><strong>ผลลัพธ์สุดท้าย: [1, 2, 4, 5]</strong> — เทียบ 6 · สลับ 4</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 2.2 — Selection sort: [7, 3, 5, 1] แสดง min ของแต่ละรอบ</summary><div class="sol-body">
+    <p>รอบ 1: min = 1 (idx 3) → สลับกับ idx 0 → [1, 3, 5, 7]<br>
+    รอบ 2: min ของ {3,5,7} = 3 → อยู่ตำแหน่งถูกแล้ว (idx 1) ไม่สลับ<br>
+    รอบ 3: min ของ {5,7} = 5 → อยู่ถูกแล้ว ไม่สลับ</p>
+    <p><strong>ผลลัพธ์สุดท้าย: [1, 3, 5, 7]</strong> — เทียบ 6 ครั้ง · สลับ 1 ครั้ง</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 2.3 — Insertion sort: [5, 3, 1] แสดงว่าแต่ละตัว "เลื่อนกี่ตัว"</summary><div class="sol-body">
+    <p>หยิบ 3 → เลื่อน 5 → [3, 5, 1] · หยิบ 1 → เลื่อน 5, 3 → [1, 3, 5] ✅</p>
+    <p><strong>ผลลัพธ์สุดท้าย: [1, 3, 5]</strong> — เลื่อน 3 ครั้ง (= inversions ของ [5,3,1] คือคู่ 5-3, 5-1, 3-1)</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 3 -->
+<div class="on-item" id="it3">
+  <div class="on-head">
+    <input type="checkbox" data-key="it3">
+    <span class="on-num">ช่อง 3</span>
+    <h2>Trace Quick Sort (pivot = ตัวท้าย, แบบกำแพง i)</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ปี 67</span><span class="chip">⏱ 30 นาที</span><span class="chip">เกณฑ์ผ่าน: partition ถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p>เลือก <strong>pivot = ตัวท้าย</strong> · มี "กำแพง" i เริ่มหน้าโซน · เดิน j ไล่ดูทุกตัว:
+    ถ้า a[j] ≤ pivot → ขยายกำแพง (i++) แล้วสลับมาไว้หน้ากำแพง · ครบลูปสลับ pivot ไว้หลังกำแพง →
+    pivot ลงตำแหน่งจริงแล้ว → ทำซ้ำกับโซนซ้ายและขวาแยกกัน</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — [3, 8, 2, 5] pivot = 5</summary><div class="sol-body">
+    <p>i = −1 · j=0: 3 ≤ 5 → i=0 สลับ a[0]↔a[0] (ตำแหน่งเดิม) · j=1: 8 &gt; 5 ข้าม · j=2: 2 ≤ 5 → i=1 สลับ a[1]↔a[2] → [3, 2, 8, 5]<br>
+    จบลูป: สลับ pivot → a[i+1]=a[2] ↔ a[3] → <strong>[3, 2, 5, 8]</strong> pivot ลง index 2<br>
+    quicksort ซ้าย [3, 2]: pivot = 2 → 3 &gt; 2 ไม่มีสลับ → จบลูปสลับ a[0]↔a[1] → [2, 3] ✅ · ขวา [8] จบ</p>
+    <p><strong>ผลลัพธ์: [2, 3, 5, 8]</strong></p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 3.1 — Quick sort: [9, 4, 7, 1] pivot = ตัวท้าย</summary><div class="sol-body">
+    <p><strong>รอบ 1:</strong> pivot = 1 → ทุกตัว &gt; 1 → กำแพงไม่ขยายเลย → จบลูปสลับ pivot a[0]↔a[3] → <strong>[1, 4, 7, 9]</strong> pivot ลง index 0 → ซ้ายว่าง, ขวา [4, 7, 9]<br>
+    <strong>quicksort [4, 7, 9]:</strong> pivot = 9 → 4 ≤ 9 (สลับตัวเอง), 7 ≤ 9 (สลับตัวเอง) → pivot คงที่ index 2 → ซ้าย [4,7] · ขวาว่าง<br>
+    <strong>quicksort [4, 7]:</strong> pivot = 7 → 4 ≤ 7 → pivot คงที่ → จบ</p>
+    <p><strong>ผลลัพธ์: [1, 4, 7, 9]</strong> — สังเกต pivot 1 แย่สุด (เล็กสุด) ต้นไม้เอียงมาก แต่ยังเรียงถูก</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 3.2 — Quick sort: [6, 3, 8, 5] pivot = ตัวท้าย</summary><div class="sol-body">
+    <p><strong>รอบ 1:</strong> pivot = 5 · j=0: 6 &gt; 5 ข้าม · j=1: 3 ≤ 5 → i=0 สลับ a[0]↔a[1] → [3, 6, 8, 5] · j=2: 8 &gt; 5 ข้าม<br>
+    จบลูป: สลับ a[1]↔a[3] → <strong>[3, 5, 8, 6]</strong> pivot ลง index 1 → ซ้าย [3], ขวา [8, 6]<br>
+    <strong>quicksort [8, 6]:</strong> pivot = 6 · 8 &gt; 6 → จบลูปสลับ a[0]↔a[1] → [6, 8] ✅</p>
+    <p><strong>ผลลัพธ์: [3, 5, 6, 8]</strong></p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 3.3 — Quick sort: [2, 1, 3] pivot = ตัวท้าย</summary><div class="sol-body">
+    <p><strong>รอบ 1:</strong> pivot = 3 · ทุกตัว ≤ 3 → pivot อยู่ที่เดิม index 2 → ซ้าย [2, 1], ขวาว่าง<br>
+    <strong>quicksort [2, 1]:</strong> pivot = 1 · 2 &gt; 1 → จบลูปสลับ a[0]↔a[1] → [1, 2] ✅</p>
+    <p><strong>ผลลัพธ์: [1, 2, 3]</strong> — สังเกตว่า pivot ที่ดีที่สุดคือค่ากลาง (median) pivot 3 และ 1 เป็น bad pivot</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 4 -->
+<div class="on-item" id="it4">
+  <div class="on-head">
+    <input type="checkbox" data-key="it4">
+    <span class="on-num">ช่อง 4</span>
+    <h2>BST: สร้างต้นไม้จากลำดับ + searchIter (เติมโค้ดปี 66!)</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ทั้ง 66/67</span><span class="chip">⏱ 40 นาที</span><span class="chip">เกณฑ์ผ่าน: วาดถูก 2 ต้น + เขียน searchIter ได้จากความจำ</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p>ตัวแรก = root · ตัวถัดไปเทียบกับ node ปัจจุบัน: <strong>น้อยกว่าเลี้ยวซ้าย มากกว่าเลี้ยวขวา</strong> จนเจอช่องว่างแล้ววาง ·
+    เช็คตัวเองด้วย in-order (ซ้าย→root→ขวา) ต้องได้เรียงจากน้อยไปมาก ·
+    <strong>searchIter</strong> = เดินตามกฎเดียวกัน: เท่ากัน return · น้อยกว่าซ้าย · มากกว่าขวา · null คืน null</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — insert 40, 20, 60, 10, 30</summary><div class="sol-body">
+    <p>40 = root → 20 &lt; 40 ซ้าย → 60 &gt; 40 ขวา → 10: ซ้ายของ 40 → ซ้ายของ 20 → วาง · 30: ซ้ายของ 40 → ขวาของ 20 → วาง<br>
+    ผล: <strong>40(20(10, 30), 60)</strong> · ตรวจ in-order: 10, 20, 30, 40, 60 เรียง ✅</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 4.1 — วาด BST จาก insert 25, 15, 50, 10, 35 แล้วเขียน in-order</summary><div class="sol-body">
+    <p>25 = root · 15 &lt; 25 ซ้าย · 50 &gt; 25 ขวา · 10 &lt; 25 → ซ้ายของ 15 · 35 &gt; 25 → ขวาของ 50 จริงไหม? — <strong>35 &gt; 25 ไปขวาเจอ 50, 35 &lt; 50 → ซ้ายของ 50</strong></p>
+    <p>ผล: <strong>25(15(10, 35), 50)</strong> · in-order: 10, 15, 25, 35, 50 เรียง ✅</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 4.2 — insert 1, 2, 3, 4 ตามลำดับ → ได้ต้นแบบไหน? สูงเท่าไร?</summary><div class="sol-body">
+    <p>ทุกตัวมากกว่าตัวก่อน → วิ่งขวาตลอด → ได้ <strong>สายเดียว 1→2→3→4</strong> (deformed = linked list) สูง 3 (n−1)<br>
+    ผล: search กลายเป็น O(n) — นี่คือเหตุผลที่ต้องมี AVL (บทถัดไป)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 4.3 — trace searchIter(35) บนต้นข้อ 4.1 + เขียนโค้ดจากความจำ</summary><div class="sol-body">
+    <p><strong>trace:</strong> cur = 25 → 35 &gt; 25 → cur = 50 → 35 &lt; 50 → cur = 35 → 35 == 35 → <strong>return 35</strong> (เทียบ 3 ครั้ง)</p>
+    <pre><code>TreeNode searchIter(int key) {
+  TreeNode cur = root;
+  while (cur != null) {
+    if (key == cur.data) return cur;      // ← เจอ
+    else if (key &lt; cur.data) cur = cur.left;   // ← น้อยกว่าซ้าย
+    else cur = cur.right;                      // ← มากกว่าขวา
+  }
+  return null; }
+</code></pre>
+    <p>ปิดเฉลยแล้วเขียนใหม่จากความจำ 1 รอบ — ตรงนี้คือโค้ดที่ออกจริงปี 66 (เติม 1 บรรทัด)</p>
+    </div></details>
+  </div>
+</div>
+<!-- ช่อง 5 -->
+<div class="on-item" id="it5">
+  <div class="on-head">
+    <input type="checkbox" data-key="it5">
+    <span class="on-num">ช่อง 5</span>
+    <h2>Min Heap: insert (เคาะขึ้น) + delete min (เคาะลง)</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ทั้ง 66/67</span><span class="chip">⏱ 40 นาที</span><span class="chip">เกณฑ์ผ่าน: ถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p><strong>สูตร:</strong> ลูกซ้าย = 2i+1, ลูกขวา = 2i+2, แม่ = (i−1)/2 · กฎเดียว: แม่ ≤ ลูก (min heap)<br>
+    <strong>insert</strong> = วางท้ายแล้วเทียบกับแม่ ถ้าน้อยกว่าแม่ → สลับ ไต่ขึ้นจนหยุด (<strong>percolate up</strong>)<br>
+    <strong>delete min</strong> = หยิบ root, ยกใบสุดท้ายมาแทน, สลับกับ<strong>ลูกที่เล็กกว่า</strong>ลงไปจนถูกกฎ (<strong>percolate down</strong>)</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — insert 4 ลง [2, 5, 7, 9, 6]</summary><div class="sol-body">
+    <p>วาง 4 ที่ index 5 → แม่ = (5−1)/2 = index 1 คือ 5 → 4 &lt; 5 สลับ → [2, <strong>4</strong>, 7, 9, 6, <strong>5</strong>]<br>
+    ตอนนี้ 4 อยู่ index 1 → แม่ = index 0 คือ 2 → 4 &gt; 2 ถูกกฎ → หยุด</p>
+    <p><strong>ผลลัพธ์: [2, 4, 7, 9, 6, 5]</strong> — สลับ 1 ครั้ง</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 5.1 — insert 1 ลง min heap [3, 5, 8, 7, 9, 10] ต้องสลับกี่ครั้ง?</summary><div class="sol-body">
+    <p>วาง 1 ที่ index 6 → แม่ = index 2 คือ 8 → 1 &lt; 8 สลับ → [3, 5, <strong>1</strong>, 7, 9, 10, <strong>8</strong>]<br>
+    1 อยู่ index 2 → แม่ = index 0 คือ 3 → 1 &lt; 3 สลับ → [<strong>1</strong>, 5, <strong>3</strong>, 7, 9, 10, 8] → ถึง root จบ</p>
+    <p><strong>ผลลัพธ์: [1, 5, 3, 7, 9, 10, 8]</strong> — สลับ 2 ครั้ง (เดินขึ้น 2 ชั้น)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 5.2 — delete min จาก [1, 5, 3, 7, 9, 10, 8] (ผลของข้อ 5.1)</summary><div class="sol-body">
+    <p>① return root = <strong>1</strong> · ② ยกใบสุดท้าย (8) ขึ้น root → [8, 5, 3, 7, 9, 10]<br>
+    ③ ลูกของ 8 = 5 (idx1), 3 (idx2) → เล็กกว่าคือ 3 → สลับ → [3, 5, 8, 7, 9, 10]<br>
+    ④ 8 อยู่ idx2 → ลูกซ้าย = 2(2)+1 = 5 คือ 10, ลูกขวา = idx6 เกิน size → ลูกเดียว: 8 &lt; 10 → หยุด ✅</p>
+    <p><strong>return 1 · ผลลัพธ์: [3, 5, 8, 7, 9, 10]</strong></p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 5.3 — ใน array ของ heap node ที่ index 4: แม่อยู่ไหน? ลูกซ้าย/ขวาอยู่ไหน?</summary><div class="sol-body">
+    <p>แม่ = (4−1)/2 = <strong>index 1</strong> · ลูกซ้าย = 2(4)+1 = <strong>index 9</strong> · ลูกขวา = 2(4)+2 = <strong>index 10</strong><br>
+    (ถ้า index เกิน size แปลว่าไม่มีลูกตำแหน่งนั้น — complete tree อัดชิดซ้าย)</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 6 -->
+<div class="on-item" id="it6">
+  <div class="on-head">
+    <input type="checkbox" data-key="it6">
+    <span class="on-num">ช่อง 6</span>
+    <h2>AVL Tree: หา node ที่พัง + เลือกเคสหมุนให้ถูก</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ทั้ง 66/67</span><span class="chip">⏱ 45 นาที</span><span class="chip">เกณฑ์ผ่าน: เลือกเคสถูก + วาดหลังหมุนถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 4 บรรทัด</div>
+    <p>BF = height(ซ้าย) − height(ขวา) (ใบ = 0, ช่องว่าง = −1) — อนุญาต −1, 0, +1 เท่านั้น<br>
+    insert แบบ BST ปกติ → เดินขึ้นจากใบใหม่ ตรวจ BF ทุก node → เจอ |BF| = 2 ตัวแรก = จุดหมุน<br>
+    ดู <strong>2 ก้าวสุดท้าย</strong>ของเส้นทาง: ตรงกัน (LL/RR) = หมุนเดี่ยวสวนทาง · เลี้ยว (LR/RL) = หมุนคู่<br>
+    LL → หมุนขวา · RR → หมุนซ้าย · LR → ซ้ายที่ลูกแล้วขวาที่ node · RL → ขวาที่ลูกแล้วซ้ายที่ node</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — insert 30, 20, 10 (เคส LL)</summary><div class="sol-body">
+    <p>30 → 20 ซ้าย → 10: ซ้ายของ 20 → เดินขึ้น: 20 BF = +1 ok · <strong>30 BF = +2 ❌</strong><br>
+    เส้นทาง 30→20→10 ซ้าย-ซ้าย = <strong>เคส LL</strong> → หมุน<strong>ขวา</strong>ที่ 30: 20 ขึ้นเป็น root, 30 ลงขวา<br>
+    ผล: <strong>20(10, 30)</strong> — ทุก BF = 0 ✅ (หมุนเดี่ยว 1 ครั้งจบ ตามทฤษฎี insert)</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 6.1 — insert 10, 20, 30 → พังที่ไหน เคสอะไร แล้ววาดหลังแก้</summary><div class="sol-body">
+    <p>10 → 20 ขวา → 30 ขวาขวา → เดินขึ้น: 20 BF = −1 ok · <strong>10 BF = −2 ❌</strong> (พังที่ 10)<br>
+    เส้นทาง 10→20→30 ขวา-ขวา = <strong>เคส RR</strong> → หมุน<strong>ซ้าย</strong>ที่ 10: 20 ขึ้นเป็น root, 10 ลงซ้าย</p>
+    <p>ผล: <strong>20(10, 30)</strong> ✅ — ตรงข้ามกับตัวอย่างเป๊ะ (ซ้าย-ซ้าย ↔ ขวา-ขวา)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 6.2 — insert 30, 10, 20 → เคสอะไร แก้ยังไง?</summary><div class="sol-body">
+    <p>30 → 10 ซ้าย → 20: ซ้ายของ 30, ขวาของ 10 → เดินขึ้น: 10 BF = −1 · <strong>30 BF = +2 ❌</strong> แต่ลูกซ้าย (10) BF = −1 (ถนัดขวา) → เส้นทาง ซ้าย-ขวา = <strong>เคส LR (เคสใน)</strong></p>
+    <p>แก้ 2 รอบ: ① หมุน<strong>ซ้าย</strong>ที่ลูกซ้าย (10) → 20 ขึ้น 10 ลงซ้าย → เส้นทางกลายเป็น 30→20→10 ตรง ② หมุน<strong>ขวา</strong>ที่ 30 → 20 ขึ้น root<br>
+    ผล: <strong>20(10, 30)</strong> ✅ — จำง่าย: เคสใน = หมุนให้เส้นตรงก่อน แล้วจบแบบเคสนอก</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 6.3 — จากต้น 20(10, 30) insert ต่อด้วย 25 → ต้องหมุนไหม?</summary><div class="sol-body">
+    <p>25 &gt; 20 → ขวาเจอ 30 → 25 &lt; 30 → ซ้ายของ 30 (วางใบ)<br>
+    เดินขึ้น: 25 ใบ · 30: BF = h(ซ้าย=1) − h(ขวา=−1) = <strong>+1</strong> ok · 20: BF = 1 − 2 = <strong>−1</strong> ok</p>
+    <p><strong>ไม่พัง ไม่ต้องหมุน!</strong> ต้น: 20(10, 30(25, −)) — ข้อสอบชอบใส่ข้อแบบนี้ปนมาให้ระวัง ไม่ใช่ทุก insert ต้องหมุน</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 7 -->
+<div class="on-item" id="it7">
+  <div class="on-head">
+    <input type="checkbox" data-key="it7">
+    <span class="on-num">ช่อง 7</span>
+    <h2>Kruskal MST: เรียงเส้น → รับ/ทิ้งด้วย Union-Find</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ปี 66</span><span class="chip">⏱ 30 นาที</span><span class="chip">เกณฑ์ผ่าน: ตารางถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p>เริ่มทุกจุดเป็นกลุ่มตัวเอง → เรียงเส้นจากถูกไปแพง → ไล่ดูทีละเส้น:<br>
+    <strong>จบสองข้างคนละกลุ่ม (find ไม่เท่ากัน)</strong> = รับเส้น + union รวมกลุ่ม ·
+    <strong>กลุ่มเดียวกัน</strong> = ทิ้ง (รับแล้วสร้างวง!) · จบเมื่อได้ครบ V−1 เส้น</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — จุด A, B, C: เส้น A–B (2), B–C (3), A–C (4)</summary><div class="sol-body">
+    <table>
+    <thead><tr><th class="num">รอบ</th><th>เส้น</th><th>find สองข้าง</th><th>ตัดสิน</th><th>กลุ่มหลังรวม</th></tr></thead>
+    <tbody>
+    <tr><td class="num">1</td><td>A–B (2)</td><td>{A} vs {B}</td><td class="good">รับ ✓</td><td>{A,B}</td></tr>
+    <tr><td class="num">2</td><td>B–C (3)</td><td>{A,B} vs {C}</td><td class="good">รับ ✓</td><td>{A,B,C} → 2 เส้น = 3−1 <b>จบ</b></td></tr>
+    <tr><td class="num">3</td><td>A–C (4)</td><td>กลุ่มเดียวกัน</td><td class="bad">ทิ้ง ✗ (วง)</td><td>—</td></tr>
+    </tbody></table>
+    <p><strong>MST = {A–B, B–C} รวม 5</strong></p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 7.1 — จุด 1-4: เส้น 1–2 (1), 3–4 (2), 2–3 (3), 2–4 (4), 1–3 (5) — หา MST</summary><div class="sol-body">
+    <p>เรียง: 1–2(1), 3–4(2), 2–3(3), 2–4(4), 1–3(5)</p>
+    <table>
+    <thead><tr><th class="num">รอบ</th><th>เส้น</th><th>ตัดสิน</th><th>กลุ่ม</th></tr></thead>
+    <tbody>
+    <tr><td class="num">1</td><td>1–2 (1)</td><td class="good">รับ ✓</td><td>{1,2}</td></tr>
+    <tr><td class="num">2</td><td>3–4 (2)</td><td class="good">รับ ✓</td><td>{1,2} · {3,4}</td></tr>
+    <tr><td class="num">3</td><td>2–3 (3)</td><td class="good">รับ ✓</td><td>{1,2,3,4} → 3 เส้น = 4−1 <b>จบ</b></td></tr>
+    <tr><td class="num">4</td><td>2–4 (4)</td><td class="bad">ทิ้ง ✗ (วง)</td><td>—</td></tr>
+    </tbody></table>
+    <p><strong>MST = {1–2, 3–4, 2–3} รวม 6</strong> — เส้น 1–3 ไม่ต้องดูต่อแล้ว</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 7.2 — จุด A-D: เส้น C–D (2), B–C (3), A–B (4), D–A (5), A–C (6) — หา MST</summary><div class="sol-body">
+    <p>เรียงแล้วตามลำดับที่ให้ (เส้นเรียงมาให้พอดี)</p>
+    <table>
+    <thead><tr><th class="num">รอบ</th><th>เส้น</th><th>ตัดสิน</th><th>กลุ่ม</th></tr></thead>
+    <tbody>
+    <tr><td class="num">1</td><td>C–D (2)</td><td class="good">รับ ✓</td><td>{C,D}</td></tr>
+    <tr><td class="num">2</td><td>B–C (3)</td><td class="good">รับ ✓</td><td>{B,C,D}</td></tr>
+    <tr><td class="num">3</td><td>A–B (4)</td><td class="good">รับ ✓</td><td>{A,B,C,D} → 3 เส้น = 4−1 <b>จบ</b></td></tr>
+    <tr><td class="num">4</td><td>D–A (5)</td><td class="bad">ทิ้ง ✗ (วง)</td><td>—</td></tr>
+    <tr><td class="num">5</td><td>A–C (6)</td><td class="bad">ทิ้ง ✗ (วง)</td><td>—</td></tr>
+    </tbody></table>
+    <p><strong>MST = {C–D, B–C, A–B} รวม 9</strong> — เส้นแพงมักถูกทิ้งเป็นตัวสุดท้าย</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 7.3 (concept) — ทำไมเส้นที่จบสองข้างกลุ่มเดียวกันถึงต้องทิ้ง?</summary><div class="sol-body">
+    <p>เพราะถ้ารับ = เกิด<strong>วงวน (cycle)</strong> ทันที — MST ต้องเป็น tree: <strong>ต่อกันหมด + ไม่มีวง + ใช้แค่ V−1 เส้น</strong><br>
+    และ Union-Find จับได้เร็วมาก: แค่เทียบ find(u) == find(v) (หัวกลุ่มเดียวกันไหม) ใน ~O(1)</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 8 -->
+<div class="on-item" id="it8">
+  <div class="on-head">
+    <input type="checkbox" data-key="it8">
+    <span class="on-num">ช่อง 8</span>
+    <h2>Dijkstra: trace ตาราง dist ทีละรอบ</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 ออกแน่ ทั้ง 66/67</span><span class="chip">⏱ 40 นาที</span><span class="chip">เกณฑ์ผ่าน: trace ถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p>dist[ต้นทาง] = 0 ที่เหลือ ∞ · วน: <strong>หยิบจุดที่ dist น้อยสุด</strong>จากคิว → ผ่อนทุกเส้นทางออกจากจุดนั้น:
+    <code>alt = dist[u] + w</code> ถ้า alt &lt; dist[v] → อัปเดต dist[v], prev[v]=u, ยัดคิวใหม่ ·
+    จบเมื่อคิวหมด · เขียนตารางไปทีละรอบ อย่าทำในหัว!</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — A→B (2), A→C (5), B→C (1) จาก A</summary><div class="sol-body">
+    <p>เริ่ม: dist = {A:0, B:∞, C:∞} · pop (0,A): ผ่อน B = 2 ✓, C = 5 ✓<br>
+    pop (2,B): ผ่อน C: 2+1 = 3 &lt; 5 → อัปเดต C = 3 (ผ่าน B!) · pop (3,C): ไม่มีเส้นออก · คิวหมด จบ</p>
+    <p><strong>ผลลัพธ์: dist = {A:0, B:2, C:3}</strong> · เส้นทางไป C = A→B→C — เส้น A→C ตรงแพงกว่าอ้อมผ่าน B!</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 8.1 — A→B (4), A→C (1), C→B (1): dist สุดท้ายของ B?</summary><div class="sol-body">
+    <p>pop A: B = 4, C = 1 · pop C (1): ผ่อน B: 1+1 = 2 &lt; 4 → <strong>อัปเดต B = 2 ผ่าน C</strong> · pop B (2) จบ</p>
+    <p><strong>B = 2, C = 1</strong> · เส้นทางไป B = A→C→B — อ้อมผ่าน C ดีกว่า A→B ตรง (นี่คือหัวใจ Dijkstra: อย่าเชื่อเส้นตรง)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 8.2 — A→B (3), B→C (4), A→D (7), C→D (2): dist สุดท้ายทุกจุด?</summary><div class="sol-body">
+    <p>pop A(0): B = 3, D = 7 · pop B(3): C = 3+4 = 7 · pop C(7): ผ่อน D: 7+2 = 9 ≥ 7 → <strong>ไม่อัปเดต (ข้าม!)</strong> · pop D(7) จบ</p>
+    <p><strong>dist = {A:0, B:3, C:7, D:7}</strong> — จุดสำคัญ: เส้น C→D ไม่ช่วยอะไรเพราะ alt แพงกว่า dist เดิม (กรณี "ข้าม" ต้องโชว์ในตาราง ไม่งั้นโดนหัก)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 8.3 (concept) — ทำไม Dijkstra ใช้กับน้ำหนักติดลบไม่ได้?</summary><div class="sol-body">
+    <p>เพราะ Dijkstra เป็น greedy: พอหยิบจุดที่ dist น้อยสุดออกจากคิว จะ<strong>สมมติว่าค่านั้นสุดท้ายแล้ว</strong>ไม่กลับมาแก้อีก<br>
+    น้ำหนักลบทำลายสมมติฐานนี้ — เดินอ้อมมาก่อน (มองว่าแพง) แล้วตามด้วยเส้นลบ อาจสั้นกว่าเส้นตรง → dist ที่ "ล็อก" ไปแล้วกลายเป็นผิด โดยอัลกอริทึมไม่ยอมแก้ให้</p>
+    </div></details>
+  </div>
+</div>
+<!-- ช่อง 9 -->
+<div class="on-item" id="it9">
+  <div class="on-head">
+    <input type="checkbox" data-key="it9">
+    <span class="on-num">ช่อง 9</span>
+    <h2>โค้ดที่ต้องเขียนจริง: Binary String (1 ห้ามติดกัน) + searchIter</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟥 แลปข้อเดียวของปี 67 + เติมโค้ดปี 66</span><span class="chip">⏱ 30 นาที</span><span class="chip">เกณฑ์ผ่าน: เขียน Binary String ได้จากความจำ + searchIter ได้จากความจำ</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 2 บรรทัด</div>
+    <p>สร้าง string ทีละตำแหน่ง (recursion): วาง <strong>0 ได้เสมอ</strong> · วาง <strong>1 ได้เมื่อตัวก่อนไม่ใช่ 1</strong> — กิ่งที่ผิดเงื่อนไขถูกตัดตั้งแต่ต้น<br>
+    จำนวนคำตอบ = เลข Fibonacci: K=1→2, K=2→3, K=3→5, K=4→8</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — K = 2 ทำมือ + เขียนโค้ด</summary><div class="sol-body">
+    <p>เริ่มว่าง → วาง 0 ได้ / วาง 1 ได้ (ยังไม่มีตัวก่อนหน้า)<br>
+    0 → วาง 0 ได้, วาง 1 ได้ → <strong>00, 01</strong> · 1 → ตัวก่อนคือ 1 ห้ามวาง 1 → วาง 0 ได้ → <strong>10</strong> · (11 ตัดเพราะ 1 ติดกัน)</p>
+    <p>คำตอบ K=2: <strong>00, 01, 10</strong> (3 ตัว) — โค้ด:</p>
+    <pre><code>void gen(String s, int k, char last) {
+  if (s.length() == k) { System.out.println(s); return; }
+  gen(s + "0", k, '0');            // วาง 0 ได้เสมอ
+  if (last != '1') gen(s + "1", k, '1');   // วาง 1 ได้เมื่อตัวก่อนไม่ใช่ 1
+}
+// เรียก: gen("", k, '0');</code></pre>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 9.1 — K = 3: ไล่คำตอบทั้งหมดด้วยมือ (จากต้นไม้ ช่วยให้ไม่หลง)</summary><div class="sol-body">
+    <p>วาง 0 → "0": วาง 0 → "00": วาง 0 → <strong>000</strong> ✓, วาง 1 → <strong>001</strong> ✓ · "0" วาง 1 → "01": วาง 0 → <strong>010</strong> ✓ (วาง 1 = 011 ตัด)<br>
+    วาง 1 → "1": ห้ามวาง 1 → วาง 0 → "10": วาง 0 → <strong>100</strong> ✓, วาง 1 → <strong>101</strong> ✓ (วาง 1 ต่อ 1 ตัด)</p>
+    <p><strong>5 ตัว: 000, 001, 010, 100, 101</strong> — ให้เขียนเป็นต้นไม้ 4 ชั้นในข้อสอบจะได้คะแนนขั้นตอนเต็ม</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 9.2 — ปรับโค้ดให้กลายเป็นเงื่อนไข "0 ห้ามติดกัน" แทน</summary><div class="sol-body">
+    <p>สลับบทบาท: วาง <strong>1 ได้เสมอ</strong> · วาง <strong>0 ได้เมื่อตัวก่อนไม่ใช่ 0</strong>:</p>
+    <pre><code>gen(s + "1", k, '1');                    // วาง 1 ได้เสมอ
+if (last != '0') gen(s + "0", k, '0');   // วาง 0 ได้เมื่อตัวก่อนไม่ใช่ 0
+</code></pre>
+    <p>และเรียก gen("", k, '1') ก็ได้ (ตัวแรกเลือกอะไรก็ได้) — คำตอบ K=2 → 11, 10, 01 (3 ตัว)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 9.3 — K = 4 มีคำตอบกี่ตัว? (ไม่ต้องไล่ทุกตัว)</summary><div class="sol-body">
+    <p>ใช้ Fibonacci: จำนวน(ยาว n) = จำนวน(ยาว n−1) + จำนวน(ยาว n−2)<br>
+    (จบด้วย 0 → หน้าเป็นอะไรก็ได้ของ n−1 · จบด้วย 1 → หน้าต้องจบด้วย 0 ของ n−2)<br>
+    2, 3, 5, <strong>8</strong>, 13… → <strong>K = 4 มี 8 ตัว</strong> (คือ 2⁴−Fibonacci ที่ติดกัน: 0011, 0110, 0111, 1011, 1100, 1101, 1110, 1111 — ตัด 8 ตัว เหลือ 8 ตัว)</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 9.4 — ปิดเฉลยแล้วเขียน searchIter + Binary String ใหม่จากความจำ (โค้ด 2 ตัวนี้ต้องออกไปแน่)</summary><div class="sol-body">
+    <p>searchIter โครง: <code>while (cur != null)</code> → เท่ากัน return → น้อยซ้าย มากขวา → หลุด return null (เฉลยใน Drill 3 ข้อ 4.3)<br>
+    Binary String โครง: <code>if length==k print</code> → <code>gen(s+"0")</code> เสมอ → <code>if last!='1' gen(s+"1")</code> (เฉลยด้านบน)</p>
+    <p>เขียนทั้ง 2 โดยไม่เปิดเฉลย = <strong>ผ่านเกณฑ์ช่องนี้</strong> — โค้ดทั้งเว็บไม่ต้องจำอื่นอีกแล้ว</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 10 -->
+<div class="on-item" id="it10">
+  <div class="on-head">
+    <input type="checkbox" data-key="it10">
+    <span class="on-num">ช่อง 10</span>
+    <h2>ทฤษฎีสายตรวจ: Red-Black valid ไหม + Splay delete (🟨 ถ้ามีเวลา)</h2>
+  </div>
+  <div class="on-meta"><span class="chip">🟨 สไลด์มีเคสตรวจ 8 ข้อ มีโอกาสออกทฤษฎี</span><span class="chip">⏱ 20 นาที</span><span class="chip">เกณฑ์ผ่าน: ตรวจถูก 2 ใน 3</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>คอนเซปต์ 3 บรรทัด</div>
+    <p>RB ตรวจ 4 ข้อพอ: ① root ดำ ② BST ถูกลำดับ ③ แดงไม่มีลูกแดง ④ นับ node ดำทุกเส้นทาง root→NIL เท่ากัน (NIL นับดำ, แดงไม่นับ)<br>
+    Splay delete = splay ตัวที่ลบขึ้น root → splay max ฝั่งซ้ายขึ้นหัว subtree ซ้าย → root ใหม่คือตัวนั้น + ต่อขวาเดิมใต้มัน</p></div>
+    <details class="sol ex" open><summary>ตัวอย่างที่ทำให้ดู — ต้น 20B(10R, 30R) เป็น valid RB ไหม?</summary><div class="sol-body">
+    <p>① root 20B ดำ ✓ ② ลำดับ BST ถูก ✓ ③ ไม่มีแดงติดแดง ✓ ④ นับดำ: 20B→10R→NIL = 2 ดำ · 20B→30R→NIL = 2 ดำ — เท่ากัน ✓</p>
+    <p><strong>valid ✅</strong> — เทคนิค: ทุกเส้นทางมีดำเท่ากันพอดี 2 ตัว (root + NIL) โดย node แดงไม่ถูกนับ</p>
+    </div></details>
+    <p style="margin:10px 0 4px"><strong>โจทย์ให้ลอง:</strong></p>
+    <details class="sol"><summary>โจทย์ 10.1 — ต้น 20R(10B, 30B) valid ไหม?</summary><div class="sol-body">
+    <p><strong>invalid ❌</strong> — ผิดกฎ ③ (ไม่ใช่ ②!): <strong>root เป็นสีแดง</strong> — กฎบังคับ root ดำเสมอ · โครงสร้างอื่นถูกหมด แก้โดย recolor 20 → ดำก็ valid ทันที</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 10.2 — ต้น 10B(5R(2B,7B), 15B) valid ไหม?</summary><div class="sol-body">
+    <p>① root ดำ ✓ ② BST ✓ ③ แดงไม่ติดแดง ✓ ④ นับดำ: 10B→5R→2B→NIL = 3 ดำ · 10B→5R→7B→NIL = 3 ดำ · 10B→15B→NIL = 3 ดำ — เท่ากันหมด</p>
+    <p><strong>valid ✅</strong> — สังเกตว่าต้นไม่จำเป็นต้องสมมาตร แค่ผ่าน 4 กฎก็ผ่าน</p>
+    </div></details>
+    <details class="sol"><summary>โจทย์ 10.3 — Splay tree 10(5(3,7), 15(−,20)): access 3 แล้วต้นเป็นอะไร?</summary><div class="sol-body">
+    <p>3 อยู่ทาง ซ้าย-ซ้าย (10→5→3) = <strong>เคส Zig-Zig → หมุนปู่ก่อนแล้วพ่อ</strong><br>
+    ① หมุนขวาที่ปู่ 10: 5 ขึ้นแทน, 10 ลงขวาของ 5 (ลูกซ้ายของ 10 ย้ายไปเป็นลูกขวาของ 5 — ตรงนี้ไม่มี) → 5(3, 10(−,7))<br>
+    ② หมุนขวาที่พ่อ 5: 3 ขึ้น root → <strong>3(−, 5(−, 10(−,7)))</strong> · 15(−,20) แขวนขวาของ 10 ตามเดิม</p>
+    <p>จำ: ตรงกัน → ปู่ก่อน · คนละทาง (Zig-Zag) → พ่อก่อน</p>
+    </div></details>
+  </div>
+</div>
+
+<!-- ช่อง 11 -->
+<div class="on-item" id="it11">
+  <div class="on-head">
+    <input type="checkbox" data-key="it11">
+    <span class="on-num">ช่อง 11</span>
+    <h2>จบก่อนนอน: พิมพ์ Short Note + อ่านกล่อง "กับดัก" ท้ายสุด</h2>
+  </div>
+  <div class="on-meta"><span class="chip">⏱ 10 นาที</span><span class="chip">ปี 66 นำ short note เข้าห้องได้ 1 แผ่น</span></div>
+  <div class="on-body">
+    <div class="box basic"><div class="box-title"><span class="em">📗</span>สิ่งที่ต้องทำก่อนนอน</div>
+    <p>① <a href="short-note.html">พิมพ์ Short Note 1 แผ่น</a> (A4 สองหน้า) — โยนสูตรทั้งหมด ไม่ต้องจำหัว ·
+    ② อ่านกล่อง "⚠️ กับดักข้อสอบ" ท้ายแต่ละบท 1 รอบ ·
+    ③ นอนอย่างน้อย 5 ชั่วโมง (ตื่นมาทบทวน 30 นาทีดีกว่าอดนอนอ่านต่อ)</p></div>
+    <details class="sol ex" open><summary>กับดัก 7 ข้อ ที่ทำผิดบ่อยที่สุด (อ่านจบก่อนสอบ)</summary><div class="sol-body">
+    <ol>
+    <li>โจทย์ถาม <strong>min หรือ max</strong>, <strong>asc หรือ desc</strong> — ขีดเส้นใต้ก่อนทำ</li>
+    <li><strong>Counting sort</strong> stable ต่อเมื่อวางจาก<strong>ขวาไปซ้าย</strong></li>
+    <li><strong>Heap เคาะลง</strong> เลือกลูก<strong>เล็กกว่า</strong> (min heap) เสมอ ไม่ใช่ลูกซ้าย</li>
+    <li><strong>BST ลบ 2 ลูก</strong> = แทนด้วย max ของ subtree<strong>ซ้าย</strong> (หรือ min ขวา) ไม่ใช่ลูกซ้าย</li>
+    <li><strong>AVL ดู 2 ก้าวสุดท้าย</strong> ก่อนเลือกเคส — ไม่ใช่ก้าวเดียว</li>
+    <li><strong>Dijkstra</strong> เจอ alt ≥ dist เดิม = ข้าม (อย่าลืมเขียนในตาราง)</li>
+    <li><strong>Kruskal</strong> เส้นจบสองข้างกลุ่มเดียวกัน = ทิ้งทันที (วง)</li>
+    </ol>
+    </div></details>
+    <p style="margin-top:8px"><strong>จบเช็คลิสต์!</strong> ถ้าติ๊กครบ 11 ช่อง = พร้อมสอบ (แม้พื้นฐานเริ่มจากศูนย์คืนเดียวก็ผ่านได้)</p>
+  </div>
+</div>
+</div>
+
+<footer class="site"><div class="inner">DSA Final Prep · แผนคืนเดียวจบ</div></footer>
+<script src="assets/tts.js"></script>
+<script src="assets/main.js"></script>
+<script>
+/* เช็คลิสต์จำค่า + progress bar */
+(function () {
+  var boxes = document.querySelectorAll('input[type=checkbox][data-key]');
+  var done = document.getElementById('onDone'), bar = document.getElementById('onBar');
+  function update() {
+    var c = 0;
+    boxes.forEach(function (b) { if (b.checked) c++; b.closest('.on-item').classList.toggle('done', b.checked); });
+    done.textContent = c;
+    bar.style.width = (boxes.length ? Math.round(c / boxes.length * 100) : 0) + '%';
+  }
+  boxes.forEach(function (b) {
+    var k = 'dsa-onenight-' + b.dataset.key;
+    try { b.checked = localStorage.getItem(k) === '1'; } catch (e) {}
+    b.addEventListener('change', function () { try { localStorage.setItem(k, b.checked ? '1' : '0'); } catch (e) {} update(); });
+  });
+  update();
+})();
+</script>
+</body>
+</html>
