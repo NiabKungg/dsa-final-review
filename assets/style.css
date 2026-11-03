@@ -313,6 +313,13 @@ svg .dnode { fill: #fffdf5; stroke: #94a3b8; stroke-width: 1.4; }
 svg .dchip { fill: #fef3c7; stroke: #d97706; }
 svg .dnote { font-size: 12px; fill: #475569; }
 
+/* ไดอะแกรม drill วาดด้วยสีตัวอักษรเข้มบนพื้นสว่าง (ตายตัว)
+   → ในธีมมืดต้องบังคับพื้นหลังรูปกลุ่มนี้ให้ยังเป็นสว่าง ไม่งั้นตัวอักษรดำมองไม่เห็น */
+[data-theme="dark"] figure.diagram:has(svg .dcell) { background: #fffdf8; border-color: #e3dccd; }
+[data-theme="dark"] figure.diagram:has(svg .dcell) figcaption { color: #5b6673; }
+[data-theme="dark"] figure.diagram:has(svg .dcell) figcaption b { color: #0b5a54; }
+[data-theme="dark"] figure.diagram:has(svg .dcell) svg { border-radius: 8px; }
+
 /* grid background for bucket diagrams */
 svg .bucket { fill: var(--bg-soft); stroke: var(--line); }
 [data-theme="dark"] svg .bucket { fill: #232d34; }
